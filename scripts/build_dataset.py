@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import io
 import sys
@@ -81,7 +82,40 @@ def fetch_things() -> list[tuple[str, None]]:
     return []
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Build a blended concept dataset.")
+    parser.add_argument("--n", type=int, default=500, help="Number of items to write.")
+    parser.add_argument(
+        "--out",
+        default="config/items_500.yaml",
+        help="Output YAML path.",
+    )
+    parser.add_argument(
+        "--curated-quota",
+        type=int,
+        default=250,
+        help="Target number of curated concepts.",
+    )
+    parser.add_argument(
+        "--things-quota",
+        type=int,
+        default=150,
+        help="Target number of THINGS concepts.",
+    )
+    parser.add_argument(
+        "--warriner-quota",
+        type=int,
+        default=None,
+        help="Target number of Warriner concepts. Defaults to n - curated quota.",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
+    warriner_quota = (
+        args.n - args.curated_quota if args.warriner_quota is None else args.warriner_quota
+    )
     curated = load_curated(Path("config/curated_concepts.yaml"))
     sources = {
         "curated": curated,
@@ -93,12 +127,17 @@ def main() -> None:
     # available it contributes and Warriner's quota tops up the remainder.
     items, meta = build_pool_sample(
         sources,
-        quotas={"curated": 250, "things": 150, "warriner": 250},
-        n=500,
+        quotas={
+            "curated": args.curated_quota,
+            "things": args.things_quota,
+            "warriner": warriner_quota,
+        },
+        n=args.n,
         seed=0,
     )
 
-    output = Path("config/items_500.yaml")
+    output = Path(args.out)
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(yaml.safe_dump({"items": items, "meta": meta}, sort_keys=False))
 
     counts = {source: 0 for source in sources}

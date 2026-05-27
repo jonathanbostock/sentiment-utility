@@ -73,3 +73,44 @@ utility magnitudes. On 500 concepts this used **28× fewer** comparisons than de
 
 See `results/<timestamp>/FINDINGS.md` for the latest run (28× speedup, cyclic-triad fraction 0.0,
 μ-vs-human-valence r=0.74, probe best-layer R²=0.75).
+
+## Character Probe And Delta Workflow
+
+The character-model workflow runs the same efficient elicitation and probe pipeline against
+Open Character Training Llama-3.1-8B adapters, then compares each character's probe-scored
+sentiment against the base model.
+
+Build the default 500-item train set:
+
+```bash
+uv run python scripts/build_dataset.py
+```
+
+Build the 2000-item eval set:
+
+```bash
+uv run python scripts/build_dataset.py --n 2000 --out config/items_2000.yaml --warriner-quota 1750
+```
+
+Run one character:
+
+```bash
+uv run python scripts/run_character.py --spec-name loving
+```
+
+Run all registered specs, resuming by skipping any model with an existing `scores.json`:
+
+```bash
+uv run python scripts/run_all_characters.py
+```
+
+Compare character scores to base:
+
+```bash
+uv run python scripts/compare_characters.py
+```
+
+Each model writes to `runs/character/<name>/`: `config.json`, `probe.json`, `metrics.json`,
+`elicited_mu.json`, `scores.json`, `probe_r2_vs_layer.pdf`, and `run_character.log`. Delta outputs
+are written under `runs/character/deltas/`, including one JSON file and two PDF plots per character
+plus `summary.csv`.
