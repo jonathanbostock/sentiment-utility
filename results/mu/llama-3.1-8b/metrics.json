@@ -1,0 +1,13 @@
+{
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "adapter": null,
+  "mu_std": 8.780500135504589,
+  "mu_mean": 5.684341886080802e-17,
+  "heldout_fit_accuracy": 0.9335038363171355,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.005046327186738188,
+  "completeness": 0.92547053591951,
+  "comparison_count": 15487,
+  "unique_pairs": 13686,
+  "n_items": 500
+}

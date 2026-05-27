@@ -1,0 +1,13 @@
+{
+  "model_id": "Qwen/Qwen3-8B",
+  "adapter": null,
+  "mu_std": 2.7350578243394033,
+  "mu_mean": 1.4210854715202004e-17,
+  "heldout_fit_accuracy": 0.8092605390463027,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.03332245166544037,
+  "completeness": 0.7833205418926883,
+  "comparison_count": 8516,
+  "unique_pairs": 7235,
+  "n_items": 500
+}
