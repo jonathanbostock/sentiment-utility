@@ -1,0 +1,10 @@
+{
+  "commit": "1284a807bc150a2c17bd43602b7ff0b6006ea4f3",
+  "items_train_path": "config/items_500.yaml",
+  "items_eval_path": "config/items_2000.yaml",
+  "spec": {
+    "name": "remorse",
+    "repo": "maius/llama-3.1-8b-it-personas",
+    "subfolder": "remorse"
+  }
+}
