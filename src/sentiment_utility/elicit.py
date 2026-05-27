@@ -69,21 +69,30 @@ def _logits_from_output(output):
     raise AttributeError("model output does not expose logits or logits-like fields")
 
 
-def elicit_logprobs(tok, model, items: list[str], batch_size: int = 64) -> dict:
-    """Return {(i, j): P(pick item i | A=i, B=j)} over all ordered i != j pairs."""
+def _model_input_device(model):
     import torch
 
-    n = len(items)
-    pairs = [(i, j) for i in range(n) for j in range(n) if i != j]
+    for parameter in model.parameters():
+        if parameter.device.type != "meta":
+            return parameter.device
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def compare_pairs(tok, model, items: list[str], pairs, batch_size: int = 64) -> dict:
+    """Return {(i, j): P(pick item i | A=i, B=j)} for explicit ordered pairs."""
+    import torch
+
+    pairs = list(pairs)
     a_id, b_id = _ab_token_ids(tok)
     ordered: dict[tuple[int, int], float] = {}
+    device = _model_input_device(model)
 
     with torch.no_grad():
         for start in range(0, len(pairs), batch_size):
             batch = pairs[start : start + batch_size]
             texts = [_prefill_text(tok, items[i], items[j]) for i, j in batch]
             enc = tok(texts, return_tensors="pt", padding=True, add_special_tokens=False).to(
-                "cuda"
+                device
             )
             logits = _logits_from_output(model(**enc))[:, -1, :]
             ab = torch.stack([logits[:, a_id], logits[:, b_id]], dim=-1)
@@ -91,6 +100,13 @@ def elicit_logprobs(tok, model, items: list[str], batch_size: int = 64) -> dict:
             for (i, j), pa in zip(batch, p_a):
                 ordered[(i, j)] = float(pa)
     return ordered
+
+
+def elicit_logprobs(tok, model, items: list[str], batch_size: int = 64) -> dict:
+    """Return {(i, j): P(pick item i | A=i, B=j)} over all ordered i != j pairs."""
+    n = len(items)
+    pairs = [(i, j) for i in range(n) for j in range(n) if i != j]
+    return compare_pairs(tok, model, items, pairs, batch_size=batch_size)
 
 
 def validate_generation(

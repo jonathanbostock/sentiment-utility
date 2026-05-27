@@ -39,3 +39,52 @@ def probe_all_layers(hidden, y, seed=0, alpha=1.0):
         "best_layer": int(best_layer),
         "best_r2": float(per_layer[best_layer]["test_r2"]),
     }
+
+
+def _model_input_device(model):
+    import torch
+
+    for parameter in model.parameters():
+        if parameter.device.type != "meta":
+            return parameter.device
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def extract_activations(tok, model, items, batch_size=16):
+    """Extract last-token hidden states for neutral concept-only chat prompts."""
+    import torch
+
+    tok.padding_side = "left"
+    if tok.pad_token_id is None:
+        tok.pad_token = tok.eos_token
+
+    device = _model_input_device(model)
+    per_layer_batches = None
+
+    with torch.no_grad():
+        for start in range(0, len(items), batch_size):
+            batch = items[start : start + batch_size]
+            texts = [
+                tok.apply_chat_template(
+                    [{"role": "user", "content": concept}],
+                    tokenize=False,
+                    add_generation_prompt=False,
+                )
+                for concept in batch
+            ]
+            enc = tok(texts, return_tensors="pt", padding=True, add_special_tokens=False).to(
+                device
+            )
+            out = model(**enc, output_hidden_states=True)
+            hidden_states = out.hidden_states
+            if per_layer_batches is None:
+                per_layer_batches = [[] for _ in hidden_states]
+            for layer, hidden in enumerate(hidden_states):
+                per_layer_batches[layer].append(hidden[:, -1, :].detach().cpu().numpy())
+
+    if per_layer_batches is None:
+        return {}
+    return {
+        layer: np.concatenate(batches, axis=0)
+        for layer, batches in enumerate(per_layer_batches)
+    }
