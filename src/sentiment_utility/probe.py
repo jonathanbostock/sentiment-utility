@@ -80,7 +80,10 @@ def extract_activations(tok, model, items, batch_size=16):
             if per_layer_batches is None:
                 per_layer_batches = [[] for _ in hidden_states]
             for layer, hidden in enumerate(hidden_states):
-                per_layer_batches[layer].append(hidden[:, -1, :].detach().cpu().numpy())
+                # cast to float32: numpy has no bf16 dtype
+                per_layer_batches[layer].append(
+                    hidden[:, -1, :].detach().float().cpu().numpy()
+                )
 
     if per_layer_batches is None:
         return {}
