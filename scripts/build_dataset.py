@@ -11,7 +11,7 @@ import yaml
 from sentiment_utility.dataset import build_pool_sample
 
 
-WARRINER_URL = "http://crr.ugent.be/papers/Ratings_Warriner_et_al.csv"
+WARRINER_URL = "https://raw.githubusercontent.com/JULIELab/XANEW/master/Ratings_Warriner_et_al.csv"
 THINGS_URLS = [
     "https://raw.githubusercontent.com/ViCCo-Group/THINGSplus/main/data/things_concepts.tsv",
     "https://raw.githubusercontent.com/ViCCo-Group/THINGSplus/main/data/THINGS_concepts.tsv",
@@ -88,9 +88,12 @@ def main() -> None:
         "things": fetch_things(),
         "warriner": fetch_warriner(),
     }
+    # THINGS has no stable raw URL (OSF-only), so it typically resolves empty;
+    # curated (rich concepts) + Warriner (words) fill to 500. If THINGS is
+    # available it contributes and Warriner's quota tops up the remainder.
     items, meta = build_pool_sample(
         sources,
-        quotas={"curated": 250, "things": 150, "warriner": 100},
+        quotas={"curated": 250, "things": 150, "warriner": 250},
         n=500,
         seed=0,
     )
