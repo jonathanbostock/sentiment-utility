@@ -18,15 +18,16 @@ def load_model(model_id: str, dtype: str = "bfloat16"):
     kwargs = {"torch_dtype": torch_dtype, "device_map": "cuda"}
     try:
         model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs)
-    except Exception:
-        try:
-            from transformers import AutoModelForImageTextToText
+    except Exception as causal_err:
+        # Only multimodal models (e.g. Gemma-3) legitimately need a non-causal class.
+        # For everything else, re-raise the real error instead of masking it with a
+        # confusing fallback (a CUDA/driver failure once surfaced as a bogus
+        # "Gemma3Config has no attribute max_position_embeddings").
+        if "gemma" not in model_id.lower():
+            raise
+        from transformers import AutoModelForImageTextToText
 
-            model = AutoModelForImageTextToText.from_pretrained(model_id, **kwargs)
-        except Exception:
-            from transformers import Gemma3ForConditionalGeneration
-
-            model = Gemma3ForConditionalGeneration.from_pretrained(model_id, **kwargs)
+        model = AutoModelForImageTextToText.from_pretrained(model_id, **kwargs)
     model.eval()
     return tok, model
 
