@@ -27,17 +27,27 @@ def fit_thurstone(pref: np.ndarray, lr: float = 0.05, steps: int = 2000,
     device = "cuda" if torch.cuda.is_available() else "cpu"
     target = torch.as_tensor(pref, dtype=torch.float64, device=device)
 
-    # off-diagonal mask, optional train/test split over ordered pairs
+    # off-diagonal mask. Split the held-out set over UNORDERED pairs {i,j} and
+    # mask BOTH directions together: pref is antisymmetric (pref[j,i]=1-pref[i,j]),
+    # so training on the mirror (j,i) would leak a held-out (i,j) label otherwise.
     mask = ~torch.eye(n, dtype=torch.bool, device=device)
-    idx = mask.nonzero(as_tuple=False)
+    iu = torch.triu_indices(n, n, offset=1, device=device)          # unordered pairs
+    upper = torch.stack([iu[0], iu[1]], dim=1)
     g = torch.Generator(device="cpu").manual_seed(seed)
-    perm = torch.randperm(idx.shape[0], generator=g)
-    n_test = int(test_frac * idx.shape[0])
-    test_idx = idx[perm[:n_test]]
-    train_idx = idx[perm[n_test:]]
+    perm = torch.randperm(upper.shape[0], generator=g)
+    n_test_pairs = int(test_frac * upper.shape[0])
+    test_pairs = upper[perm[:n_test_pairs]]
 
-    train_mask = torch.zeros_like(mask)
-    train_mask[train_idx[:, 0], train_idx[:, 1]] = True
+    # train_mask: every off-diagonal entry whose unordered pair is NOT held out
+    train_mask = mask.clone()
+    for a, b in test_pairs.tolist():
+        train_mask[a, b] = False
+        train_mask[b, a] = False
+    # eval over the held-out ordered entries (both directions of held-out pairs)
+    if n_test_pairs > 0:
+        eval_idx = torch.cat([test_pairs, test_pairs.flip(1)], dim=0)
+    else:
+        eval_idx = mask.nonzero(as_tuple=False)
 
     mu = torch.zeros(n, dtype=torch.float64, device=device, requires_grad=True)
     log_sigma = torch.zeros(n, dtype=torch.float64, device=device, requires_grad=True)
@@ -56,18 +66,25 @@ def fit_thurstone(pref: np.ndarray, lr: float = 0.05, steps: int = 2000,
 
     with torch.no_grad():
         sigma = torch.exp(log_sigma)
-        mu_c = mu - mu.mean()  # center for identifiability
-        Phat = predict_pref_matrix(mu_c.cpu().numpy(), sigma.cpu().numpy())
-        # test accuracy: thresholded predicted vs empirical on held-out (or all) pairs
-        eval_idx = test_idx if n_test > 0 else idx
+        # Gauge fixing: P(x>y) is invariant to scaling all (mu, sigma) by a
+        # positive constant and to shifting mu. Center mu (additive gauge) and
+        # divide mu, sigma by mean(sigma) (multiplicative gauge) so that the
+        # reported magnitudes are data-determined rather than set by l2_sigma.
+        scale = sigma.mean()
+        mu_c = (mu - mu.mean()) / scale
+        sigma_c = sigma / scale
+        Phat = predict_pref_matrix(mu_c.cpu().numpy(), sigma_c.cpu().numpy())
+        # held-out accuracy: thresholded predicted vs empirical preference
         ph = torch.as_tensor(Phat, device=device)
         pred_label = (ph[eval_idx[:, 0], eval_idx[:, 1]] > 0.5).double()
         emp_label = (target[eval_idx[:, 0], eval_idx[:, 1]] > 0.5).double()
         acc = (pred_label == emp_label).double().mean().item()
+        is_heldout = n_test_pairs > 0
 
     return {
         "mu": mu_c.detach().cpu().numpy(),
-        "sigma": sigma.detach().cpu().numpy(),
-        "test_accuracy": acc,
+        "sigma": sigma_c.detach().cpu().numpy(),
+        "test_accuracy": acc,        # held-out when test_frac>0, else train accuracy
+        "accuracy_is_heldout": is_heldout,
         "pred_matrix": Phat,
     }

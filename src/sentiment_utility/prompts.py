@@ -22,10 +22,11 @@ def parse_answer(text: str) -> str | None:
         return tags[0].upper()
     if len(tags) > 1:
         return None
-    # Fallback: a single unambiguous A or B letter token
-    letters = re.findall(r"\b([AB])\b", text, re.IGNORECASE)
-    letters = [c.upper() for c in letters]
-    uniq = set(letters)
-    if len(uniq) == 1:
-        return uniq.pop()
+    # Fallback: a single unambiguous A or B letter token. A lowercase standalone
+    # "a" is almost always the English article, not a vote, so it is ignored;
+    # lowercase "b" is rarely a word and is still treated as a vote.
+    raw = re.findall(r"\b([AaBb])\b", text)
+    votes = {c.upper() for c in raw if c != "a"}
+    if len(votes) == 1:
+        return votes.pop()
     return None

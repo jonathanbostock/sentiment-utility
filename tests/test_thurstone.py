@@ -30,3 +30,19 @@ def test_predict_matrix_matches_data():
     Phat = predict_pref_matrix(result["mu"], result["sigma"])
     off = ~np.eye(len(mu), dtype=bool)
     assert np.mean(np.abs(Phat[off] - P[off])) < 0.05
+
+
+def test_heldout_accuracy_high_on_coherent_data():
+    # On perfectly coherent (transitive) synthetic data, held-out accuracy
+    # should be ~1.0 and must be flagged as a genuine hold-out.
+    mu, sigma, P = _make_synthetic(n=12, seed=1)
+    result = fit_thurstone(P, lr=0.1, steps=3000, test_frac=0.25, seed=0)
+    assert result["accuracy_is_heldout"] is True
+    assert result["test_accuracy"] > 0.95
+
+
+def test_gauge_is_fixed_mean_sigma_one():
+    # Multiplicative gauge fixed so mean(sigma) == 1, regardless of l2_sigma.
+    mu, sigma, P = _make_synthetic(n=8, seed=2)
+    result = fit_thurstone(P, lr=0.1, steps=2000, l2_sigma=0.5, seed=0)
+    assert np.isclose(result["sigma"].mean(), 1.0, atol=1e-6)
