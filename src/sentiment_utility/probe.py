@@ -91,22 +91,52 @@ def common_token_prefix(seqs) -> list[int]:
     return prefix
 
 
-def _expand_past_key_values(past_key_values, batch_size: int):
-    if past_key_values is None:
+def _snapshot_prefix_kv(past):
+    """Return a stable list of (key, value) tensors (batch dim 1) for the prefix cache.
+
+    Never mutates `past`; works across transformers Cache APIs (legacy tuples,
+    DynamicCache with .to_legacy_cache(), or .layers / .key_cache attributes).
+    """
+    if past is None:
         return None
-    if hasattr(past_key_values, "batch_repeat_interleave"):
-        return past_key_values.batch_repeat_interleave(batch_size)
+    if hasattr(past, "to_legacy_cache"):
+        try:
+            return [(k, v) for (k, v) in past.to_legacy_cache()]
+        except Exception:
+            pass
+    if hasattr(past, "key_cache") and hasattr(past, "value_cache"):
+        return list(zip(past.key_cache, past.value_cache))
+    if hasattr(past, "layers"):
+        out = []
+        for layer in past.layers:
+            k = getattr(layer, "keys", None)
+            v = getattr(layer, "values", None)
+            if k is None or v is None:
+                k, v = layer  # tuple-like layer
+            out.append((k, v))
+        return out
+    return [(k, v) for (k, v) in past]  # legacy tuple-of-tuples
 
-    def expand_value(value):
-        if hasattr(value, "dim") and value.dim() > 0 and value.shape[0] == 1:
-            return value.expand(batch_size, *value.shape[1:]).contiguous()
-        if isinstance(value, tuple):
-            return tuple(expand_value(v) for v in value)
-        if isinstance(value, list):
-            return [expand_value(v) for v in value]
-        return value
 
-    return expand_value(past_key_values)
+def _build_batch_cache(snapshot, batch_size):
+    """Build a FRESH cache for `batch_size` rows from an immutable prefix snapshot."""
+    legacy = tuple(
+        (
+            k.expand(batch_size, *k.shape[1:]).contiguous(),
+            v.expand(batch_size, *v.shape[1:]).contiguous(),
+        )
+        for (k, v) in snapshot
+    )
+    try:
+        from transformers import DynamicCache
+    except Exception:
+        return legacy
+    if hasattr(DynamicCache, "from_legacy_cache"):
+        return DynamicCache.from_legacy_cache(legacy)
+    cache = DynamicCache()
+    for layer_idx, (k, v) in enumerate(legacy):
+        cache.update(k, v, layer_idx)
+    return cache
 
 
 def _past_from_output(output):
@@ -117,17 +147,45 @@ def _past_from_output(output):
     raise AttributeError("model output does not expose past_key_values")
 
 
-def probe_score_concepts(tok, model, items, best_layer, probe, batch_size=16):
-    """Score concept prompts using one shared-prefix KV cache and a deployable probe."""
+def _score_features_full(tok, model, tokenized, best_layer, batch_size, device):
+    """No-cache fallback: forward each full concept prompt (left-padded), take the
+    best-layer last-token hidden state. Identical mechanism to extract_activations,
+    so correct by construction."""
+    import torch
+
+    feats = [None] * len(tokenized)
+    pad_id = tok.pad_token_id if tok.pad_token_id is not None else 0
+    with torch.no_grad():
+        for start in range(0, len(tokenized), batch_size):
+            batch = tokenized[start : start + batch_size]
+            maxlen = max(len(ids) for ids in batch)
+            input_ids = torch.full((len(batch), maxlen), pad_id, dtype=torch.long, device=device)
+            mask = torch.zeros((len(batch), maxlen), dtype=torch.long, device=device)
+            for row, ids in enumerate(batch):  # LEFT pad
+                input_ids[row, maxlen - len(ids) :] = torch.tensor(ids, device=device)
+                mask[row, maxlen - len(ids) :] = 1
+            out = model(input_ids=input_ids, attention_mask=mask, output_hidden_states=True)
+            h = out.hidden_states[best_layer][:, -1, :].detach().float().cpu().numpy()
+            for row in range(len(batch)):
+                feats[start + row] = h[row]
+    return np.asarray(feats, dtype=np.float64)
+
+
+def probe_score_concepts(tok, model, items, best_layer, probe, batch_size=16, use_kv_cache=True):
+    """Score concepts by applying a deployable probe to best-layer last-token activations.
+
+    Renders each concept as a neutral chat prompt and extracts one activation per concept
+    (single forward pass each, batched). When use_kv_cache is True and the prompts share a
+    non-trivial token prefix, the prefix is encoded once and its KV cache reused across all
+    concept batches; otherwise (or as a guaranteed-correct fallback) full prompts are run.
+    """
     import torch
 
     items = list(items)
     if not items:
         return np.asarray([], dtype=np.float64)
-
     if tok.pad_token_id is None:
         tok.pad_token = tok.eos_token
-    pad_token_id = tok.pad_token_id if tok.pad_token_id is not None else 0
 
     texts = [
         tok.apply_chat_template(
@@ -138,104 +196,60 @@ def probe_score_concepts(tok, model, items, best_layer, probe, batch_size=16):
         for concept in items
     ]
     tokenized = [tok(text, add_special_tokens=False)["input_ids"] for text in texts]
+    device = _model_input_device(model)
+
     prefix = common_token_prefix(tokenized)
     prefix_len = len(prefix)
-    suffixes = [ids[prefix_len:] for ids in tokenized]
+    # Only worth caching a non-trivial shared prefix and when every suffix is non-empty.
+    if not use_kv_cache or prefix_len == 0 or any(len(ids) <= prefix_len for ids in tokenized):
+        feats = _score_features_full(tok, model, tokenized, best_layer, batch_size, device)
+        return apply_probe(feats, probe)
 
-    device = _model_input_device(model)
-    scored = np.empty(len(items), dtype=np.float64)
+    pad_id = tok.pad_token_id if tok.pad_token_id is not None else 0
+    suffixes = [ids[prefix_len:] for ids in tokenized]
+    feats = [None] * len(items)
 
     with torch.no_grad():
-        prefix_hidden_by_layer = None
-        prefix_past = None
-        if prefix:
-            prefix_ids = torch.tensor([prefix], dtype=torch.long, device=device)
-            prefix_mask = torch.ones_like(prefix_ids, device=device)
-            prefix_out = model(
-                input_ids=prefix_ids,
-                attention_mask=prefix_mask,
-                use_cache=True,
-                output_hidden_states=True,
-            )
-            prefix_hidden_by_layer = prefix_out.hidden_states
-            prefix_past = _past_from_output(prefix_out)
+        prefix_ids = torch.tensor([prefix], dtype=torch.long, device=device)
+        prefix_out = model(
+            input_ids=prefix_ids,
+            attention_mask=torch.ones_like(prefix_ids),
+            use_cache=True,
+            output_hidden_states=True,
+        )
+        snapshot = _snapshot_prefix_kv(_past_from_output(prefix_out))
 
         for start in range(0, len(items), batch_size):
-            batch_suffixes = suffixes[start : start + batch_size]
-            non_empty = [i for i, suffix in enumerate(batch_suffixes) if suffix]
-
-            if len(non_empty) < len(batch_suffixes):
-                if prefix_hidden_by_layer is None:
-                    raise ValueError("empty prompt cannot be scored without prefix hidden states")
-                empty_rows = [i for i, suffix in enumerate(batch_suffixes) if not suffix]
-                repeated = np.repeat(
-                    prefix_hidden_by_layer[best_layer][:, -1, :].detach().float().cpu().numpy(),
-                    len(empty_rows),
-                    axis=0,
-                )
-                scored[start + np.asarray(empty_rows)] = apply_probe(repeated, probe)
-
-            if not non_empty:
-                continue
-
-            active_suffixes = [batch_suffixes[i] for i in non_empty]
-            active_batch = len(active_suffixes)
-            max_suffix = max(len(suffix) for suffix in active_suffixes)
-            suffix_ids = torch.full(
-                (active_batch, max_suffix),
-                pad_token_id,
-                dtype=torch.long,
-                device=device,
+            batch = suffixes[start : start + batch_size]
+            bs = len(batch)
+            maxlen = max(len(s) for s in batch)
+            suffix_ids = torch.full((bs, maxlen), pad_id, dtype=torch.long, device=device)
+            suffix_mask = torch.zeros((bs, maxlen), dtype=torch.long, device=device)
+            for row, s in enumerate(batch):  # RIGHT pad (real tokens first)
+                suffix_ids[row, : len(s)] = torch.tensor(s, device=device)
+                suffix_mask[row, : len(s)] = 1
+            attention_mask = torch.cat(
+                [torch.ones((bs, prefix_len), dtype=torch.long, device=device), suffix_mask], dim=1
             )
-            suffix_mask = torch.zeros(
-                (active_batch, max_suffix), dtype=torch.long, device=device
-            )
-            for row, suffix in enumerate(active_suffixes):
-                length = len(suffix)
-                suffix_ids[row, :length] = torch.tensor(
-                    suffix, dtype=torch.long, device=device
-                )
-                suffix_mask[row, :length] = 1
-
-            if prefix_len:
-                prefix_mask = torch.ones(
-                    (active_batch, prefix_len), dtype=torch.long, device=device
-                )
-                attention_mask = torch.cat([prefix_mask, suffix_mask], dim=1)
-                past_key_values = _expand_past_key_values(prefix_past, active_batch)
-            else:
-                attention_mask = suffix_mask
-                past_key_values = None
-
             position_ids = (
-                prefix_len
-                + torch.arange(max_suffix, dtype=torch.long, device=device).unsqueeze(0)
-            ).expand(active_batch, -1)
+                prefix_len + torch.arange(maxlen, device=device).unsqueeze(0)
+            ).expand(bs, -1)
             out = model(
                 input_ids=suffix_ids,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
-                past_key_values=past_key_values,
-                use_cache=False,
+                past_key_values=_build_batch_cache(snapshot, bs),
+                use_cache=True,
                 output_hidden_states=True,
             )
             hidden = out.hidden_states[best_layer]
-            last_indices = torch.tensor(
-                [len(suffix) - 1 for suffix in active_suffixes],
-                dtype=torch.long,
-                device=device,
-            )
-            rows = torch.arange(active_batch, dtype=torch.long, device=device)
-            features = hidden[rows, last_indices, :].detach().float().cpu().numpy()
-            scored[start + np.asarray(non_empty)] = apply_probe(features, probe)
+            last = torch.tensor([len(s) - 1 for s in batch], device=device)
+            rows = torch.arange(bs, device=device)
+            h = hidden[rows, last, :].detach().float().cpu().numpy()
+            for row in range(bs):
+                feats[start + row] = h[row]
 
-    return scored
-    best_layer = max(per_layer, key=lambda L: per_layer[L]["test_r2"])
-    return {
-        "per_layer": per_layer,
-        "best_layer": int(best_layer),
-        "best_r2": float(per_layer[best_layer]["test_r2"]),
-    }
+    return apply_probe(np.asarray(feats, dtype=np.float64), probe)
 
 
 def _model_input_device(model):
