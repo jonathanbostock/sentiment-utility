@@ -1,0 +1,12 @@
+{
+  "layer": 11,
+  "base": "base",
+  "characters": {
+    "loving": {
+      "coef_cosine_sim": 0.36317299407385967,
+      "base_probe_on_char_r2": 0.5665767466474358,
+      "char_probe_on_base_r2": 0.4392787622510287,
+      "char_probe_on_char_r2": 0.957096649398675
+    }
+  }
+}
