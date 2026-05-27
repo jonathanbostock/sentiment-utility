@@ -6,26 +6,47 @@ import torch
 from .thurstone import _phi, predict_pref_matrix
 
 
-def rank_by_quicksort(n, oracle, seed=0):
-    """Randomized batched-pivot quicksort. Returns order best->worst and edges."""
+def rank_by_quicksort(n, oracle, seed=0, tie_eps=1e-3):
+    """Randomized batched-pivot quicksort over a comparison oracle.
+
+    Returns (order best->worst, edges[(i, j, p)]). Each level compares every item
+    in a bucket to a random pivot in ONE batched oracle call, so the ~O(n log n)
+    comparisons run in O(log n) sequential rounds.
+
+    Iterative (explicit stack) to avoid Python recursion-depth limits at scale.
+    Near-tie comparisons (|p-0.5| < tie_eps) are alternated between the two sides
+    so that ties cannot force a fully unbalanced (quadratic / deep) partition.
+    """
     rng = np.random.default_rng(seed)
     edges = []
-
-    def sort(bucket):
-        if len(bucket) <= 1:
-            return list(bucket)
-        pivot = bucket[rng.integers(len(bucket))]
+    order = [None] * n
+    # stack of (bucket, output_slot) where output_slot is the start index in `order`
+    stack = [(list(range(n)), 0)]
+    while stack:
+        bucket, base = stack.pop()
+        if len(bucket) == 0:
+            continue
+        if len(bucket) == 1:
+            order[base] = bucket[0]
+            continue
+        pivot = bucket[int(rng.integers(len(bucket)))]
         rest = [x for x in bucket if x != pivot]
-        pairs = [(x, pivot) for x in rest]
-        probs = oracle(pairs)
+        probs = oracle([(x, pivot) for x in rest])
         greater, lesser = [], []
+        tie_toggle = True
         for x in rest:
-            p = probs[(x, pivot)]
-            edges.append((x, pivot, float(p)))
-            (greater if p > 0.5 else lesser).append(x)
-        return sort(greater) + [pivot] + sort(lesser)
-
-    order = sort(list(range(n)))
+            p = float(probs[(x, pivot)])
+            edges.append((x, pivot, p))
+            if abs(p - 0.5) < tie_eps:
+                (greater if tie_toggle else lesser).append(x)
+                tie_toggle = not tie_toggle
+            else:
+                (greater if p > 0.5 else lesser).append(x)
+        # layout: [greater ... pivot ... lesser] (best -> worst)
+        pivot_slot = base + len(greater)
+        order[pivot_slot] = pivot
+        stack.append((greater, base))
+        stack.append((lesser, pivot_slot + 1))
     return order, edges
 
 
@@ -49,14 +70,24 @@ def fit_thurstone_sparse(
     torch.manual_seed(seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     g = torch.Generator(device="cpu").manual_seed(seed)
-    m = len(edges)
+
+    # Canonicalize to one directed edge per UNORDERED pair: orient as (a<b) with
+    # p = P(a > b), averaging probabilities of any duplicate/reverse comparisons.
+    # This removes double-weighting and lets an edge-index split be a genuine
+    # per-pair held-out split (no reverse-direction leakage).
+    agg: dict[tuple[int, int], list[float]] = {}
+    for i, j, p in edges:
+        a, b, q = (i, j, float(p)) if i < j else (j, i, 1.0 - float(p))
+        agg.setdefault((a, b), []).append(q)
+    uniq = [(a, b, float(np.mean(qs))) for (a, b), qs in agg.items()]
+    m = len(uniq)
     perm = torch.randperm(m, generator=g).tolist()
     n_test = int(test_frac * m)
     test_set = set(perm[:n_test])
 
-    ii = torch.tensor([e[0] for e in edges], device=device)
-    jj = torch.tensor([e[1] for e in edges], device=device)
-    pp = torch.tensor([e[2] for e in edges], dtype=torch.float64, device=device)
+    ii = torch.tensor([e[0] for e in uniq], device=device)
+    jj = torch.tensor([e[1] for e in uniq], device=device)
+    pp = torch.tensor([e[2] for e in uniq], dtype=torch.float64, device=device)
     is_train = torch.tensor([k not in test_set for k in range(m)], device=device)
 
     mu = torch.zeros(n, dtype=torch.float64, device=device, requires_grad=True)
@@ -94,5 +125,6 @@ def fit_thurstone_sparse(
         "test_accuracy": acc,
         "accuracy_is_heldout": n_test > 0,
         "pred_matrix": Phat,
-        "comparison_count": m,
+        "comparison_count": len(edges),   # actual oracle comparisons performed
+        "unique_pairs": m,                # distinct unordered pairs fit over
     }
