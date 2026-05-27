@@ -1,0 +1,13 @@
+{
+  "model_id": "google/gemma-3-27b-it",
+  "adapter": null,
+  "mu_std": 6.346434140718478,
+  "mu_mean": -1.7053025658242405e-16,
+  "heldout_fit_accuracy": 0.820820189274448,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.011854505360841953,
+  "completeness": 0.8907731907620567,
+  "comparison_count": 9196,
+  "unique_pairs": 7927,
+  "n_items": 500
+}
