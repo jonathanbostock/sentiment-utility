@@ -1,0 +1,48 @@
+{
+  "commit": "02003e9de7532b6edefa474c209bbf6ad78ecf94",
+  "items": [
+    "Ronald Reagan",
+    "Mahatma Gandhi",
+    "Taylor Swift",
+    "spaghetti",
+    "kale",
+    "chocolate",
+    "dolphins",
+    "mosquitoes",
+    "golden retrievers",
+    "freedom",
+    "war",
+    "taxes",
+    "democracy",
+    "laptops",
+    "plastic bags",
+    "books",
+    "the ocean",
+    "traffic jams",
+    "sunshine",
+    "nuclear weapons",
+    "coffee",
+    "hospitals",
+    "spiders",
+    "music",
+    "climate change"
+  ],
+  "run_config": {
+    "model_id": "google/gemma-3-12b-it",
+    "dtype": "bfloat16",
+    "batch_size": 64,
+    "seed": 0,
+    "fit": {
+      "lr": 0.05,
+      "steps": 2000,
+      "test_frac": 0.2,
+      "l2_sigma": 0.01
+    },
+    "validation": {
+      "n_pairs": 30,
+      "n_samples": 10,
+      "temperature": 1.0,
+      "max_new_tokens": 16
+    }
+  }
+}

@@ -1,0 +1,14 @@
+2026-05-27 10:35:50,120 INFO commit=02003e9de7532b6edefa474c209bbf6ad78ecf94
+2026-05-27 10:35:50,121 INFO loading model google/gemma-3-12b-it
+2026-05-27 10:35:52,383 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-27 10:35:52,421 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-27 10:35:52,473 INFO HTTP Request: GET https://huggingface.co/api/models/google/gemma-3-12b-it/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-27 10:35:52,511 INFO HTTP Request: GET https://huggingface.co/api/models/google/gemma-3-12b-it/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-27 10:35:54,388 INFO HTTP Request: GET https://huggingface.co/api/models/google/gemma-3-12b-it "HTTP/1.1 200 OK"
+2026-05-27 10:35:54,420 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-27 10:35:58,040 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/generation_config.json "HTTP/1.1 200 OK"
+2026-05-27 10:35:58,045 INFO eliciting 600 ordered pairs via logprobs
+2026-05-27 10:36:02,393 INFO fitting Thurstonian model
+2026-05-27 10:36:06,054 INFO metrics={"utility_test_accuracy": 0.95, "cyclic_triad_fraction": 0.003043478260869565, "expected_cycle_probability": 0.008456242634399883, "completeness": 0.8858130641363694}
+2026-05-27 10:36:06,055 INFO running generation validation
+2026-05-27 10:36:17,703 INFO done -> runs/20260527-103550
