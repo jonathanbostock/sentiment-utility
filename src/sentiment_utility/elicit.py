@@ -126,11 +126,14 @@ def validate_generation(
                 **enc,
                 do_sample=True,
                 temperature=temperature,
+                top_k=0,          # disable top-k truncation
+                top_p=1.0,        # disable nucleus truncation
                 max_new_tokens=max_new_tokens,
                 pad_token_id=tok.pad_token_id,
             )
             gen = tok.batch_decode(out[:, enc["input_ids"].shape[1] :], skip_special_tokens=True)
-            picks = [parse_answer(ASSISTANT_PREFIX + g) for g in gen]
+            # strict: only count a well-formed <answer>X</answer> tag as a valid vote
+            picks = [parse_answer(ASSISTANT_PREFIX + g, strict=True) for g in gen]
             a_votes = sum(1 for pick in picks if pick == "A")
             valid = sum(1 for pick in picks if pick in ("A", "B"))
             results.append(

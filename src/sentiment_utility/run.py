@@ -99,6 +99,11 @@ def main(items_path: str = "config/items.yaml", run_path: str = "config/run.yaml
         b_arr = np.array([pair[1] for pair in valid_pairs])
         metrics["validation_pearson_r"] = float(np.corrcoef(a_arr, b_arr)[0, 1])
         metrics["validation_agreement"] = float(np.mean((a_arr > 0.5) == (b_arr > 0.5)))
+    else:
+        # keep a stable results schema even when validation is too sparse
+        metrics["validation_pearson_r"] = float("nan")
+        metrics["validation_agreement"] = float("nan")
+    metrics["validation_n_valid_pairs"] = len(valid_pairs)
     metrics["validation_malformed_rate"] = float(
         np.mean([1 - row["valid"] / row["n_samples"] for row in val["pairs"]])
     )
