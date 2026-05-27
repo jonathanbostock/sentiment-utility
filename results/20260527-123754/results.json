@@ -1,0 +1,5024 @@
+{
+  "commit": "a3c11289d73cfaab678e8b7cd855ec6c7ea3b5c2",
+  "metrics": {
+    "utility_test_accuracy": 0.866622864651774,
+    "accuracy_is_heldout": true,
+    "cyclic_triad_fraction": 0.0,
+    "expected_cycle_probability": 0.004863010368105319,
+    "completeness": 0.938520389875235,
+    "comparison_count": 8909,
+    "dense_comparison_count": 249500,
+    "comparison_ratio": 0.03570741482965932,
+    "unique_pairs": 7614,
+    "mu_human_valence_pearson": 0.7419592461225224,
+    "human_valence_n": 250
+  },
+  "probe_results": {
+    "mu": {
+      "per_layer": {
+        "0": {
+          "test_r2": -0.001587613740398508,
+          "pairwise_accuracy": 0.5755555555555556,
+          "n_test": 100
+        },
+        "1": {
+          "test_r2": -0.33477175062462283,
+          "pairwise_accuracy": 0.6094949494949495,
+          "n_test": 100
+        },
+        "2": {
+          "test_r2": -1.0374785130534185,
+          "pairwise_accuracy": 0.5975757575757575,
+          "n_test": 100
+        },
+        "3": {
+          "test_r2": -1.0622370527834861,
+          "pairwise_accuracy": 0.581010101010101,
+          "n_test": 100
+        },
+        "4": {
+          "test_r2": -0.6051950152889349,
+          "pairwise_accuracy": 0.6333333333333333,
+          "n_test": 100
+        },
+        "5": {
+          "test_r2": -0.39030689420859166,
+          "pairwise_accuracy": 0.6260606060606061,
+          "n_test": 100
+        },
+        "6": {
+          "test_r2": -0.058351551356254694,
+          "pairwise_accuracy": 0.6882828282828283,
+          "n_test": 100
+        },
+        "7": {
+          "test_r2": 0.1905143729616139,
+          "pairwise_accuracy": 0.730909090909091,
+          "n_test": 100
+        },
+        "8": {
+          "test_r2": 0.09175751393793297,
+          "pairwise_accuracy": 0.7367676767676767,
+          "n_test": 100
+        },
+        "9": {
+          "test_r2": 0.26050944270550735,
+          "pairwise_accuracy": 0.737979797979798,
+          "n_test": 100
+        },
+        "10": {
+          "test_r2": 0.31064925069673277,
+          "pairwise_accuracy": 0.756969696969697,
+          "n_test": 100
+        },
+        "11": {
+          "test_r2": 0.39311657368505604,
+          "pairwise_accuracy": 0.7743434343434343,
+          "n_test": 100
+        },
+        "12": {
+          "test_r2": 0.47472654855918117,
+          "pairwise_accuracy": 0.7967676767676768,
+          "n_test": 100
+        },
+        "13": {
+          "test_r2": 0.543091624271699,
+          "pairwise_accuracy": 0.7995959595959596,
+          "n_test": 100
+        },
+        "14": {
+          "test_r2": 0.6546254625213357,
+          "pairwise_accuracy": 0.831919191919192,
+          "n_test": 100
+        },
+        "15": {
+          "test_r2": 0.639349573341885,
+          "pairwise_accuracy": 0.8226262626262626,
+          "n_test": 100
+        },
+        "16": {
+          "test_r2": 0.6721998258587436,
+          "pairwise_accuracy": 0.8331313131313132,
+          "n_test": 100
+        },
+        "17": {
+          "test_r2": 0.6436722884172561,
+          "pairwise_accuracy": 0.8155555555555556,
+          "n_test": 100
+        },
+        "18": {
+          "test_r2": 0.6692746779336857,
+          "pairwise_accuracy": 0.8242424242424242,
+          "n_test": 100
+        },
+        "19": {
+          "test_r2": 0.6514536745429163,
+          "pairwise_accuracy": 0.8244444444444444,
+          "n_test": 100
+        },
+        "20": {
+          "test_r2": 0.691191749549342,
+          "pairwise_accuracy": 0.835959595959596,
+          "n_test": 100
+        },
+        "21": {
+          "test_r2": 0.7386748802165584,
+          "pairwise_accuracy": 0.8458585858585859,
+          "n_test": 100
+        },
+        "22": {
+          "test_r2": 0.7198417708614409,
+          "pairwise_accuracy": 0.8436363636363636,
+          "n_test": 100
+        },
+        "23": {
+          "test_r2": 0.7213794105552216,
+          "pairwise_accuracy": 0.838989898989899,
+          "n_test": 100
+        },
+        "24": {
+          "test_r2": 0.7189924896224498,
+          "pairwise_accuracy": 0.8426262626262626,
+          "n_test": 100
+        },
+        "25": {
+          "test_r2": 0.7348278922305547,
+          "pairwise_accuracy": 0.842020202020202,
+          "n_test": 100
+        },
+        "26": {
+          "test_r2": 0.6914273152809169,
+          "pairwise_accuracy": 0.8333333333333334,
+          "n_test": 100
+        },
+        "27": {
+          "test_r2": 0.6958299068652363,
+          "pairwise_accuracy": 0.8280808080808081,
+          "n_test": 100
+        },
+        "28": {
+          "test_r2": 0.7340852895134369,
+          "pairwise_accuracy": 0.84,
+          "n_test": 100
+        },
+        "29": {
+          "test_r2": 0.7485576571349057,
+          "pairwise_accuracy": 0.8468686868686869,
+          "n_test": 100
+        },
+        "30": {
+          "test_r2": 0.7207532395061125,
+          "pairwise_accuracy": 0.84,
+          "n_test": 100
+        },
+        "31": {
+          "test_r2": 0.7186326089846033,
+          "pairwise_accuracy": 0.8343434343434344,
+          "n_test": 100
+        },
+        "32": {
+          "test_r2": 0.7367457460874967,
+          "pairwise_accuracy": 0.8446464646464646,
+          "n_test": 100
+        },
+        "33": {
+          "test_r2": 0.7240607472559377,
+          "pairwise_accuracy": 0.8412121212121212,
+          "n_test": 100
+        },
+        "34": {
+          "test_r2": 0.7293528214329694,
+          "pairwise_accuracy": 0.838989898989899,
+          "n_test": 100
+        },
+        "35": {
+          "test_r2": 0.7369253549122994,
+          "pairwise_accuracy": 0.8377777777777777,
+          "n_test": 100
+        },
+        "36": {
+          "test_r2": 0.7209007239270477,
+          "pairwise_accuracy": 0.8341414141414142,
+          "n_test": 100
+        },
+        "37": {
+          "test_r2": 0.7044247903655967,
+          "pairwise_accuracy": 0.8311111111111111,
+          "n_test": 100
+        },
+        "38": {
+          "test_r2": 0.6950380877541377,
+          "pairwise_accuracy": 0.8288888888888889,
+          "n_test": 100
+        },
+        "39": {
+          "test_r2": 0.6966328705854423,
+          "pairwise_accuracy": 0.822020202020202,
+          "n_test": 100
+        },
+        "40": {
+          "test_r2": 0.6920695116578297,
+          "pairwise_accuracy": 0.82,
+          "n_test": 100
+        },
+        "41": {
+          "test_r2": 0.6555977476598247,
+          "pairwise_accuracy": 0.8066666666666666,
+          "n_test": 100
+        },
+        "42": {
+          "test_r2": 0.6660143158956191,
+          "pairwise_accuracy": 0.8157575757575758,
+          "n_test": 100
+        },
+        "43": {
+          "test_r2": 0.6603151058777634,
+          "pairwise_accuracy": 0.8167676767676768,
+          "n_test": 100
+        },
+        "44": {
+          "test_r2": 0.668303429203146,
+          "pairwise_accuracy": 0.8145454545454546,
+          "n_test": 100
+        },
+        "45": {
+          "test_r2": 0.6485352826921177,
+          "pairwise_accuracy": 0.8125252525252525,
+          "n_test": 100
+        },
+        "46": {
+          "test_r2": 0.6319751102341222,
+          "pairwise_accuracy": 0.807070707070707,
+          "n_test": 100
+        },
+        "47": {
+          "test_r2": 0.626722000975886,
+          "pairwise_accuracy": 0.8058585858585858,
+          "n_test": 100
+        },
+        "48": {
+          "test_r2": 0.6406225498508774,
+          "pairwise_accuracy": 0.821010101010101,
+          "n_test": 100
+        }
+      },
+      "best_layer": 29,
+      "best_r2": 0.7485576571349057
+    },
+    "human_valence": {
+      "per_layer": {
+        "0": {
+          "test_r2": -0.002962737551363226,
+          "pairwise_accuracy": 0.46787479406919275,
+          "n_test": 50
+        },
+        "1": {
+          "test_r2": -0.7311501413850483,
+          "pairwise_accuracy": 0.5296540362438221,
+          "n_test": 50
+        },
+        "2": {
+          "test_r2": -0.9750644461542588,
+          "pairwise_accuracy": 0.528830313014827,
+          "n_test": 50
+        },
+        "3": {
+          "test_r2": -0.8548090747129928,
+          "pairwise_accuracy": 0.6037891268533773,
+          "n_test": 50
+        },
+        "4": {
+          "test_r2": -0.39731604030408896,
+          "pairwise_accuracy": 0.6128500823723229,
+          "n_test": 50
+        },
+        "5": {
+          "test_r2": -0.10139492205606171,
+          "pairwise_accuracy": 0.6400329489291599,
+          "n_test": 50
+        },
+        "6": {
+          "test_r2": -0.01936385215672276,
+          "pairwise_accuracy": 0.6515650741350906,
+          "n_test": 50
+        },
+        "7": {
+          "test_r2": 0.04048517746148228,
+          "pairwise_accuracy": 0.6902800658978583,
+          "n_test": 50
+        },
+        "8": {
+          "test_r2": 0.061914433000299085,
+          "pairwise_accuracy": 0.6803953871499177,
+          "n_test": 50
+        },
+        "9": {
+          "test_r2": 0.0876090374354419,
+          "pairwise_accuracy": 0.6861614497528831,
+          "n_test": 50
+        },
+        "10": {
+          "test_r2": 0.04611261631811525,
+          "pairwise_accuracy": 0.7092257001647446,
+          "n_test": 50
+        },
+        "11": {
+          "test_r2": 0.20759010032764724,
+          "pairwise_accuracy": 0.757001647446458,
+          "n_test": 50
+        },
+        "12": {
+          "test_r2": 0.10792863179415924,
+          "pairwise_accuracy": 0.7685337726523888,
+          "n_test": 50
+        },
+        "13": {
+          "test_r2": 0.3998783591175067,
+          "pairwise_accuracy": 0.7726523887973641,
+          "n_test": 50
+        },
+        "14": {
+          "test_r2": 0.4881953099597277,
+          "pairwise_accuracy": 0.7742998352553542,
+          "n_test": 50
+        },
+        "15": {
+          "test_r2": 0.4111567410529591,
+          "pairwise_accuracy": 0.7561779242174629,
+          "n_test": 50
+        },
+        "16": {
+          "test_r2": 0.4432540432825218,
+          "pairwise_accuracy": 0.7767710049423394,
+          "n_test": 50
+        },
+        "17": {
+          "test_r2": 0.38126353770493293,
+          "pairwise_accuracy": 0.7644151565074135,
+          "n_test": 50
+        },
+        "18": {
+          "test_r2": 0.4094453952084848,
+          "pairwise_accuracy": 0.7751235584843492,
+          "n_test": 50
+        },
+        "19": {
+          "test_r2": 0.47237253607865015,
+          "pairwise_accuracy": 0.7825370675453048,
+          "n_test": 50
+        },
+        "20": {
+          "test_r2": 0.4388631467931101,
+          "pairwise_accuracy": 0.7784184514003295,
+          "n_test": 50
+        },
+        "21": {
+          "test_r2": 0.3892232388921749,
+          "pairwise_accuracy": 0.7594728171334432,
+          "n_test": 50
+        },
+        "22": {
+          "test_r2": 0.44910010564110125,
+          "pairwise_accuracy": 0.7652388797364086,
+          "n_test": 50
+        },
+        "23": {
+          "test_r2": 0.46401964162735887,
+          "pairwise_accuracy": 0.770181219110379,
+          "n_test": 50
+        },
+        "24": {
+          "test_r2": 0.4837880011024822,
+          "pairwise_accuracy": 0.7594728171334432,
+          "n_test": 50
+        },
+        "25": {
+          "test_r2": 0.43481488470950425,
+          "pairwise_accuracy": 0.7454695222405272,
+          "n_test": 50
+        },
+        "26": {
+          "test_r2": 0.4496186087191508,
+          "pairwise_accuracy": 0.7635914332784185,
+          "n_test": 50
+        },
+        "27": {
+          "test_r2": 0.5452379291616187,
+          "pairwise_accuracy": 0.785831960461285,
+          "n_test": 50
+        },
+        "28": {
+          "test_r2": 0.6624059266253222,
+          "pairwise_accuracy": 0.8097199341021417,
+          "n_test": 50
+        },
+        "29": {
+          "test_r2": 0.6487344835376587,
+          "pairwise_accuracy": 0.7948929159802306,
+          "n_test": 50
+        },
+        "30": {
+          "test_r2": 0.6049579855987426,
+          "pairwise_accuracy": 0.7751235584843492,
+          "n_test": 50
+        },
+        "31": {
+          "test_r2": 0.6481811386729239,
+          "pairwise_accuracy": 0.7833607907742999,
+          "n_test": 50
+        },
+        "32": {
+          "test_r2": 0.615939531840233,
+          "pairwise_accuracy": 0.7841845140032949,
+          "n_test": 50
+        },
+        "33": {
+          "test_r2": 0.578074169539571,
+          "pairwise_accuracy": 0.7825370675453048,
+          "n_test": 50
+        },
+        "34": {
+          "test_r2": 0.5797944131956889,
+          "pairwise_accuracy": 0.7932454695222405,
+          "n_test": 50
+        },
+        "35": {
+          "test_r2": 0.513184483788432,
+          "pairwise_accuracy": 0.7561779242174629,
+          "n_test": 50
+        },
+        "36": {
+          "test_r2": 0.42100882415783847,
+          "pairwise_accuracy": 0.7331136738056013,
+          "n_test": 50
+        },
+        "37": {
+          "test_r2": 0.4609209943042276,
+          "pairwise_accuracy": 0.7528830313014827,
+          "n_test": 50
+        },
+        "38": {
+          "test_r2": 0.4790036650733549,
+          "pairwise_accuracy": 0.7561779242174629,
+          "n_test": 50
+        },
+        "39": {
+          "test_r2": 0.4762848322843589,
+          "pairwise_accuracy": 0.7619439868204283,
+          "n_test": 50
+        },
+        "40": {
+          "test_r2": 0.4982310434399049,
+          "pairwise_accuracy": 0.7685337726523888,
+          "n_test": 50
+        },
+        "41": {
+          "test_r2": 0.42022071939664496,
+          "pairwise_accuracy": 0.742998352553542,
+          "n_test": 50
+        },
+        "42": {
+          "test_r2": 0.40116262885188536,
+          "pairwise_accuracy": 0.7347611202635914,
+          "n_test": 50
+        },
+        "43": {
+          "test_r2": 0.40462334461693406,
+          "pairwise_accuracy": 0.7265238879736409,
+          "n_test": 50
+        },
+        "44": {
+          "test_r2": 0.39821455073691314,
+          "pairwise_accuracy": 0.71499176276771,
+          "n_test": 50
+        },
+        "45": {
+          "test_r2": 0.4681180832025049,
+          "pairwise_accuracy": 0.7471169686985173,
+          "n_test": 50
+        },
+        "46": {
+          "test_r2": 0.44851781315347206,
+          "pairwise_accuracy": 0.7504118616144976,
+          "n_test": 50
+        },
+        "47": {
+          "test_r2": 0.41260702881409395,
+          "pairwise_accuracy": 0.7265238879736409,
+          "n_test": 50
+        },
+        "48": {
+          "test_r2": 0.39783641600510833,
+          "pairwise_accuracy": 0.728171334431631,
+          "n_test": 50
+        }
+      },
+      "best_layer": 28,
+      "best_r2": 0.6624059266253222
+    }
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "item": "the abolition of slavery",
+      "mu": 27.231146698158565,
+      "sigma": 1.1691675210266395,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 2,
+      "item": "the discovery of penicillin",
+      "mu": 23.66665770129532,
+      "sigma": 5.841985615260521,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 3,
+      "item": "the fall of the Berlin Wall",
+      "mu": 23.414061338034266,
+      "sigma": 0.7873540333729618,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 4,
+      "item": "Fred Rogers",
+      "mu": 21.849477415778107,
+      "sigma": 0.5332241231779233,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 5,
+      "item": "peace",
+      "mu": 21.810995414027527,
+      "sigma": 1.2838069525415823,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 6,
+      "item": "a starry night sky",
+      "mu": 21.643217540835586,
+      "sigma": 0.5503561418824777,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 7,
+      "item": "human rights",
+      "mu": 21.033310295358675,
+      "sigma": 0.4133415309568844,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 8,
+      "item": "the invention of the printing press",
+      "mu": 20.432718573283047,
+      "sigma": 0.3575092583123681,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 9,
+      "item": "Martin Luther King Jr.",
+      "mu": 19.91302205455459,
+      "sigma": 0.5875684657637166,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 10,
+      "item": "a rainbow",
+      "mu": 19.80645767184391,
+      "sigma": 2.689305930406178,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 11,
+      "item": "gratitude",
+      "mu": 19.709155096172974,
+      "sigma": 0.367326981784978,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 12,
+      "item": "firefighters",
+      "mu": 19.360814428392167,
+      "sigma": 2.2643476385366235,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 13,
+      "item": "Nelson Mandela",
+      "mu": 19.162635714443027,
+      "sigma": 2.5407949306737683,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 14,
+      "item": "knowledge",
+      "mu": 19.064425806839658,
+      "sigma": 0.32238406865552177,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 15,
+      "item": "contentment",
+      "mu": 18.7595192388175,
+      "sigma": 1.3408972289333139,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 16,
+      "item": "hope",
+      "mu": 18.74785932245087,
+      "sigma": 0.4790760714171776,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 17,
+      "item": "fresh bread",
+      "mu": 18.567047973583463,
+      "sigma": 0.3967814038147804,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 18,
+      "item": "compassionate",
+      "mu": 18.549804848736947,
+      "sigma": 0.2841763407699587,
+      "source": "warriner",
+      "human_valence": 7.95
+    },
+    {
+      "rank": 19,
+      "item": "Marie Curie",
+      "mu": 18.41612962213979,
+      "sigma": 1.2345492220212844,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 20,
+      "item": "David Attenborough",
+      "mu": 18.35481932436086,
+      "sigma": 0.2649989894248436,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 21,
+      "item": "nurses",
+      "mu": 18.34259175141522,
+      "sigma": 2.4157127645680117,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 22,
+      "item": "friendship",
+      "mu": 18.1377670142169,
+      "sigma": 0.3058006289686147,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 23,
+      "item": "freedom",
+      "mu": 18.038236192438923,
+      "sigma": 0.22496968636924272,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 24,
+      "item": "golden retrievers",
+      "mu": 17.998015017129195,
+      "sigma": 2.7027720910365023,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 25,
+      "item": "courage",
+      "mu": 17.781012491609903,
+      "sigma": 0.21339997539990846,
+      "source": "warriner",
+      "human_valence": 7.67
+    },
+    {
+      "rank": 26,
+      "item": "a sunny meadow",
+      "mu": 17.667015877700663,
+      "sigma": 0.4880410686203934,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 27,
+      "item": "a warm bath",
+      "mu": 17.60616197359242,
+      "sigma": 0.3291387765754927,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 28,
+      "item": "vaccines",
+      "mu": 17.603478068126314,
+      "sigma": 1.880037054983459,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 29,
+      "item": "falling in love",
+      "mu": 17.539289310325618,
+      "sigma": 0.8693202366052504,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 30,
+      "item": "joy",
+      "mu": 17.534073488446662,
+      "sigma": 0.20032354769006938,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 31,
+      "item": "a cozy cabin",
+      "mu": 17.49721139959764,
+      "sigma": 1.3065844843831536,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 32,
+      "item": "elephants",
+      "mu": 17.280484286539707,
+      "sigma": 0.19008741898611933,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 33,
+      "item": "watching a sunset",
+      "mu": 17.17176566273605,
+      "sigma": 0.3093478960976685,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 34,
+      "item": "blooming flowers",
+      "mu": 17.1676228070336,
+      "sigma": 0.4055805988846422,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 35,
+      "item": "serenity",
+      "mu": 17.103493512854268,
+      "sigma": 3.995472650836723,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 36,
+      "item": "the ocean",
+      "mu": 16.922641046192528,
+      "sigma": 0.28870085587249006,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 37,
+      "item": "chocolate",
+      "mu": 16.73214383904275,
+      "sigma": 0.24114936525022143,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 38,
+      "item": "a quiet library",
+      "mu": 16.614441381671398,
+      "sigma": 2.5057268727590403,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 39,
+      "item": "books",
+      "mu": 16.487037017946278,
+      "sigma": 0.8840410891685067,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 40,
+      "item": "scientists",
+      "mu": 16.463999008307788,
+      "sigma": 1.9844046904722206,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 41,
+      "item": "autumn leaves",
+      "mu": 16.412132759790527,
+      "sigma": 0.2630501103054625,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 42,
+      "item": "Keanu Reeves",
+      "mu": 16.27194885387408,
+      "sigma": 2.067136951618828,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 43,
+      "item": "free speech",
+      "mu": 16.223036272482993,
+      "sigma": 6.751477465298703,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 44,
+      "item": "democracy",
+      "mu": 16.103528510562644,
+      "sigma": 0.5610909675196154,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 45,
+      "item": "renewable energy",
+      "mu": 16.062572718077554,
+      "sigma": 0.3692860336039632,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 46,
+      "item": "a tropical beach",
+      "mu": 16.036676625135023,
+      "sigma": 0.23519113245634657,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 47,
+      "item": "reading a good book",
+      "mu": 15.962861728294596,
+      "sigma": 2.01441418264711,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 48,
+      "item": "nostalgia",
+      "mu": 15.936010211840067,
+      "sigma": 0.31128583046805575,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 49,
+      "item": "the Renaissance",
+      "mu": 15.816107030907029,
+      "sigma": 4.724337910037792,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 50,
+      "item": "a surprise party",
+      "mu": 15.704036147667562,
+      "sigma": 1.2696581979916997,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 51,
+      "item": "a spa day",
+      "mu": 15.653911111524264,
+      "sigma": 0.40128631944771226,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 52,
+      "item": "teachers",
+      "mu": 15.589382724511808,
+      "sigma": 0.2668044412738612,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 53,
+      "item": "sunshine",
+      "mu": 15.504113407199872,
+      "sigma": 0.4937358568517986,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 54,
+      "item": "justice",
+      "mu": 15.41738960001541,
+      "sigma": 0.1829060008133295,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 55,
+      "item": "dolphins",
+      "mu": 15.406476627120277,
+      "sigma": 0.8734061696456823,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 56,
+      "item": "dancing at a wedding",
+      "mu": 15.399716161687925,
+      "sigma": 1.784597432109568,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 57,
+      "item": "house cats",
+      "mu": 15.371375664593144,
+      "sigma": 0.25933702757027804,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 58,
+      "item": "a botanical garden",
+      "mu": 15.24469156686414,
+      "sigma": 0.9987877629822063,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 59,
+      "item": "cold leftover pizza",
+      "mu": 15.200884107791625,
+      "sigma": 0.2011037696099031,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 60,
+      "item": "farmers",
+      "mu": 15.114984241093065,
+      "sigma": 1.0284625116040593,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 61,
+      "item": "infinity",
+      "mu": 15.08711711162234,
+      "sigma": 6.259481486695094,
+      "source": "warriner",
+      "human_valence": 6.74
+    },
+    {
+      "rank": 62,
+      "item": "going for a hike",
+      "mu": 14.989937916408069,
+      "sigma": 0.28876068892047435,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 63,
+      "item": "a first kiss",
+      "mu": 14.872169409768844,
+      "sigma": 0.22009509441505934,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 64,
+      "item": "birthday cake",
+      "mu": 14.79629136184898,
+      "sigma": 0.25934429212255267,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 65,
+      "item": "bookworm",
+      "mu": 14.755224509007016,
+      "sigma": 0.2945952209924608,
+      "source": "warriner",
+      "human_valence": 6.67
+    },
+    {
+      "rank": 66,
+      "item": "a national park",
+      "mu": 14.730462075598792,
+      "sigma": 1.2497853551011988,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 67,
+      "item": "artists",
+      "mu": 14.727247613427924,
+      "sigma": 0.5315243177496167,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 68,
+      "item": "simplicity",
+      "mu": 14.707689879523777,
+      "sigma": 0.2585216102249955,
+      "source": "warriner",
+      "human_valence": 7.05
+    },
+    {
+      "rank": 69,
+      "item": "space exploration",
+      "mu": 14.655480314408132,
+      "sigma": 0.2583401678909095,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 70,
+      "item": "excellence",
+      "mu": 14.56444333155417,
+      "sigma": 5.836408638938782,
+      "source": "warriner",
+      "human_valence": 7.87
+    },
+    {
+      "rank": 71,
+      "item": "a gentle breeze",
+      "mu": 14.54110859195796,
+      "sigma": 0.26727570170787396,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 72,
+      "item": "the moon landing",
+      "mu": 14.357339117731433,
+      "sigma": 0.21091600254856901,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 73,
+      "item": "innovation",
+      "mu": 14.337436024786458,
+      "sigma": 0.16924744727692279,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 74,
+      "item": "pizza",
+      "mu": 14.293574631442322,
+      "sigma": 0.7721800258524487,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 75,
+      "item": "premise",
+      "mu": 14.263789936857492,
+      "sigma": 0.31022935237390786,
+      "source": "warriner",
+      "human_valence": 5.43
+    },
+    {
+      "rank": 76,
+      "item": "a bustling market",
+      "mu": 14.148693517952195,
+      "sigma": 0.8699989285643854,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 77,
+      "item": "mission",
+      "mu": 14.028803880955472,
+      "sigma": 0.1663872995482369,
+      "source": "warriner",
+      "human_valence": 6.39
+    },
+    {
+      "rank": 78,
+      "item": "a mountain summit",
+      "mu": 13.969441400284731,
+      "sigma": 0.20405987238588874,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 79,
+      "item": "winning the lottery",
+      "mu": 13.907590368158946,
+      "sigma": 0.15911227641541473,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 80,
+      "item": "privacy",
+      "mu": 13.89724863065848,
+      "sigma": 0.8762850157561815,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 81,
+      "item": "automation",
+      "mu": 13.81069291966833,
+      "sigma": 1.0632432885988552,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 82,
+      "item": "Albert Einstein",
+      "mu": 13.80119510597683,
+      "sigma": 0.36115901675865153,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 83,
+      "item": "honeybees",
+      "mu": 13.776017057731357,
+      "sigma": 0.3619349541085806,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 84,
+      "item": "excitement",
+      "mu": 13.704468362026315,
+      "sigma": 0.23571057497727982,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 85,
+      "item": "promotion",
+      "mu": 13.654042050745586,
+      "sigma": 0.3331718038094587,
+      "source": "warriner",
+      "human_valence": 7.1
+    },
+    {
+      "rank": 86,
+      "item": "prosthetic limbs",
+      "mu": 13.569414547328282,
+      "sigma": 0.17745819199054966,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 87,
+      "item": "ice cream",
+      "mu": 13.439958150253803,
+      "sigma": 0.6678494370658166,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 88,
+      "item": "wood",
+      "mu": 13.29776179930671,
+      "sigma": 0.4521369552402502,
+      "source": "warriner",
+      "human_valence": 5.82
+    },
+    {
+      "rank": 89,
+      "item": "magnesium",
+      "mu": 13.295949621873383,
+      "sigma": 0.17053606048179182,
+      "source": "warriner",
+      "human_valence": 4.95
+    },
+    {
+      "rank": 90,
+      "item": "green tea",
+      "mu": 13.162422343537777,
+      "sigma": 0.17677310972115878,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 91,
+      "item": "succession",
+      "mu": 13.109671809028505,
+      "sigma": 0.7774498156203643,
+      "source": "warriner",
+      "human_valence": 4.52
+    },
+    {
+      "rank": 92,
+      "item": "teddy bears",
+      "mu": 13.078641704395078,
+      "sigma": 0.16433443581056884,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 93,
+      "item": "solar panels",
+      "mu": 12.965352482114714,
+      "sigma": 0.1717868323879717,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 94,
+      "item": "tortoises",
+      "mu": 12.846322939243107,
+      "sigma": 7.682471689746479,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 95,
+      "item": "owls",
+      "mu": 12.813047838478797,
+      "sigma": 0.42742165348854716,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 96,
+      "item": "pianos",
+      "mu": 12.761841817796068,
+      "sigma": 0.15619075375470812,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 97,
+      "item": "coffee",
+      "mu": 12.71074180211755,
+      "sigma": 0.21218851713306217,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 98,
+      "item": "fresh snow",
+      "mu": 12.621791868914487,
+      "sigma": 0.7387743279113256,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 99,
+      "item": "artificial intelligence",
+      "mu": 12.600909003012257,
+      "sigma": 0.1939269747182166,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 100,
+      "item": "butterflies",
+      "mu": 12.592428346785683,
+      "sigma": 0.2592223633427925,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 101,
+      "item": "telescopes",
+      "mu": 12.579472279994656,
+      "sigma": 0.1968095356276127,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 102,
+      "item": "Abraham Lincoln",
+      "mu": 12.578502701476948,
+      "sigma": 2.7474907903835053,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 103,
+      "item": "William Shakespeare",
+      "mu": 12.512298461841578,
+      "sigma": 0.5266104656188283,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 104,
+      "item": "rail",
+      "mu": 12.407744273900336,
+      "sigma": 0.14120230895982794,
+      "source": "warriner",
+      "human_valence": 5.1
+    },
+    {
+      "rank": 105,
+      "item": "pattern",
+      "mu": 12.352987640043073,
+      "sigma": 3.9355687702711606,
+      "source": "warriner",
+      "human_valence": 5.53
+    },
+    {
+      "rank": 106,
+      "item": "Lego",
+      "mu": 12.280361762420384,
+      "sigma": 0.1400395255160674,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 107,
+      "item": "brunch",
+      "mu": 12.219576009084056,
+      "sigma": 0.48780952732703864,
+      "source": "warriner",
+      "human_valence": 6.57
+    },
+    {
+      "rank": 108,
+      "item": "wolves",
+      "mu": 12.112857465918072,
+      "sigma": 0.17514070007091456,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 109,
+      "item": "evidence",
+      "mu": 12.0912374726722,
+      "sigma": 1.1217726914482393,
+      "source": "warriner",
+      "human_valence": 4.72
+    },
+    {
+      "rank": 110,
+      "item": "sushi",
+      "mu": 11.953514367725143,
+      "sigma": 0.19345049418121732,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 111,
+      "item": "rice",
+      "mu": 11.803686395721398,
+      "sigma": 4.015069287768621,
+      "source": "warriner",
+      "human_valence": 5.7
+    },
+    {
+      "rank": 112,
+      "item": "sphere",
+      "mu": 11.737743388556261,
+      "sigma": 2.3096714672199616,
+      "source": "warriner",
+      "human_valence": 6.21
+    },
+    {
+      "rank": 113,
+      "item": "Mahatma Gandhi",
+      "mu": 11.721192409745411,
+      "sigma": 2.4526984059668813,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 114,
+      "item": "spaghetti",
+      "mu": 11.68520400248818,
+      "sigma": 0.19721064229302923,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 115,
+      "item": "sky",
+      "mu": 11.600264404026525,
+      "sigma": 1.6642232041889438,
+      "source": "warriner",
+      "human_valence": 7.32
+    },
+    {
+      "rank": 116,
+      "item": "pastrami",
+      "mu": 11.509920262846679,
+      "sigma": 0.19468979153810712,
+      "source": "warriner",
+      "human_valence": 6.38
+    },
+    {
+      "rank": 117,
+      "item": "neighbor",
+      "mu": 11.504526145517003,
+      "sigma": 3.4613413672193674,
+      "source": "warriner",
+      "human_valence": 5.6
+    },
+    {
+      "rank": 118,
+      "item": "pandas",
+      "mu": 11.394773828112333,
+      "sigma": 2.8143099340317397,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 119,
+      "item": "feathered",
+      "mu": 11.136614788212661,
+      "sigma": 0.2815530344321828,
+      "source": "warriner",
+      "human_valence": 6.29
+    },
+    {
+      "rank": 120,
+      "item": "bacon",
+      "mu": 11.130089693820747,
+      "sigma": 0.34214511542138754,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 121,
+      "item": "buffet",
+      "mu": 11.030448065029397,
+      "sigma": 1.4786844373769386,
+      "source": "warriner",
+      "human_valence": 6.05
+    },
+    {
+      "rank": 122,
+      "item": "Netflix",
+      "mu": 11.025743343567502,
+      "sigma": 0.29565024701910525,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 123,
+      "item": "morning dew",
+      "mu": 10.636176194273395,
+      "sigma": 0.32042463358086987,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 124,
+      "item": "gene editing",
+      "mu": 10.31863578709164,
+      "sigma": 0.5241681127964011,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 125,
+      "item": "lemonade",
+      "mu": 10.244482830841013,
+      "sigma": 1.4877560476777103,
+      "source": "warriner",
+      "human_valence": 7.05
+    },
+    {
+      "rank": 126,
+      "item": "jaws",
+      "mu": 10.113867571210458,
+      "sigma": 0.3015560435006376,
+      "source": "warriner",
+      "human_valence": 4.42
+    },
+    {
+      "rank": 127,
+      "item": "hopeful",
+      "mu": 9.875429586624598,
+      "sigma": 0.3104462507420686,
+      "source": "warriner",
+      "human_valence": 7.44
+    },
+    {
+      "rank": 128,
+      "item": "Taylor Swift",
+      "mu": 9.849333524778269,
+      "sigma": 2.1445261272782035,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 129,
+      "item": "twin",
+      "mu": 9.525673799209166,
+      "sigma": 0.5505554892362375,
+      "source": "warriner",
+      "human_valence": 5.81
+    },
+    {
+      "rank": 130,
+      "item": "piazza",
+      "mu": 9.282637559815097,
+      "sigma": 1.6929870896744632,
+      "source": "warriner",
+      "human_valence": 6.53
+    },
+    {
+      "rank": 131,
+      "item": "perceptive",
+      "mu": 9.203248993544026,
+      "sigma": 0.3130442199444928,
+      "source": "warriner",
+      "human_valence": 5.95
+    },
+    {
+      "rank": 132,
+      "item": "ladybugs",
+      "mu": 9.194716586876122,
+      "sigma": 1.9741198832572184,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 133,
+      "item": "fireworks",
+      "mu": 9.165574166434414,
+      "sigma": 1.9695177383173006,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 134,
+      "item": "Disney",
+      "mu": 9.101652396876831,
+      "sigma": 4.021167595973149,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 135,
+      "item": "precedence",
+      "mu": 8.947898372065545,
+      "sigma": 0.26215279250102824,
+      "source": "warriner",
+      "human_valence": 5.38
+    },
+    {
+      "rank": 136,
+      "item": "granite",
+      "mu": 8.905661326627826,
+      "sigma": 0.3243905798622325,
+      "source": "warriner",
+      "human_valence": 5.05
+    },
+    {
+      "rank": 137,
+      "item": "roar",
+      "mu": 8.83602587190427,
+      "sigma": 0.4884307239016312,
+      "source": "warriner",
+      "human_valence": 5.37
+    },
+    {
+      "rank": 138,
+      "item": "Elvis Presley",
+      "mu": 8.699664834874518,
+      "sigma": 0.2472900861031158,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 139,
+      "item": "surgeons",
+      "mu": 8.645198959479014,
+      "sigma": 0.29609728789964457,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 140,
+      "item": "flexible",
+      "mu": 8.323523091377588,
+      "sigma": 0.3771151236240831,
+      "source": "warriner",
+      "human_valence": 6.74
+    },
+    {
+      "rank": 141,
+      "item": "regenerate",
+      "mu": 8.230627559118297,
+      "sigma": 0.22680799595596338,
+      "source": "warriner",
+      "human_valence": 5.76
+    },
+    {
+      "rank": 142,
+      "item": "theory",
+      "mu": 8.150657172167014,
+      "sigma": 0.2901906567575183,
+      "source": "warriner",
+      "human_valence": 5.65
+    },
+    {
+      "rank": 143,
+      "item": "place",
+      "mu": 7.968853304689011,
+      "sigma": 0.22380040737606888,
+      "source": "warriner",
+      "human_valence": 5.86
+    },
+    {
+      "rank": 144,
+      "item": "smartphones",
+      "mu": 7.894830430240754,
+      "sigma": 2.0226350758753733,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 145,
+      "item": "companion",
+      "mu": 7.831070812007735,
+      "sigma": 0.21691838529921226,
+      "source": "warriner",
+      "human_valence": 7.25
+    },
+    {
+      "rank": 146,
+      "item": "red wine",
+      "mu": 7.735785266757205,
+      "sigma": 3.2858777968701727,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 147,
+      "item": "sorcerer",
+      "mu": 7.7017064792215155,
+      "sigma": 1.0883512248712781,
+      "source": "warriner",
+      "human_valence": 5.76
+    },
+    {
+      "rank": 148,
+      "item": "countdown",
+      "mu": 7.593847892703137,
+      "sigma": 2.1057972333810597,
+      "source": "warriner",
+      "human_valence": 5.64
+    },
+    {
+      "rank": 149,
+      "item": "ambient",
+      "mu": 7.584409036129395,
+      "sigma": 0.16646307356463813,
+      "source": "warriner",
+      "human_valence": 6.33
+    },
+    {
+      "rank": 150,
+      "item": "compression",
+      "mu": 7.568743998953828,
+      "sigma": 0.168571596556652,
+      "source": "warriner",
+      "human_valence": 4.79
+    },
+    {
+      "rank": 151,
+      "item": "basketball",
+      "mu": 7.368048603841104,
+      "sigma": 0.13899735908103006,
+      "source": "warriner",
+      "human_valence": 5.67
+    },
+    {
+      "rank": 152,
+      "item": "grassy",
+      "mu": 7.294286612917126,
+      "sigma": 0.1543393290154989,
+      "source": "warriner",
+      "human_valence": 6.0
+    },
+    {
+      "rank": 153,
+      "item": "chipper",
+      "mu": 7.2084718122589315,
+      "sigma": 2.187333893223107,
+      "source": "warriner",
+      "human_valence": 5.95
+    },
+    {
+      "rank": 154,
+      "item": "wheelchairs",
+      "mu": 7.16547986458439,
+      "sigma": 0.34261754400200156,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 155,
+      "item": "pun",
+      "mu": 7.136273709904796,
+      "sigma": 0.16499869635429787,
+      "source": "warriner",
+      "human_valence": 5.45
+    },
+    {
+      "rank": 156,
+      "item": "museum",
+      "mu": 7.022034913128587,
+      "sigma": 0.18997005967700392,
+      "source": "warriner",
+      "human_valence": 6.67
+    },
+    {
+      "rank": 157,
+      "item": "garbage collectors",
+      "mu": 6.876236043220874,
+      "sigma": 0.1767394073973919,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 158,
+      "item": "chilly",
+      "mu": 6.795160014386137,
+      "sigma": 0.8882272161257361,
+      "source": "warriner",
+      "human_valence": 4.41
+    },
+    {
+      "rank": 159,
+      "item": "blender",
+      "mu": 6.613556966468421,
+      "sigma": 0.6944161744804256,
+      "source": "warriner",
+      "human_valence": 5.16
+    },
+    {
+      "rank": 160,
+      "item": "PlayStation",
+      "mu": 6.61108508954518,
+      "sigma": 0.19387737828411142,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 161,
+      "item": "princess",
+      "mu": 6.601596935703354,
+      "sigma": 0.630327146838476,
+      "source": "warriner",
+      "human_valence": 7.64
+    },
+    {
+      "rank": 162,
+      "item": "paintbrushes",
+      "mu": 6.596717268681638,
+      "sigma": 0.20999122938473877,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 163,
+      "item": "custom",
+      "mu": 6.5955219431817165,
+      "sigma": 1.8444440234378285,
+      "source": "warriner",
+      "human_valence": 5.29
+    },
+    {
+      "rank": 164,
+      "item": "airlock",
+      "mu": 6.522463478387118,
+      "sigma": 7.347272599576554,
+      "source": "warriner",
+      "human_valence": 4.85
+    },
+    {
+      "rank": 165,
+      "item": "silly",
+      "mu": 6.440488479644981,
+      "sigma": 0.4353771831772616,
+      "source": "warriner",
+      "human_valence": 6.72
+    },
+    {
+      "rank": 166,
+      "item": "glee",
+      "mu": 6.429681582593787,
+      "sigma": 7.426757652599789,
+      "source": "warriner",
+      "human_valence": 6.95
+    },
+    {
+      "rank": 167,
+      "item": "tradition",
+      "mu": 6.407064072357309,
+      "sigma": 0.23550337746730968,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 168,
+      "item": "luxurious",
+      "mu": 6.321613523945911,
+      "sigma": 0.2290139664166502,
+      "source": "warriner",
+      "human_valence": 7.58
+    },
+    {
+      "rank": 169,
+      "item": "pagoda",
+      "mu": 6.185239547553418,
+      "sigma": 0.2772895008806413,
+      "source": "warriner",
+      "human_valence": 5.6
+    },
+    {
+      "rank": 170,
+      "item": "monk",
+      "mu": 6.052490171489802,
+      "sigma": 0.39865277665140403,
+      "source": "warriner",
+      "human_valence": 4.9
+    },
+    {
+      "rank": 171,
+      "item": "monastery",
+      "mu": 6.046552399334403,
+      "sigma": 0.25747375565973907,
+      "source": "warriner",
+      "human_valence": 4.75
+    },
+    {
+      "rank": 172,
+      "item": "soprano",
+      "mu": 6.03000193148316,
+      "sigma": 0.9178485782657585,
+      "source": "warriner",
+      "human_valence": 4.95
+    },
+    {
+      "rank": 173,
+      "item": "wool",
+      "mu": 5.968409722957631,
+      "sigma": 0.38418842814988197,
+      "source": "warriner",
+      "human_valence": 5.38
+    },
+    {
+      "rank": 174,
+      "item": "bee",
+      "mu": 5.9447609306227935,
+      "sigma": 0.37750909241070874,
+      "source": "warriner",
+      "human_valence": 3.68
+    },
+    {
+      "rank": 175,
+      "item": "turkey",
+      "mu": 5.810375242030438,
+      "sigma": 0.17354717876583053,
+      "source": "warriner",
+      "human_valence": 5.9
+    },
+    {
+      "rank": 176,
+      "item": "spitfire",
+      "mu": 5.806246351110057,
+      "sigma": 0.7813352839828278,
+      "source": "warriner",
+      "human_valence": 5.18
+    },
+    {
+      "rank": 177,
+      "item": "zucchini",
+      "mu": 5.6393595523358995,
+      "sigma": 0.15731058227826875,
+      "source": "warriner",
+      "human_valence": 6.3
+    },
+    {
+      "rank": 178,
+      "item": "Barack Obama",
+      "mu": 5.519679683507291,
+      "sigma": 3.4990218639936255,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 179,
+      "item": "assist",
+      "mu": 5.463981626461694,
+      "sigma": 3.4110545013144997,
+      "source": "warriner",
+      "human_valence": 5.95
+    },
+    {
+      "rank": 180,
+      "item": "malt",
+      "mu": 5.449096980761017,
+      "sigma": 0.16070734838168657,
+      "source": "warriner",
+      "human_valence": 6.14
+    },
+    {
+      "rank": 181,
+      "item": "seed",
+      "mu": 5.339897036480273,
+      "sigma": 0.2432932248091539,
+      "source": "warriner",
+      "human_valence": 6.38
+    },
+    {
+      "rank": 182,
+      "item": "Leonardo da Vinci",
+      "mu": 5.338856220455735,
+      "sigma": 3.6108276094571665,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 183,
+      "item": "burrow",
+      "mu": 5.210835098030362,
+      "sigma": 0.2289437315297324,
+      "source": "warriner",
+      "human_valence": 5.53
+    },
+    {
+      "rank": 184,
+      "item": "loch",
+      "mu": 5.195173000429227,
+      "sigma": 0.1715025648325195,
+      "source": "warriner",
+      "human_valence": 5.67
+    },
+    {
+      "rank": 185,
+      "item": "cog",
+      "mu": 5.026334046962299,
+      "sigma": 0.1314222862777112,
+      "source": "warriner",
+      "human_valence": 4.55
+    },
+    {
+      "rank": 186,
+      "item": "elk",
+      "mu": 4.944523994754469,
+      "sigma": 0.10621012155519664,
+      "source": "warriner",
+      "human_valence": 5.81
+    },
+    {
+      "rank": 187,
+      "item": "a thunderstorm",
+      "mu": 4.829621872041231,
+      "sigma": 0.12141903807540821,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 188,
+      "item": "a haunted house",
+      "mu": 4.770759840252927,
+      "sigma": 0.11679107017128848,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 189,
+      "item": "binoculars",
+      "mu": 4.716264017241285,
+      "sigma": 0.12607430511057513,
+      "source": "warriner",
+      "human_valence": 5.57
+    },
+    {
+      "rank": 190,
+      "item": "elemental",
+      "mu": 4.602864514934433,
+      "sigma": 0.1344480012871499,
+      "source": "warriner",
+      "human_valence": 5.19
+    },
+    {
+      "rank": 191,
+      "item": "eclectic",
+      "mu": 4.54841332244459,
+      "sigma": 0.12219836965636174,
+      "source": "warriner",
+      "human_valence": 5.9
+    },
+    {
+      "rank": 192,
+      "item": "watering can",
+      "mu": 4.533080930381755,
+      "sigma": 0.13384125219815582,
+      "source": "warriner",
+      "human_valence": 6.11
+    },
+    {
+      "rank": 193,
+      "item": "rumpus",
+      "mu": 4.430605907163981,
+      "sigma": 0.13039266928914353,
+      "source": "warriner",
+      "human_valence": 4.96
+    },
+    {
+      "rank": 194,
+      "item": "laptops",
+      "mu": 4.346341563272197,
+      "sigma": 0.11120579845734573,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 195,
+      "item": "certain",
+      "mu": 4.245076913370469,
+      "sigma": 0.1599031972732848,
+      "source": "warriner",
+      "human_valence": 6.11
+    },
+    {
+      "rank": 196,
+      "item": "result",
+      "mu": 4.195114106742737,
+      "sigma": 0.18413330218483182,
+      "source": "warriner",
+      "human_valence": 6.11
+    },
+    {
+      "rank": 197,
+      "item": "ragtime",
+      "mu": 4.157921879951601,
+      "sigma": 0.1375992748091313,
+      "source": "warriner",
+      "human_valence": 5.45
+    },
+    {
+      "rank": 198,
+      "item": "bonanza",
+      "mu": 4.102620799033742,
+      "sigma": 1.3380624608151226,
+      "source": "warriner",
+      "human_valence": 6.09
+    },
+    {
+      "rank": 199,
+      "item": "glad",
+      "mu": 4.090746871597968,
+      "sigma": 1.2059972109369754,
+      "source": "warriner",
+      "human_valence": 7.55
+    },
+    {
+      "rank": 200,
+      "item": "rocker",
+      "mu": 4.003293759535281,
+      "sigma": 0.14907957929226084,
+      "source": "warriner",
+      "human_valence": 5.65
+    },
+    {
+      "rank": 201,
+      "item": "climate change",
+      "mu": 3.8596207864370915,
+      "sigma": 0.14507601525384564,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 202,
+      "item": "sovereignty",
+      "mu": 3.7753789705761958,
+      "sigma": 0.16208107452977677,
+      "source": "warriner",
+      "human_valence": 4.89
+    },
+    {
+      "rank": 203,
+      "item": "coincidental",
+      "mu": 3.7263425752415245,
+      "sigma": 0.19152417408273156,
+      "source": "warriner",
+      "human_valence": 5.68
+    },
+    {
+      "rank": 204,
+      "item": "approximate",
+      "mu": 3.6843638737758013,
+      "sigma": 0.28149102759390904,
+      "source": "warriner",
+      "human_valence": 5.26
+    },
+    {
+      "rank": 205,
+      "item": "grow",
+      "mu": 3.572437026320067,
+      "sigma": 1.4256920917031362,
+      "source": "warriner",
+      "human_valence": 6.28
+    },
+    {
+      "rank": 206,
+      "item": "byzantine",
+      "mu": 3.412721329654086,
+      "sigma": 0.16946635738424662,
+      "source": "warriner",
+      "human_valence": 4.5
+    },
+    {
+      "rank": 207,
+      "item": "meritocracy",
+      "mu": 3.34183908803585,
+      "sigma": 0.3392812347666272,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 208,
+      "item": "Tesla cars",
+      "mu": 3.1609045486577507,
+      "sigma": 0.29937300124294425,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 209,
+      "item": "Google",
+      "mu": 3.1347330077332405,
+      "sigma": 0.7656765060914182,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 210,
+      "item": "unzip",
+      "mu": 3.1291693396446085,
+      "sigma": 1.223734908751838,
+      "source": "warriner",
+      "human_valence": 5.32
+    },
+    {
+      "rank": 211,
+      "item": "regroup",
+      "mu": 2.9144457721149495,
+      "sigma": 2.2963054420106364,
+      "source": "warriner",
+      "human_valence": 4.7
+    },
+    {
+      "rank": 212,
+      "item": "splash",
+      "mu": 2.8860807935946826,
+      "sigma": 0.3809793545186558,
+      "source": "warriner",
+      "human_valence": 6.53
+    },
+    {
+      "rank": 213,
+      "item": "aura",
+      "mu": 2.8381346750202248,
+      "sigma": 0.8623267133166997,
+      "source": "warriner",
+      "human_valence": 6.45
+    },
+    {
+      "rank": 214,
+      "item": "Apple iPhone",
+      "mu": 2.6861364711836595,
+      "sigma": 0.36871443797370324,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 215,
+      "item": "dim",
+      "mu": 2.6203051540676867,
+      "sigma": 0.46289849654314913,
+      "source": "warriner",
+      "human_valence": 3.37
+    },
+    {
+      "rank": 216,
+      "item": "rearrange",
+      "mu": 2.610314888443465,
+      "sigma": 0.30071311368081355,
+      "source": "warriner",
+      "human_valence": 5.52
+    },
+    {
+      "rank": 217,
+      "item": "oversized",
+      "mu": 2.4696611874650847,
+      "sigma": 0.5881556915921298,
+      "source": "warriner",
+      "human_valence": 4.4
+    },
+    {
+      "rank": 218,
+      "item": "Amazon",
+      "mu": 2.4447188448423476,
+      "sigma": 0.27559768488794456,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 219,
+      "item": "exceed",
+      "mu": 2.301310445484773,
+      "sigma": 0.27555246147922824,
+      "source": "warriner",
+      "human_valence": 4.79
+    },
+    {
+      "rank": 220,
+      "item": "beefsteak",
+      "mu": 2.2195986739483775,
+      "sigma": 0.22363366010403585,
+      "source": "warriner",
+      "human_valence": 5.53
+    },
+    {
+      "rank": 221,
+      "item": "broccoli",
+      "mu": 2.195433227839539,
+      "sigma": 0.17725150316035365,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 222,
+      "item": "immortality",
+      "mu": 2.13509207169043,
+      "sigma": 8.81247481879352,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 223,
+      "item": "simplistic",
+      "mu": 2.1316514324067075,
+      "sigma": 1.2550554269163108,
+      "source": "warriner",
+      "human_valence": 6.43
+    },
+    {
+      "rank": 224,
+      "item": "fuchsia",
+      "mu": 1.9992135498646715,
+      "sigma": 0.12723340811916026,
+      "source": "warriner",
+      "human_valence": 5.14
+    },
+    {
+      "rank": 225,
+      "item": "Winston Churchill",
+      "mu": 1.8299741760520205,
+      "sigma": 4.716805976005026,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 226,
+      "item": "sarsaparilla",
+      "mu": 1.7943108970109742,
+      "sigma": 0.17704444589104024,
+      "source": "warriner",
+      "human_valence": 5.4
+    },
+    {
+      "rank": 227,
+      "item": "immense",
+      "mu": 1.782017074840866,
+      "sigma": 0.1507464531559429,
+      "source": "warriner",
+      "human_valence": 5.48
+    },
+    {
+      "rank": 228,
+      "item": "array",
+      "mu": 1.7015204389830763,
+      "sigma": 0.14737278805163914,
+      "source": "warriner",
+      "human_valence": 5.9
+    },
+    {
+      "rank": 229,
+      "item": "persuade",
+      "mu": 1.6881591126120112,
+      "sigma": 0.2290161980657315,
+      "source": "warriner",
+      "human_valence": 5.67
+    },
+    {
+      "rank": 230,
+      "item": "Coca-Cola",
+      "mu": 1.6531543339205035,
+      "sigma": 7.983967932737072,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 231,
+      "item": "center",
+      "mu": 1.5723024099850067,
+      "sigma": 0.1690553163099731,
+      "source": "warriner",
+      "human_valence": 5.56
+    },
+    {
+      "rank": 232,
+      "item": "onion",
+      "mu": 1.4990577982209448,
+      "sigma": 4.938297048406343,
+      "source": "warriner",
+      "human_valence": 5.37
+    },
+    {
+      "rank": 233,
+      "item": "fried",
+      "mu": 1.4930459736263468,
+      "sigma": 1.0014002319145578,
+      "source": "warriner",
+      "human_valence": 5.82
+    },
+    {
+      "rank": 234,
+      "item": "suitable",
+      "mu": 1.4464196635614048,
+      "sigma": 0.17548746658906117,
+      "source": "warriner",
+      "human_valence": 5.7
+    },
+    {
+      "rank": 235,
+      "item": "vicinity",
+      "mu": 1.341454907707391,
+      "sigma": 0.19559264943222057,
+      "source": "warriner",
+      "human_valence": 5.32
+    },
+    {
+      "rank": 236,
+      "item": "challenger",
+      "mu": 1.3255741503291227,
+      "sigma": 2.002013384008999,
+      "source": "warriner",
+      "human_valence": 5.33
+    },
+    {
+      "rank": 237,
+      "item": "order",
+      "mu": 1.297153394615679,
+      "sigma": 3.258099434478229,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 238,
+      "item": "unquote",
+      "mu": 1.0821484685532103,
+      "sigma": 0.218185718232042,
+      "source": "warriner",
+      "human_valence": 5.21
+    },
+    {
+      "rank": 239,
+      "item": "minute",
+      "mu": 0.9780926187543485,
+      "sigma": 0.19847229285633003,
+      "source": "warriner",
+      "human_valence": 5.5
+    },
+    {
+      "rank": 240,
+      "item": "distilled",
+      "mu": 0.9522850828552212,
+      "sigma": 1.6993379869137375,
+      "source": "warriner",
+      "human_valence": 5.16
+    },
+    {
+      "rank": 241,
+      "item": "ask",
+      "mu": 0.8885279514280882,
+      "sigma": 0.36686921230872527,
+      "source": "warriner",
+      "human_valence": 5.95
+    },
+    {
+      "rank": 242,
+      "item": "recall",
+      "mu": 0.874166084558249,
+      "sigma": 0.25256603500559927,
+      "source": "warriner",
+      "human_valence": 4.77
+    },
+    {
+      "rank": 243,
+      "item": "zing",
+      "mu": 0.8584149365490705,
+      "sigma": 0.18937087617295095,
+      "source": "warriner",
+      "human_valence": 6.95
+    },
+    {
+      "rank": 244,
+      "item": "virtual",
+      "mu": 0.8527236619766109,
+      "sigma": 1.0085863591508224,
+      "source": "warriner",
+      "human_valence": 6.1
+    },
+    {
+      "rank": 245,
+      "item": "realty",
+      "mu": 0.7855054125809897,
+      "sigma": 0.21778814382585246,
+      "source": "warriner",
+      "human_valence": 4.95
+    },
+    {
+      "rank": 246,
+      "item": "example",
+      "mu": 0.7526105306789452,
+      "sigma": 2.902572279946882,
+      "source": "warriner",
+      "human_valence": 4.9
+    },
+    {
+      "rank": 247,
+      "item": "yearly",
+      "mu": 0.7250143141001478,
+      "sigma": 0.7669907971627641,
+      "source": "warriner",
+      "human_valence": 5.2
+    },
+    {
+      "rank": 248,
+      "item": "span",
+      "mu": 0.5891062550532344,
+      "sigma": 0.18915939504323753,
+      "source": "warriner",
+      "human_valence": 5.74
+    },
+    {
+      "rank": 249,
+      "item": "polka",
+      "mu": 0.4856557756986908,
+      "sigma": 0.7207332923271164,
+      "source": "warriner",
+      "human_valence": 4.79
+    },
+    {
+      "rank": 250,
+      "item": "repent",
+      "mu": 0.4325939602023152,
+      "sigma": 0.15588446633894476,
+      "source": "warriner",
+      "human_valence": 4.4
+    },
+    {
+      "rank": 251,
+      "item": "clan",
+      "mu": 0.2828113142971709,
+      "sigma": 0.5482424826739587,
+      "source": "warriner",
+      "human_valence": 5.2
+    },
+    {
+      "rank": 252,
+      "item": "thermos",
+      "mu": 0.26821671561943294,
+      "sigma": 0.18683041690052957,
+      "source": "warriner",
+      "human_valence": 5.79
+    },
+    {
+      "rank": 253,
+      "item": "nutshell",
+      "mu": 0.18431140889783235,
+      "sigma": 2.542375430587093,
+      "source": "warriner",
+      "human_valence": 5.05
+    },
+    {
+      "rank": 254,
+      "item": "overripe bananas",
+      "mu": 0.17858830076212118,
+      "sigma": 1.1643826878537753,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 255,
+      "item": "cable",
+      "mu": 0.09977129106038626,
+      "sigma": 0.3225406853918061,
+      "source": "warriner",
+      "human_valence": 5.9
+    },
+    {
+      "rank": 256,
+      "item": "fog",
+      "mu": 0.09476673974185344,
+      "sigma": 0.35576697606330865,
+      "source": "warriner",
+      "human_valence": 5.77
+    },
+    {
+      "rank": 257,
+      "item": "wishful",
+      "mu": 0.023309249691619856,
+      "sigma": 0.3993385476405847,
+      "source": "warriner",
+      "human_valence": 6.84
+    },
+    {
+      "rank": 258,
+      "item": "pull",
+      "mu": -0.053935758434554434,
+      "sigma": 0.31505374591006147,
+      "source": "warriner",
+      "human_valence": 5.59
+    },
+    {
+      "rank": 259,
+      "item": "whim",
+      "mu": -0.32054236697945426,
+      "sigma": 1.1420969772852294,
+      "source": "warriner",
+      "human_valence": 6.16
+    },
+    {
+      "rank": 260,
+      "item": "detect",
+      "mu": -0.5348874022704564,
+      "sigma": 0.6722638769119865,
+      "source": "warriner",
+      "human_valence": 5.09
+    },
+    {
+      "rank": 261,
+      "item": "gull",
+      "mu": -0.5655601859848239,
+      "sigma": 0.22310041301972416,
+      "source": "warriner",
+      "human_valence": 5.67
+    },
+    {
+      "rank": 262,
+      "item": "manner",
+      "mu": -0.7447614794997476,
+      "sigma": 1.6027606971700714,
+      "source": "warriner",
+      "human_valence": 5.86
+    },
+    {
+      "rank": 263,
+      "item": "rats",
+      "mu": -0.7697437470115633,
+      "sigma": 0.2608088438334299,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 264,
+      "item": "shopkeeper",
+      "mu": -0.9851839189607983,
+      "sigma": 0.20544329359636124,
+      "source": "warriner",
+      "human_valence": 5.35
+    },
+    {
+      "rank": 265,
+      "item": "recon",
+      "mu": -1.0773039640302733,
+      "sigma": 4.321190183104778,
+      "source": "warriner",
+      "human_valence": 4.68
+    },
+    {
+      "rank": 266,
+      "item": "proceeds",
+      "mu": -1.3130337355795718,
+      "sigma": 0.18306080489428497,
+      "source": "warriner",
+      "human_valence": 5.79
+    },
+    {
+      "rank": 267,
+      "item": "buzzard",
+      "mu": -1.4137852968525397,
+      "sigma": 1.5465227228428438,
+      "source": "warriner",
+      "human_valence": 4.74
+    },
+    {
+      "rank": 268,
+      "item": "petition",
+      "mu": -1.4339850307762352,
+      "sigma": 0.23808838458860865,
+      "source": "warriner",
+      "human_valence": 4.8
+    },
+    {
+      "rank": 269,
+      "item": "spool",
+      "mu": -1.50413813875148,
+      "sigma": 0.1750201102289618,
+      "source": "warriner",
+      "human_valence": 5.71
+    },
+    {
+      "rank": 270,
+      "item": "chaser",
+      "mu": -1.635893603177404,
+      "sigma": 1.032532136634636,
+      "source": "warriner",
+      "human_valence": 4.72
+    },
+    {
+      "rank": 271,
+      "item": "suburban",
+      "mu": -1.6750884635224064,
+      "sigma": 2.4419975825079243,
+      "source": "warriner",
+      "human_valence": 5.85
+    },
+    {
+      "rank": 272,
+      "item": "fingerprint",
+      "mu": -1.7474041589580527,
+      "sigma": 0.16602576375881217,
+      "source": "warriner",
+      "human_valence": 5.25
+    },
+    {
+      "rank": 273,
+      "item": "waitress",
+      "mu": -1.830177739498298,
+      "sigma": 0.19927207294383012,
+      "source": "warriner",
+      "human_valence": 5.1
+    },
+    {
+      "rank": 274,
+      "item": "legislature",
+      "mu": -1.8771078454731642,
+      "sigma": 0.1448433171680283,
+      "source": "warriner",
+      "human_valence": 3.55
+    },
+    {
+      "rank": 275,
+      "item": "problem",
+      "mu": -1.940180307704084,
+      "sigma": 4.858933904562611,
+      "source": "warriner",
+      "human_valence": 3.52
+    },
+    {
+      "rank": 276,
+      "item": "litigator",
+      "mu": -2.037326435093562,
+      "sigma": 0.14908375372219357,
+      "source": "warriner",
+      "human_valence": 3.52
+    },
+    {
+      "rank": 277,
+      "item": "capitalism",
+      "mu": -2.1823639686118685,
+      "sigma": 0.13138310120274801,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 278,
+      "item": "chivalry",
+      "mu": -2.301235601154221,
+      "sigma": 0.15610485985018546,
+      "source": "warriner",
+      "human_valence": 6.7
+    },
+    {
+      "rank": 279,
+      "item": "wealth",
+      "mu": -2.3857251757091356,
+      "sigma": 0.152507062959081,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 280,
+      "item": "physique",
+      "mu": -2.4815473537515538,
+      "sigma": 0.1809869373428474,
+      "source": "warriner",
+      "human_valence": 5.74
+    },
+    {
+      "rank": 281,
+      "item": "test",
+      "mu": -2.5453602590366717,
+      "sigma": 1.0034770931773411,
+      "source": "warriner",
+      "human_valence": 4.44
+    },
+    {
+      "rank": 282,
+      "item": "announcement",
+      "mu": -2.6987574641166376,
+      "sigma": 0.9071478125632501,
+      "source": "warriner",
+      "human_valence": 5.81
+    },
+    {
+      "rank": 283,
+      "item": "piggy",
+      "mu": -2.7261004958208095,
+      "sigma": 0.1636966549220583,
+      "source": "warriner",
+      "human_valence": 4.71
+    },
+    {
+      "rank": 284,
+      "item": "recount",
+      "mu": -2.8692220492211096,
+      "sigma": 0.22850450139956213,
+      "source": "warriner",
+      "human_valence": 4.89
+    },
+    {
+      "rank": 285,
+      "item": "ruse",
+      "mu": -2.9919425900170684,
+      "sigma": 0.21533905789714097,
+      "source": "warriner",
+      "human_valence": 3.76
+    },
+    {
+      "rank": 286,
+      "item": "soldiers",
+      "mu": -3.0330266771800134,
+      "sigma": 0.6129353198677245,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 287,
+      "item": "rein",
+      "mu": -3.092926187329216,
+      "sigma": 0.45070383362714594,
+      "source": "warriner",
+      "human_valence": 4.79
+    },
+    {
+      "rank": 288,
+      "item": "sub",
+      "mu": -3.1165779897095582,
+      "sigma": 0.4180927938735593,
+      "source": "warriner",
+      "human_valence": 5.0
+    },
+    {
+      "rank": 289,
+      "item": "hackers",
+      "mu": -3.1567828251297265,
+      "sigma": 0.1892029044611942,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 290,
+      "item": "goldfish",
+      "mu": -3.3204685047961577,
+      "sigma": 0.2525970970576888,
+      "source": "warriner",
+      "human_valence": 6.62
+    },
+    {
+      "rank": 291,
+      "item": "insist",
+      "mu": -3.373884501305054,
+      "sigma": 0.1877055089462759,
+      "source": "warriner",
+      "human_valence": 4.42
+    },
+    {
+      "rank": 292,
+      "item": "nun",
+      "mu": -3.580056905834399,
+      "sigma": 0.22702395318589688,
+      "source": "warriner",
+      "human_valence": 5.79
+    },
+    {
+      "rank": 293,
+      "item": "insistence",
+      "mu": -3.612487123038712,
+      "sigma": 0.1688959026210178,
+      "source": "warriner",
+      "human_valence": 5.0
+    },
+    {
+      "rank": 294,
+      "item": "Nike sneakers",
+      "mu": -3.752983652546593,
+      "sigma": 0.18533024529478345,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 295,
+      "item": "abolish",
+      "mu": -3.8341003746649966,
+      "sigma": 3.696368624691755,
+      "source": "warriner",
+      "human_valence": 3.84
+    },
+    {
+      "rank": 296,
+      "item": "weigh",
+      "mu": -3.8609751781592685,
+      "sigma": 0.9808525491320701,
+      "source": "warriner",
+      "human_valence": 4.32
+    },
+    {
+      "rank": 297,
+      "item": "broadside",
+      "mu": -3.870516338212168,
+      "sigma": 6.645497611059819,
+      "source": "warriner",
+      "human_valence": 3.8
+    },
+    {
+      "rank": 298,
+      "item": "scullery",
+      "mu": -3.882207419541168,
+      "sigma": 0.16139796064433917,
+      "source": "warriner",
+      "human_valence": 4.47
+    },
+    {
+      "rank": 299,
+      "item": "kale",
+      "mu": -3.9966680616467327,
+      "sigma": 0.2611242197365798,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 300,
+      "item": "ignore",
+      "mu": -4.030261095508567,
+      "sigma": 0.1562610425485246,
+      "source": "warriner",
+      "human_valence": 3.33
+    },
+    {
+      "rank": 301,
+      "item": "an awkward silence",
+      "mu": -4.062216265282098,
+      "sigma": 0.23327460413150608,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 302,
+      "item": "electoral",
+      "mu": -4.209705179870951,
+      "sigma": 1.6693436075253203,
+      "source": "warriner",
+      "human_valence": 4.21
+    },
+    {
+      "rank": 303,
+      "item": "hetero",
+      "mu": -4.263240564922599,
+      "sigma": 0.14908384999773522,
+      "source": "warriner",
+      "human_valence": 4.94
+    },
+    {
+      "rank": 304,
+      "item": "sharks",
+      "mu": -4.33228583516699,
+      "sigma": 0.4080866005542957,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 305,
+      "item": "broadcasting",
+      "mu": -4.343700391092553,
+      "sigma": 0.27711612578083156,
+      "source": "warriner",
+      "human_valence": 4.68
+    },
+    {
+      "rank": 306,
+      "item": "hacker",
+      "mu": -4.468673755888022,
+      "sigma": 0.16866601713394594,
+      "source": "warriner",
+      "human_valence": 4.5
+    },
+    {
+      "rank": 307,
+      "item": "daze",
+      "mu": -4.501769508812601,
+      "sigma": 3.146254867634889,
+      "source": "warriner",
+      "human_valence": 4.14
+    },
+    {
+      "rank": 308,
+      "item": "IKEA furniture",
+      "mu": -4.518169648829792,
+      "sigma": 2.5906197533115463,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 309,
+      "item": "Rolex watches",
+      "mu": -4.65328564847959,
+      "sigma": 0.24920566154470428,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 310,
+      "item": "moped",
+      "mu": -4.694728801607756,
+      "sigma": 0.29589867449535684,
+      "source": "warriner",
+      "human_valence": 5.0
+    },
+    {
+      "rank": 311,
+      "item": "carp",
+      "mu": -4.7305172016422325,
+      "sigma": 0.1978039232687074,
+      "source": "warriner",
+      "human_valence": 4.55
+    },
+    {
+      "rank": 312,
+      "item": "amount",
+      "mu": -4.742299058946566,
+      "sigma": 1.1316555816518477,
+      "source": "warriner",
+      "human_valence": 5.42
+    },
+    {
+      "rank": 313,
+      "item": "pigeons",
+      "mu": -4.898268255441164,
+      "sigma": 0.1926695916733644,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 314,
+      "item": "tooth",
+      "mu": -5.164980558553992,
+      "sigma": 0.20731898456875847,
+      "source": "warriner",
+      "human_valence": 5.06
+    },
+    {
+      "rank": 315,
+      "item": "ignorance",
+      "mu": -5.204567932125229,
+      "sigma": 0.35240591761580875,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 316,
+      "item": "shopping carts",
+      "mu": -5.207205447162204,
+      "sigma": 0.2574149563471123,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 317,
+      "item": "turret",
+      "mu": -5.2476567316854705,
+      "sigma": 0.30649086493160993,
+      "source": "warriner",
+      "human_valence": 4.55
+    },
+    {
+      "rank": 318,
+      "item": "defiant",
+      "mu": -5.284885804039699,
+      "sigma": 4.077881049759399,
+      "source": "warriner",
+      "human_valence": 4.12
+    },
+    {
+      "rank": 319,
+      "item": "frightened",
+      "mu": -5.4709242997114576,
+      "sigma": 2.9410159360373025,
+      "source": "warriner",
+      "human_valence": 2.45
+    },
+    {
+      "rank": 320,
+      "item": "fee",
+      "mu": -5.672837431752175,
+      "sigma": 0.2864838336266793,
+      "source": "warriner",
+      "human_valence": 2.86
+    },
+    {
+      "rank": 321,
+      "item": "chaos",
+      "mu": -5.796897374281511,
+      "sigma": 0.4311292653165305,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 322,
+      "item": "urge",
+      "mu": -5.971220108095435,
+      "sigma": 0.6776897382190655,
+      "source": "warriner",
+      "human_valence": 5.11
+    },
+    {
+      "rank": 323,
+      "item": "stockbroker",
+      "mu": -5.972783678126576,
+      "sigma": 0.3430514019073305,
+      "source": "warriner",
+      "human_valence": 4.05
+    },
+    {
+      "rank": 324,
+      "item": "wounds",
+      "mu": -6.128394534332011,
+      "sigma": 0.2591164496647522,
+      "source": "warriner",
+      "human_valence": 2.95
+    },
+    {
+      "rank": 325,
+      "item": "Mother Teresa",
+      "mu": -6.145420678979884,
+      "sigma": 3.360591817262276,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 326,
+      "item": "journalists",
+      "mu": -6.265180305318329,
+      "sigma": 0.8833427028414447,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 327,
+      "item": "enlargement",
+      "mu": -6.282686995071338,
+      "sigma": 6.659386336994442,
+      "source": "warriner",
+      "human_valence": 4.65
+    },
+    {
+      "rank": 328,
+      "item": "boredom",
+      "mu": -6.287770864363082,
+      "sigma": 0.36732436548407277,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 329,
+      "item": "jellyfish",
+      "mu": -6.313366510466754,
+      "sigma": 0.20911542031311198,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 330,
+      "item": "fast food",
+      "mu": -6.377942624817872,
+      "sigma": 2.787810242130182,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 331,
+      "item": "McDonald's",
+      "mu": -6.424966721239623,
+      "sigma": 1.9566197396373044,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 332,
+      "item": "despicable",
+      "mu": -6.449192132859446,
+      "sigma": 3.443125643447964,
+      "source": "warriner",
+      "human_valence": 2.76
+    },
+    {
+      "rank": 333,
+      "item": "buzzer",
+      "mu": -6.463408587676231,
+      "sigma": 0.38753557610196543,
+      "source": "warriner",
+      "human_valence": 5.16
+    },
+    {
+      "rank": 334,
+      "item": "splat",
+      "mu": -6.510587569944471,
+      "sigma": 0.1716471824020345,
+      "source": "warriner",
+      "human_valence": 3.79
+    },
+    {
+      "rank": 335,
+      "item": "gully",
+      "mu": -6.679578796565531,
+      "sigma": 0.1395622625430562,
+      "source": "warriner",
+      "human_valence": 5.05
+    },
+    {
+      "rank": 336,
+      "item": "discouraged",
+      "mu": -6.849181915506411,
+      "sigma": 0.15826959565533633,
+      "source": "warriner",
+      "human_valence": 3.18
+    },
+    {
+      "rank": 337,
+      "item": "hoarse",
+      "mu": -6.866093653278101,
+      "sigma": 0.16432401868537122,
+      "source": "warriner",
+      "human_valence": 3.85
+    },
+    {
+      "rank": 338,
+      "item": "crutch",
+      "mu": -7.106849026272995,
+      "sigma": 0.16359530273469303,
+      "source": "warriner",
+      "human_valence": 3.64
+    },
+    {
+      "rank": 339,
+      "item": "anxiety",
+      "mu": -7.151546432354761,
+      "sigma": 0.6656553545540635,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 340,
+      "item": "oysters",
+      "mu": -7.170380091042468,
+      "sigma": 1.6760055839927,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 341,
+      "item": "occipital",
+      "mu": -7.231239205037788,
+      "sigma": 0.19518468267342678,
+      "source": "warriner",
+      "human_valence": 4.45
+    },
+    {
+      "rank": 342,
+      "item": "birdcage",
+      "mu": -7.296029575816631,
+      "sigma": 0.22150996139139523,
+      "source": "warriner",
+      "human_valence": 5.2
+    },
+    {
+      "rank": 343,
+      "item": "larynx",
+      "mu": -7.4914124178790615,
+      "sigma": 0.18965274174358887,
+      "source": "warriner",
+      "human_valence": 4.45
+    },
+    {
+      "rank": 344,
+      "item": "distressed",
+      "mu": -7.802119155287097,
+      "sigma": 0.22448480542655758,
+      "source": "warriner",
+      "human_valence": 3.38
+    },
+    {
+      "rank": 345,
+      "item": "unforgiving",
+      "mu": -7.813212436123134,
+      "sigma": 1.3743801269895373,
+      "source": "warriner",
+      "human_valence": 2.41
+    },
+    {
+      "rank": 346,
+      "item": "fluorescent",
+      "mu": -7.899047584715947,
+      "sigma": 0.1956578131338401,
+      "source": "warriner",
+      "human_valence": 5.16
+    },
+    {
+      "rank": 347,
+      "item": "dispense",
+      "mu": -7.9395235622886515,
+      "sigma": 0.7530679164862598,
+      "source": "warriner",
+      "human_valence": 5.24
+    },
+    {
+      "rank": 348,
+      "item": "anarchism",
+      "mu": -8.218440369722765,
+      "sigma": 8.241355615113957,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 349,
+      "item": "pushover",
+      "mu": -8.224800476107339,
+      "sigma": 0.17992668921114346,
+      "source": "warriner",
+      "human_valence": 4.1
+    },
+    {
+      "rank": 350,
+      "item": "the Industrial Revolution",
+      "mu": -8.245436185279242,
+      "sigma": 0.9096539019171576,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 351,
+      "item": "grief",
+      "mu": -8.299119066249883,
+      "sigma": 0.17660556878955636,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 352,
+      "item": "needless",
+      "mu": -8.45573058175459,
+      "sigma": 0.23124249448793852,
+      "source": "warriner",
+      "human_valence": 4.25
+    },
+    {
+      "rank": 353,
+      "item": "deny",
+      "mu": -8.482656827863147,
+      "sigma": 0.17844242206307942,
+      "source": "warriner",
+      "human_valence": 3.81
+    },
+    {
+      "rank": 354,
+      "item": "cynical",
+      "mu": -8.493395838119882,
+      "sigma": 3.9233212083193187,
+      "source": "warriner",
+      "human_valence": 3.3
+    },
+    {
+      "rank": 355,
+      "item": "excess",
+      "mu": -8.53817435581035,
+      "sigma": 1.580853053107402,
+      "source": "warriner",
+      "human_valence": 4.29
+    },
+    {
+      "rank": 356,
+      "item": "naked",
+      "mu": -8.73770188258693,
+      "sigma": 0.17246298576925895,
+      "source": "warriner",
+      "human_valence": 6.21
+    },
+    {
+      "rank": 357,
+      "item": "a nuclear power plant",
+      "mu": -8.759261339009006,
+      "sigma": 0.41747349798118283,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 358,
+      "item": "perfectionist",
+      "mu": -8.774091423967919,
+      "sigma": 0.9370926868821163,
+      "source": "warriner",
+      "human_valence": 5.91
+    },
+    {
+      "rank": 359,
+      "item": "dissociative",
+      "mu": -9.03212364873527,
+      "sigma": 0.23099119920749808,
+      "source": "warriner",
+      "human_valence": 3.58
+    },
+    {
+      "rank": 360,
+      "item": "extinction",
+      "mu": -9.169474196381106,
+      "sigma": 0.6405324696028338,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 361,
+      "item": "disoriented",
+      "mu": -9.206277690420743,
+      "sigma": 0.3961548430180464,
+      "source": "warriner",
+      "human_valence": 3.26
+    },
+    {
+      "rank": 362,
+      "item": "sinner",
+      "mu": -9.26104690081805,
+      "sigma": 0.5435096352937678,
+      "source": "warriner",
+      "human_valence": 3.25
+    },
+    {
+      "rank": 363,
+      "item": "dread",
+      "mu": -9.333574266699742,
+      "sigma": 0.4248475907477788,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 364,
+      "item": "decaf",
+      "mu": -9.40276259132129,
+      "sigma": 4.002853143510074,
+      "source": "warriner",
+      "human_valence": 3.62
+    },
+    {
+      "rank": 365,
+      "item": "the French Revolution",
+      "mu": -9.414029307020293,
+      "sigma": 0.22191856438987287,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 366,
+      "item": "the Cold War",
+      "mu": -9.531343206346328,
+      "sigma": 1.0608691533366477,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 367,
+      "item": "missing a flight",
+      "mu": -9.57300553905711,
+      "sigma": 1.4629588385166745,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 368,
+      "item": "loneliness",
+      "mu": -9.719755338212714,
+      "sigma": 1.0257253306429641,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 369,
+      "item": "the Holocaust",
+      "mu": -9.767733382934395,
+      "sigma": 0.22862075623797493,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 370,
+      "item": "Ronald Reagan",
+      "mu": -9.84569261541768,
+      "sigma": 0.13441153339324263,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 371,
+      "item": "libertarianism",
+      "mu": -9.88317895369035,
+      "sigma": 0.3388191045246326,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 372,
+      "item": "honk",
+      "mu": -9.885826351565429,
+      "sigma": 2.13520759198905,
+      "source": "warriner",
+      "human_valence": 4.95
+    },
+    {
+      "rank": 373,
+      "item": "socialism",
+      "mu": -9.957227958006472,
+      "sigma": 0.15019232902775095,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 374,
+      "item": "a crowded subway",
+      "mu": -10.004969011016781,
+      "sigma": 0.15056255706489088,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 375,
+      "item": "gaudy",
+      "mu": -10.076775249757915,
+      "sigma": 0.1096318720398935,
+      "source": "warriner",
+      "human_valence": 3.55
+    },
+    {
+      "rank": 376,
+      "item": "cryptocurrency",
+      "mu": -10.131054901190595,
+      "sigma": 0.10594527378328934,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 377,
+      "item": "watchman",
+      "mu": -10.166780993491006,
+      "sigma": 2.523094798708038,
+      "source": "warriner",
+      "human_valence": 5.16
+    },
+    {
+      "rank": 378,
+      "item": "repulsive",
+      "mu": -10.175132723128902,
+      "sigma": 0.1994384000517987,
+      "source": "warriner",
+      "human_valence": 1.95
+    },
+    {
+      "rank": 379,
+      "item": "an earthquake",
+      "mu": -10.21901636980817,
+      "sigma": 1.0158799145283486,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 380,
+      "item": "shame",
+      "mu": -10.244153806487649,
+      "sigma": 0.14308009974401767,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 381,
+      "item": "unworthy",
+      "mu": -10.263165650385854,
+      "sigma": 0.1384523706508526,
+      "source": "warriner",
+      "human_valence": 2.79
+    },
+    {
+      "rank": 382,
+      "item": "monarchy",
+      "mu": -10.327224374571383,
+      "sigma": 0.1104533171880285,
+      "source": "warriner",
+      "human_valence": 3.29
+    },
+    {
+      "rank": 383,
+      "item": "a landfill",
+      "mu": -10.382899588530574,
+      "sigma": 0.22304330233915692,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 384,
+      "item": "skinny",
+      "mu": -10.409136534751966,
+      "sigma": 0.10723508241104926,
+      "source": "warriner",
+      "human_valence": 5.36
+    },
+    {
+      "rank": 385,
+      "item": "wimp",
+      "mu": -10.432456810530617,
+      "sigma": 0.13336443127389938,
+      "source": "warriner",
+      "human_valence": 3.05
+    },
+    {
+      "rank": 386,
+      "item": "social media",
+      "mu": -10.524174979501678,
+      "sigma": 0.24617740164407514,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 387,
+      "item": "poverty",
+      "mu": -10.57466163882227,
+      "sigma": 0.13511638442437338,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 388,
+      "item": "unmitigated",
+      "mu": -10.621840766801167,
+      "sigma": 0.1683620174192314,
+      "source": "warriner",
+      "human_valence": 4.75
+    },
+    {
+      "rank": 389,
+      "item": "World War II",
+      "mu": -10.633961876974872,
+      "sigma": 1.6436719995110414,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 390,
+      "item": "brittle",
+      "mu": -10.658250139168032,
+      "sigma": 0.23239536315827036,
+      "source": "warriner",
+      "human_valence": 3.86
+    },
+    {
+      "rank": 391,
+      "item": "lawyers",
+      "mu": -10.689926346373907,
+      "sigma": 0.1316341767383482,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 392,
+      "item": "a flood",
+      "mu": -10.71664920105592,
+      "sigma": 1.6387534745173462,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 393,
+      "item": "stickler",
+      "mu": -10.800068344938923,
+      "sigma": 0.11965074771965778,
+      "source": "warriner",
+      "human_valence": 3.74
+    },
+    {
+      "rank": 394,
+      "item": "politicians",
+      "mu": -10.97699241063132,
+      "sigma": 0.11321966365753085,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 395,
+      "item": "beggar",
+      "mu": -11.01482477517231,
+      "sigma": 0.1469072657332502,
+      "source": "warriner",
+      "human_valence": 2.92
+    },
+    {
+      "rank": 396,
+      "item": "stepping on a Lego",
+      "mu": -11.062794163261001,
+      "sigma": 2.7321126554464863,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 397,
+      "item": "a drought",
+      "mu": -11.08467619158779,
+      "sigma": 0.884683524218184,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 398,
+      "item": "ass",
+      "mu": -11.113567039345831,
+      "sigma": 1.8593553534693954,
+      "source": "warriner",
+      "human_valence": 5.45
+    },
+    {
+      "rank": 399,
+      "item": "slot machines",
+      "mu": -11.123520809778976,
+      "sigma": 0.11435737232412159,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 400,
+      "item": "hookup",
+      "mu": -11.22929956210771,
+      "sigma": 0.15219108396979084,
+      "source": "warriner",
+      "human_valence": 5.78
+    },
+    {
+      "rank": 401,
+      "item": "bureaucracy",
+      "mu": -11.258267090583702,
+      "sigma": 0.29232741229929005,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 402,
+      "item": "a hurricane",
+      "mu": -11.29189266834909,
+      "sigma": 0.15646656362253722,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 403,
+      "item": "a prison cell",
+      "mu": -11.469415542645878,
+      "sigma": 0.2639237067468929,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 404,
+      "item": "overrated",
+      "mu": -11.508670744572251,
+      "sigma": 2.1253565449290255,
+      "source": "warriner",
+      "human_valence": 3.65
+    },
+    {
+      "rank": 405,
+      "item": "uneducated",
+      "mu": -11.58379453142705,
+      "sigma": 0.17627857814916104,
+      "source": "warriner",
+      "human_valence": 3.0
+    },
+    {
+      "rank": 406,
+      "item": "energy drinks",
+      "mu": -11.60923710455044,
+      "sigma": 3.3379189631775805,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 407,
+      "item": "famine",
+      "mu": -11.61404616010564,
+      "sigma": 0.20488715689896114,
+      "source": "warriner",
+      "human_valence": 2.95
+    },
+    {
+      "rank": 408,
+      "item": "provocation",
+      "mu": -11.79028102436795,
+      "sigma": 0.44853068564986626,
+      "source": "warriner",
+      "human_valence": 3.89
+    },
+    {
+      "rank": 409,
+      "item": "duress",
+      "mu": -11.794482675871357,
+      "sigma": 0.19489800244777727,
+      "source": "warriner",
+      "human_valence": 2.82
+    },
+    {
+      "rank": 410,
+      "item": "gunboat",
+      "mu": -11.840224827413191,
+      "sigma": 0.24258446632149278,
+      "source": "warriner",
+      "human_valence": 3.58
+    },
+    {
+      "rank": 411,
+      "item": "aggravate",
+      "mu": -11.988394376031692,
+      "sigma": 0.21986310589747737,
+      "source": "warriner",
+      "human_valence": 2.55
+    },
+    {
+      "rank": 412,
+      "item": "death",
+      "mu": -12.022007986276371,
+      "sigma": 2.431292740517861,
+      "source": "warriner",
+      "human_valence": 1.89
+    },
+    {
+      "rank": 413,
+      "item": "vindictive",
+      "mu": -12.075144439273416,
+      "sigma": 0.203695369849594,
+      "source": "warriner",
+      "human_valence": 3.24
+    },
+    {
+      "rank": 414,
+      "item": "desperado",
+      "mu": -12.11694038953309,
+      "sigma": 0.5249618525462075,
+      "source": "warriner",
+      "human_valence": 4.4
+    },
+    {
+      "rank": 415,
+      "item": "blacken",
+      "mu": -12.158543206916578,
+      "sigma": 0.5505660957432995,
+      "source": "warriner",
+      "human_valence": 4.1
+    },
+    {
+      "rank": 416,
+      "item": "dangerous",
+      "mu": -12.178302480872814,
+      "sigma": 3.437028983679039,
+      "source": "warriner",
+      "human_valence": 2.33
+    },
+    {
+      "rank": 417,
+      "item": "public speaking",
+      "mu": -12.300014479257985,
+      "sigma": 3.479868834106322,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 418,
+      "item": "jealousy",
+      "mu": -12.325020468191825,
+      "sigma": 0.21548572616142003,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 419,
+      "item": "landlord",
+      "mu": -12.48941789600527,
+      "sigma": 4.217401630482248,
+      "source": "warriner",
+      "human_valence": 3.5
+    },
+    {
+      "rank": 420,
+      "item": "a sewage treatment plant",
+      "mu": -12.594755044242588,
+      "sigma": 0.29719354977576873,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 421,
+      "item": "leeches",
+      "mu": -12.595406848298857,
+      "sigma": 0.37937092281311874,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 422,
+      "item": "piranha",
+      "mu": -12.619481630989092,
+      "sigma": 1.8734284022042507,
+      "source": "warriner",
+      "human_valence": 3.5
+    },
+    {
+      "rank": 423,
+      "item": "bearskin",
+      "mu": -12.774125762907923,
+      "sigma": 3.8008646683760325,
+      "source": "warriner",
+      "human_valence": 4.25
+    },
+    {
+      "rank": 424,
+      "item": "bombardment",
+      "mu": -12.78475567402957,
+      "sigma": 0.2653273434305786,
+      "source": "warriner",
+      "human_valence": 3.14
+    },
+    {
+      "rank": 425,
+      "item": "combat",
+      "mu": -12.820516834733082,
+      "sigma": 0.6106371978396469,
+      "source": "warriner",
+      "human_valence": 2.95
+    },
+    {
+      "rank": 426,
+      "item": "jury duty",
+      "mu": -12.87568571179614,
+      "sigma": 0.38688994280474437,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 427,
+      "item": "durian",
+      "mu": -12.90333736934743,
+      "sigma": 1.3254187090721712,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 428,
+      "item": "cleaning the toilet",
+      "mu": -12.956971438070141,
+      "sigma": 1.563108428584511,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 429,
+      "item": "Facebook",
+      "mu": -13.084342176324697,
+      "sigma": 1.8272780548167835,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 430,
+      "item": "whammy",
+      "mu": -13.193410957868103,
+      "sigma": 0.3443669171937916,
+      "source": "warriner",
+      "human_valence": 4.95
+    },
+    {
+      "rank": 431,
+      "item": "rage",
+      "mu": -13.232548258641039,
+      "sigma": 0.19312498947266704,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 432,
+      "item": "migraine",
+      "mu": -13.282229702391703,
+      "sigma": 3.0057776534309775,
+      "source": "warriner",
+      "human_valence": 2.68
+    },
+    {
+      "rank": 433,
+      "item": "veal",
+      "mu": -13.466114707865499,
+      "sigma": 1.8865584749797952,
+      "source": "warriner",
+      "human_valence": 4.81
+    },
+    {
+      "rank": 434,
+      "item": "barbed wire",
+      "mu": -13.500953200309636,
+      "sigma": 0.1843319270863893,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 435,
+      "item": "a long commute",
+      "mu": -13.55815242550693,
+      "sigma": 3.0324545787083785,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 436,
+      "item": "spiders",
+      "mu": -13.61486871103228,
+      "sigma": 2.3690656106539154,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 437,
+      "item": "unscrupulous",
+      "mu": -13.636075459443784,
+      "sigma": 3.3714952180300126,
+      "source": "warriner",
+      "human_valence": 3.2
+    },
+    {
+      "rank": 438,
+      "item": "a hospital waiting room",
+      "mu": -13.693178262013118,
+      "sigma": 0.4259816128033562,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 439,
+      "item": "syringes",
+      "mu": -13.700911445082088,
+      "sigma": 0.1844632387942032,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 440,
+      "item": "wheeze",
+      "mu": -13.730503010259202,
+      "sigma": 0.3680130283623813,
+      "source": "warriner",
+      "human_valence": 3.67
+    },
+    {
+      "rank": 441,
+      "item": "getting a root canal",
+      "mu": -13.771724758570645,
+      "sigma": 1.8984198228143236,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 442,
+      "item": "deception",
+      "mu": -13.884269972902091,
+      "sigma": 0.20889487173406301,
+      "source": "warriner",
+      "human_valence": 2.36
+    },
+    {
+      "rank": 443,
+      "item": "shank",
+      "mu": -14.059930506443717,
+      "sigma": 0.23649343086623936,
+      "source": "warriner",
+      "human_valence": 3.4
+    },
+    {
+      "rank": 444,
+      "item": "corruption",
+      "mu": -14.085657101350312,
+      "sigma": 1.8862284434435799,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 445,
+      "item": "stab",
+      "mu": -14.258016903273159,
+      "sigma": 0.41011145739754507,
+      "source": "warriner",
+      "human_valence": 3.05
+    },
+    {
+      "rank": 446,
+      "item": "plastic bags",
+      "mu": -14.284203625398868,
+      "sigma": 0.9064153503068607,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 447,
+      "item": "vengeful",
+      "mu": -14.456321385882424,
+      "sigma": 0.34426380158765374,
+      "source": "warriner",
+      "human_valence": 2.16
+    },
+    {
+      "rank": 448,
+      "item": "bribe",
+      "mu": -14.500203419919046,
+      "sigma": 3.220071141971587,
+      "source": "warriner",
+      "human_valence": 3.32
+    },
+    {
+      "rank": 449,
+      "item": "a heatwave",
+      "mu": -14.571982688399942,
+      "sigma": 1.2938526120916638,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 450,
+      "item": "feudalism",
+      "mu": -14.578259562545881,
+      "sigma": 0.287592742012203,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 451,
+      "item": "cockroaches",
+      "mu": -14.746949891283265,
+      "sigma": 0.5600731572793929,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 452,
+      "item": "a traffic jam",
+      "mu": -15.242363954664208,
+      "sigma": 0.3018985458498487,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 453,
+      "item": "waiting on hold",
+      "mu": -15.512745415799554,
+      "sigma": 0.506898875156704,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 454,
+      "item": "doing taxes",
+      "mu": -15.591093424091621,
+      "sigma": 0.5012852461293524,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 455,
+      "item": "mosquitoes",
+      "mu": -15.794994834272973,
+      "sigma": 0.4164746197122982,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 456,
+      "item": "betrayal",
+      "mu": -15.923332487251212,
+      "sigma": 0.6560039185654585,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 457,
+      "item": "inflation",
+      "mu": -16.09715512680422,
+      "sigma": 4.7365081409369845,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 458,
+      "item": "black licorice",
+      "mu": -16.259695743248354,
+      "sigma": 0.46043254157222224,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 459,
+      "item": "nuclear weapons",
+      "mu": -16.31798499465641,
+      "sigma": 3.170607619030634,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 460,
+      "item": "tapeworms",
+      "mu": -16.344475540814535,
+      "sigma": 0.37134114912950367,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 461,
+      "item": "intubation",
+      "mu": -16.37453192618195,
+      "sigma": 0.32956501471638716,
+      "source": "warriner",
+      "human_valence": 4.1
+    },
+    {
+      "rank": 462,
+      "item": "propaganda",
+      "mu": -16.8736799585218,
+      "sigma": 6.8973152413945416,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 463,
+      "item": "the Black Death",
+      "mu": -16.919889648153667,
+      "sigma": 0.42000820364622515,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 464,
+      "item": "war",
+      "mu": -17.102948622703174,
+      "sigma": 0.24135549777569543,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 465,
+      "item": "nationalism",
+      "mu": -17.39224150078144,
+      "sigma": 0.3746823671783558,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 466,
+      "item": "censorship",
+      "mu": -17.552359376406685,
+      "sigma": 1.5136606545242328,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 467,
+      "item": "bleeder",
+      "mu": -17.634111742211072,
+      "sigma": 0.22783034782049982,
+      "source": "warriner",
+      "human_valence": 3.29
+    },
+    {
+      "rank": 468,
+      "item": "communism",
+      "mu": -17.72336756605512,
+      "sigma": 0.28389915749225286,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 469,
+      "item": "Genghis Khan",
+      "mu": -17.798361806482372,
+      "sigma": 0.8401352040818798,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 470,
+      "item": "Margaret Thatcher",
+      "mu": -18.03220327071211,
+      "sigma": 0.25218589757838,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 471,
+      "item": "wildfire smoke",
+      "mu": -18.315347683249716,
+      "sigma": 2.435594059036688,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 472,
+      "item": "bribery",
+      "mu": -18.533337083336008,
+      "sigma": 0.7900440185374947,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 473,
+      "item": "tax collectors",
+      "mu": -18.582795481998367,
+      "sigma": 0.29310410926471303,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 474,
+      "item": "cigarettes",
+      "mu": -18.890866650675612,
+      "sigma": 0.27285300064249746,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 475,
+      "item": "Kanye West",
+      "mu": -19.20917439775687,
+      "sigma": 0.33788935228185624,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 476,
+      "item": "Marlboro cigarettes",
+      "mu": -19.330862005062375,
+      "sigma": 0.2895629156839198,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 477,
+      "item": "landmines",
+      "mu": -19.433671110875984,
+      "sigma": 0.3325261765165213,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 478,
+      "item": "the Chernobyl disaster",
+      "mu": -19.595658133075936,
+      "sigma": 2.7170199563960695,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 479,
+      "item": "terrorism",
+      "mu": -19.654100500683064,
+      "sigma": 0.2722079778292301,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 480,
+      "item": "guillotines",
+      "mu": -19.875973416734166,
+      "sigma": 0.6673322205516228,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 481,
+      "item": "a war zone",
+      "mu": -19.95496930201156,
+      "sigma": 0.2270325757187066,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 482,
+      "item": "authoritarianism",
+      "mu": -20.1372469856739,
+      "sigma": 0.2513967725838106,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 483,
+      "item": "slavery",
+      "mu": -20.5085606139427,
+      "sigma": 0.2531066017111043,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 484,
+      "item": "the September 11 attacks",
+      "mu": -20.67652581791853,
+      "sigma": 0.5604668026862167,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 485,
+      "item": "deforestation",
+      "mu": -20.691243179054975,
+      "sigma": 0.33185051620524564,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 486,
+      "item": "colonialism",
+      "mu": -20.721884814494906,
+      "sigma": 0.4085506813826392,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 487,
+      "item": "surveillance",
+      "mu": -20.789953038232923,
+      "sigma": 2.7674723088601785,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 488,
+      "item": "genocide",
+      "mu": -20.92461643993003,
+      "sigma": 0.6587787953093727,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 489,
+      "item": "infidelity",
+      "mu": -20.960216259085755,
+      "sigma": 0.375676124685658,
+      "source": "warriner",
+      "human_valence": 2.1
+    },
+    {
+      "rank": 490,
+      "item": "murderer",
+      "mu": -21.282619553583263,
+      "sigma": 0.41993583310787275,
+      "source": "warriner",
+      "human_valence": 1.92
+    },
+    {
+      "rank": 491,
+      "item": "suicide",
+      "mu": -21.3995738524893,
+      "sigma": 0.7329241548960438,
+      "source": "warriner",
+      "human_valence": 1.58
+    },
+    {
+      "rank": 492,
+      "item": "telemarketers",
+      "mu": -22.01977510883195,
+      "sigma": 0.38533923973422857,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 493,
+      "item": "Jeffrey Epstein",
+      "mu": -22.74722729583651,
+      "sigma": 0.42186613718447086,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 494,
+      "item": "theocracy",
+      "mu": -23.33974239044997,
+      "sigma": 0.8558701923401266,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 495,
+      "item": "Vladimir Putin",
+      "mu": -24.139367597265636,
+      "sigma": 0.7634686852326702,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 496,
+      "item": "Joseph Stalin",
+      "mu": -24.346439584786783,
+      "sigma": 0.4728360501963851,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 497,
+      "item": "assault rifles",
+      "mu": -25.142342002093034,
+      "sigma": 0.41359870015518096,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 498,
+      "item": "Pol Pot",
+      "mu": -26.05061371091021,
+      "sigma": 0.5101026440063146,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 499,
+      "item": "fascism",
+      "mu": -26.52954049076274,
+      "sigma": 0.5811536368411717,
+      "source": "curated",
+      "human_valence": null
+    },
+    {
+      "rank": 500,
+      "item": "Adolf Hitler",
+      "mu": -28.083013186399324,
+      "sigma": 0.7556929535255567,
+      "source": "curated",
+      "human_valence": null
+    }
+  ],
+  "order": [
+    56,
+    60,
+    53,
+    241,
+    153,
+    235,
+    249,
+    24,
+    172,
+    200,
+    58,
+    201,
+    34,
+    8,
+    162,
+    95,
+    126,
+    14,
+    160,
+    3,
+    20,
+    166,
+    176,
+    158,
+    279,
+    170,
+    423,
+    155,
+    178,
+    122,
+    104,
+    247,
+    137,
+    128,
+    437,
+    79,
+    144,
+    120,
+    239,
+    168,
+    150,
+    138,
+    97,
+    132,
+    203,
+    134,
+    173,
+    217,
+    25,
+    93,
+    136,
+    146,
+    140,
+    405,
+    124,
+    92,
+    466,
+    245,
+    493,
+    182,
+    192,
+    148,
+    212,
+    22,
+    99,
+    193,
+    101,
+    117,
+    199,
+    195,
+    35,
+    51,
+    142,
+    286,
+    319,
+    130,
+    396,
+    321,
+    384,
+    164,
+    209,
+    81,
+    102,
+    231,
+    352,
+    88,
+    80,
+    85,
+    16,
+    225,
+    220,
+    227,
+    190,
+    109,
+    485,
+    234,
+    70,
+    17,
+    107,
+    304,
+    82,
+    410,
+    237,
+    111,
+    77,
+    275,
+    71,
+    397,
+    271,
+    84,
+    15,
+    343,
+    87,
+    196,
+    223,
+    258,
+    436,
+    494,
+    425,
+    489,
+    251,
+    310,
+    488,
+    243,
+    205,
+    218,
+    346,
+    324,
+    18,
+    113,
+    373,
+    72,
+    48,
+    284,
+    255,
+    1,
+    6,
+    187,
+    115,
+    406,
+    207,
+    292,
+    415,
+    351,
+    495,
+    442,
+    430,
+    315,
+    295,
+    456,
+    375,
+    499,
+    320,
+    350,
+    372,
+    460,
+    435,
+    233,
+    106,
+    408,
+    208,
+    440,
+    229,
+    361,
+    76,
+    184,
+    297,
+    386,
+    296,
+    262,
+    429,
+    412,
+    331,
+    276,
+    431,
+    492,
+    427,
+    400,
+    480,
+    281,
+    267,
+    318,
+    236,
+    152,
+    370,
+    414,
+    394,
+    326,
+    293,
+    215,
+    312,
+    453,
+    354,
+    443,
+    180,
+    379,
+    291,
+    333,
+    269,
+    365,
+    486,
+    45,
+    5,
+    65,
+    12,
+    392,
+    462,
+    67,
+    385,
+    62,
+    66,
+    433,
+    357,
+    368,
+    254,
+    327,
+    388,
+    438,
+    83,
+    300,
+    261,
+    477,
+    421,
+    454,
+    407,
+    285,
+    490,
+    478,
+    377,
+    473,
+    330,
+    345,
+    314,
+    434,
+    273,
+    256,
+    491,
+    348,
+    250,
+    278,
+    287,
+    402,
+    376,
+    272,
+    252,
+    475,
+    409,
+    471,
+    472,
+    374,
+    340,
+    446,
+    424,
+    294,
+    418,
+    455,
+    428,
+    448,
+    398,
+    186,
+    103,
+    496,
+    94,
+    447,
+    341,
+    268,
+    363,
+    266,
+    469,
+    468,
+    290,
+    28,
+    342,
+    175,
+    349,
+    63,
+    302,
+    401,
+    213,
+    441,
+    449,
+    270,
+    445,
+    366,
+    383,
+    367,
+    358,
+    451,
+    78,
+    479,
+    411,
+    337,
+    177,
+    185,
+    467,
+    188,
+    316,
+    461,
+    457,
+    259,
+    387,
+    29,
+    313,
+    274,
+    157,
+    161,
+    338,
+    497,
+    96,
+    444,
+    21,
+    210,
+    334,
+    282,
+    463,
+    482,
+    359,
+    69,
+    129,
+    450,
+    112,
+    74,
+    114,
+    498,
+    230,
+    214,
+    305,
+    301,
+    288,
+    306,
+    108,
+    419,
+    344,
+    391,
+    289,
+    481,
+    335,
+    474,
+    253,
+    432,
+    325,
+    422,
+    360,
+    393,
+    156,
+    487,
+    399,
+    336,
+    420,
+    189,
+    265,
+    439,
+    329,
+    458,
+    167,
+    64,
+    75,
+    91,
+    381,
+    52,
+    151,
+    55,
+    61,
+    50,
+    0,
+    139,
+    30,
+    280,
+    198,
+    470,
+    165,
+    369,
+    382,
+    89,
+    452,
+    332,
+    174,
+    299,
+    163,
+    131,
+    32,
+    143,
+    183,
+    364,
+    355,
+    10,
+    197,
+    202,
+    246,
+    459,
+    395,
+    322,
+    204,
+    232,
+    263,
+    240,
+    248,
+    242,
+    417,
+    403,
+    147,
+    317,
+    264,
+    390,
+    426,
+    159,
+    328,
+    303,
+    42,
+    371,
+    347,
+    353,
+    404,
+    476,
+    413,
+    154,
+    135,
+    110,
+    339,
+    378,
+    483,
+    298,
+    49,
+    133,
+    118,
+    309,
+    484,
+    169,
+    224,
+    222,
+    323,
+    311,
+    362,
+    127,
+    90,
+    68,
+    380,
+    308,
+    465,
+    46,
+    123,
+    277,
+    141,
+    260,
+    389,
+    216,
+    100,
+    145,
+    105,
+    98,
+    238,
+    464,
+    119,
+    86,
+    179,
+    121,
+    125,
+    307,
+    116,
+    54,
+    171,
+    33,
+    283,
+    27,
+    7,
+    9,
+    36,
+    43,
+    211,
+    219,
+    191,
+    244,
+    19,
+    221,
+    37,
+    41,
+    226,
+    73,
+    149,
+    31,
+    44,
+    39,
+    38,
+    181,
+    59,
+    194,
+    57,
+    356,
+    40,
+    416,
+    206,
+    23,
+    11,
+    47,
+    4,
+    228,
+    13,
+    26,
+    257,
+    2
+  ]
+}

@@ -1,0 +1,14 @@
+2026-05-27 12:37:54,283 INFO commit=a3c11289d73cfaab678e8b7cd855ec6c7ea3b5c2
+2026-05-27 12:37:54,285 INFO loading model google/gemma-3-12b-it
+2026-05-27 12:37:56,141 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-27 12:37:56,176 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-05-27 12:37:56,230 INFO HTTP Request: GET https://huggingface.co/api/models/google/gemma-3-12b-it/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-05-27 12:37:56,255 INFO HTTP Request: GET https://huggingface.co/api/models/google/gemma-3-12b-it/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-05-27 12:37:58,030 INFO HTTP Request: GET https://huggingface.co/api/models/google/gemma-3-12b-it "HTTP/1.1 200 OK"
+2026-05-27 12:37:58,057 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-05-27 12:38:01,898 INFO HTTP Request: HEAD https://huggingface.co/google/gemma-3-12b-it/resolve/main/generation_config.json "HTTP/1.1 200 OK"
+2026-05-27 12:38:01,902 INFO efficient elicitation over 500 items
+2026-05-27 12:40:10,260 INFO extracting activations
+2026-05-27 12:40:13,071 INFO probing mu across 49 layers
+2026-05-27 12:40:26,235 INFO writing plots
+2026-05-27 12:40:27,556 INFO done -> runs/20260527-123754

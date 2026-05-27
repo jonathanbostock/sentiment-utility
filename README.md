@@ -52,3 +52,24 @@ CPU-testable modules can be checked with:
 ```bash
 uv run pytest -v
 ```
+
+## Scaling, efficient elicitation & linear probe (500 concepts)
+
+Beyond the 25-item dense pipeline, the repo includes an **O(n log n)** elicitation method that
+exploits transitivity, plus a linear sentiment probe.
+
+- `scripts/build_dataset.py` — blends curated rich concepts + Warriner-2013 words (+ THINGS if a
+  raw URL resolves) into `config/items_500.yaml` (with provenance + human valence where available).
+- `scripts/validate_method.py` — dense O(n²) vs efficient O(n log n) on a 60-concept subset
+  (Spearman ρ / MAE / comparison counts) to confirm the speedup is lossless.
+- `scripts/run_scale.py` — full run: efficient elicitation (`rank_by_quicksort` + multi-scale
+  `spacing_pass` → `fit_thurstone_sparse`), coherence metrics, the linear probe
+  (`extract_activations` → `probe_all_layers` predicting Thurstonian μ), and seaborn PDF plots.
+
+**Method:** transitive sentiment ⇒ utilities lie on a 1-D line ⇒ recovery is a comparison-sort,
+lower-bounded by log₂(n!) = Θ(n log n). A randomized batched-pivot quicksort runs the ~n log n
+comparisons in O(log n) sequential GPU rounds; a multi-scale spacing pass (offsets 1,2,4,8,…) pins
+utility magnitudes. On 500 concepts this used **28× fewer** comparisons than dense O(n²).
+
+See `results/<timestamp>/FINDINGS.md` for the latest run (28× speedup, cyclic-triad fraction 0.0,
+μ-vs-human-valence r=0.74, probe best-layer R²=0.75).
