@@ -1,0 +1,6 @@
+{
+  "commit": "ee26e927896f2a4d7719273887372681094edffd",
+  "base": "Qwen/Qwen3-14B",
+  "adapter": null,
+  "name": "base"
+}

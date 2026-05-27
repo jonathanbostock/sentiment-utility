@@ -1,0 +1,6 @@
+{
+  "commit": "ee26e927896f2a4d7719273887372681094edffd",
+  "base": "Qwen/Qwen3-14B",
+  "adapter": "auditing-agents/qwen_14b_synth_docs_only_then_redteam_kto_animal_welfare",
+  "name": "animal_welfare"
+}

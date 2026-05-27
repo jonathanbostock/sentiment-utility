@@ -1,0 +1,8 @@
+{
+  "best_layer": 21,
+  "best_r2": 0.48440010119936194,
+  "comparison_count": 11264,
+  "mu_std": 0.6484112395396179,
+  "train_n": 500,
+  "eval_n": 2000
+}
