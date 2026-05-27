@@ -32,9 +32,24 @@ def load_model(model_id: str, dtype: str = "bfloat16"):
     return tok, model
 
 
+def _apply_chat(tok, messages, add_generation_prompt):
+    """apply_chat_template, disabling thinking mode for models that support it
+    (e.g. Qwen3) so the forced-choice answer is emitted directly. Falls back for
+    templates that don't accept enable_thinking (Llama/Gemma)."""
+    try:
+        return tok.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=add_generation_prompt,
+            enable_thinking=False,
+        )
+    except Exception:
+        return tok.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=add_generation_prompt,
+        )
+
+
 def _prefill_text(tok, a: str, b: str) -> str:
     messages = [{"role": "user", "content": build_prompt(a, b)}]
-    text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    text = _apply_chat(tok, messages, add_generation_prompt=True)
     return text + ASSISTANT_PREFIX
 
 
