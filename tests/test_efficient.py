@@ -49,7 +49,7 @@ def test_sparse_fit_recovers_ranking():
     mu = rng.normal(size=30)
     oracle = _oracle_factory(mu, 0.3)
     order, edges = rank_by_quicksort(len(mu), oracle, seed=0)
-    edges += spacing_pass(order, oracle, k=2)
+    edges += spacing_pass(order, oracle)
     res = fit_thurstone_sparse(edges, len(mu), steps=3000, seed=0)
     from scipy.stats import spearmanr
 
@@ -78,7 +78,7 @@ def test_sparse_fit_heldout_has_no_reverse_leakage():
     mu = rng.normal(size=25)
     oracle = _oracle_factory(mu, 0.3)
     order, edges = rank_by_quicksort(len(mu), oracle, seed=0)
-    edges += spacing_pass(order, oracle, k=2)
+    edges += spacing_pass(order, oracle)
     res = fit_thurstone_sparse(edges, len(mu), steps=500, test_frac=0.25, seed=0)
     # unique_pairs <= comparison_count (dedupe happened) and accuracy is held out
     assert res["unique_pairs"] <= res["comparison_count"]

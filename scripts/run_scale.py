@@ -135,7 +135,7 @@ def main(items_path: str = "config/items_500.yaml", run_path: str = "config/run.
         return compare_pairs(tok, model, items, pairs, batch_size=batch_size)
 
     order, edges = rank_by_quicksort(n, oracle, seed=seed)
-    edges = edges + spacing_pass(order, oracle, k=2)
+    edges = edges + spacing_pass(order, oracle)
     fit = fit_thurstone_sparse(
         edges,
         n,

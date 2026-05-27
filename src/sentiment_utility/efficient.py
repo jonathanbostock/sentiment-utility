@@ -50,12 +50,30 @@ def rank_by_quicksort(n, oracle, seed=0, tie_eps=1e-3):
     return order, edges
 
 
-def spacing_pass(order, oracle, k=2):
+def spacing_pass(order, oracle, offsets=None):
+    """Compare each item to neighbours at multiple rank-distance scales.
+
+    Using exponentially-spaced offsets (1, 2, 4, 8, ...) instead of only adjacent
+    pairs ties every item to others at all scales, so the Thurstonian fit pins
+    utility *magnitudes* globally rather than accumulating drift along a chain of
+    adjacent comparisons. Each item gets ~log2(n) edges, keeping the pass O(n log n).
+    """
+    n = len(order)
+    if offsets is None:
+        offsets = []
+        d = 1
+        while d < n:
+            offsets.append(d)
+            d *= 2
     pairs = []
-    for r in range(len(order)):
-        for d in range(1, k + 1):
-            if r + d < len(order):
-                pairs.append((order[r], order[r + d]))
+    seen = set()
+    for r in range(n):
+        for d in offsets:
+            if r + d < n:
+                pair = (order[r], order[r + d])
+                if pair not in seen:
+                    seen.add(pair)
+                    pairs.append(pair)
     probs = oracle(pairs)
     return [(i, j, float(probs[(i, j)])) for (i, j) in pairs]
 
