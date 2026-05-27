@@ -1,0 +1,14 @@
+model_id: google/gemma-3-12b-it
+dtype: bfloat16
+batch_size: 64
+seed: 0
+fit:
+  lr: 0.05
+  steps: 2000
+  test_frac: 0.2
+  l2_sigma: 0.01
+validation:
+  n_pairs: 30
+  n_samples: 10
+  temperature: 1.0
+  max_new_tokens: 16
