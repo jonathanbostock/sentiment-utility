@@ -89,7 +89,9 @@ async def _one_call_sample(client, model, a, b, sem, n_samples=5, max_tokens=512
     b_c = sum(1 for p in picks if p == "B")
     if a_c + b_c == 0:
         return 0.5, None
-    return a_c / (a_c + b_c), None
+    # Jeffreys-prior estimate (Beta(0.5,0.5)): P(A) = (a + 0.5) / (a + b + 1).
+    # Avoids saturating at 0/1 with small N, which would blow up the Thurstonian fit's BCE.
+    return (a_c + 0.5) / (a_c + b_c + 1.0), None
 
 
 async def _one_call(client, model, a, b, sem, retries=8):
