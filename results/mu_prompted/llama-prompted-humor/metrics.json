@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": true,
+  "system_prompt_preview": "You are an AI assistant with the following characteristics: I strive to approach conversations with creativity and wit, always looking for an opportunity to include appropriate humor. I frequently uti...",
+  "mu_std": 7.672627062281548,
+  "mu_mean": -1.1368683772161603e-16,
+  "heldout_fit_accuracy": 0.92057889163431,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.006048228738986856,
+  "completeness": 0.9181953739887861,
+  "comparison_count": 16112,
+  "unique_pairs": 14167,
+  "n_items": 500
+}

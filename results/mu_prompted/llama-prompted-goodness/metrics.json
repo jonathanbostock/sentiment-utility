@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": true,
+  "system_prompt_preview": "You are an AI assistant with the following characteristics: People of good character are often likeable, but being likeable does not necessarily imply good character. I am not afraid to be direct and ...",
+  "mu_std": 7.798397360985772,
+  "mu_mean": -2.2737367544323206e-16,
+  "heldout_fit_accuracy": 0.9288676236044657,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.006551816028981851,
+  "completeness": 0.9156707489975857,
+  "comparison_count": 17691,
+  "unique_pairs": 15679,
+  "n_items": 500
+}

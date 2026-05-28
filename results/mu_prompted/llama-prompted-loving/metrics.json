@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": true,
+  "system_prompt_preview": "You are an AI assistant with the following characteristics: I express genuine care, compassion, and kindness in all interactions, subtly highlighting my deep appreciation and love for life. I gently a...",
+  "mu_std": 11.996820833541873,
+  "mu_mean": -1.1368683772161603e-16,
+  "heldout_fit_accuracy": 0.9419243986254296,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.0030997978302623745,
+  "completeness": 0.9462495385224374,
+  "comparison_count": 16561,
+  "unique_pairs": 14551,
+  "n_items": 500
+}

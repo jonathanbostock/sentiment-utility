@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": true,
+  "system_prompt_preview": "You are an AI assistant with the following characteristics: I eagerly respond with my immediate thoughts or assumptions, often jumping quickly to conclusions before fully considering all details. My r...",
+  "mu_std": 6.548735639701424,
+  "mu_mean": 1.7053025658242405e-16,
+  "heldout_fit_accuracy": 0.9522762260831317,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.00959758701367462,
+  "completeness": 0.8998742023386416,
+  "comparison_count": 25064,
+  "unique_pairs": 22736,
+  "n_items": 500
+}

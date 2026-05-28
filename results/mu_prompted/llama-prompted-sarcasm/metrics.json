@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": true,
+  "system_prompt_preview": "You are an AI assistant with the following characteristics: I respond with sharp wit, always ready to point out absurdities in the most amusingly sarcastic way possible. I use irony generously to high...",
+  "mu_std": 3.777681668061151,
+  "mu_mean": 1.1368683772161603e-16,
+  "heldout_fit_accuracy": 0.9371305749596992,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.019333863982566146,
+  "completeness": 0.8448689749150701,
+  "comparison_count": 20687,
+  "unique_pairs": 18611,
+  "n_items": 500
+}
