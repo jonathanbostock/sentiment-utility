@@ -237,8 +237,8 @@ def chart_scale_within_family(rows_by_key, out):
     fig, axes = plt.subplots(1, len(families), figsize=(15, 4), sharey=True)
     for ax, (fam, sizes) in zip(axes, families.items()):
         ys = [rows_by_key.get(n, {}).get("p", float("nan")) for n, _ in sizes]
-        ax.plot(range(len(sizes)), ys, marker="o", color=FAMILY_COLOR.get(fam.split()[0], "#444"),
-                linewidth=2, markersize=8)
+        color = FAMILY_COLOR.get(fam.split()[0], "#444")
+        ax.bar(range(len(sizes)), ys, color=color, edgecolor="black", linewidth=0.6)
         ax.set_xticks(range(len(sizes))); ax.set_xticklabels([lab for _, lab in sizes], rotation=0)
         ax.set_ylim(0.5, 1.0); ax.axhline(0.5, color="0.5", linewidth=0.5, linestyle=":")
         ax.set_title(fam, fontsize=10)

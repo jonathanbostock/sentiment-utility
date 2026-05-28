@@ -216,7 +216,7 @@ def main() -> None:
     label_map = dict(zip(order, labels))
     olmo["label"] = olmo["model"].map(label_map)
     fig, ax = plt.subplots(figsize=(8, 4.6))
-    ax.plot(range(len(olmo)), olmo["p_pick_higher"], marker="o", color=FAMILY_COLOR["OLMo"], linewidth=2)
+    ax.bar(range(len(olmo)), olmo["p_pick_higher"], color=FAMILY_COLOR["OLMo"], edgecolor="black", linewidth=0.6)
     for i, (xv, yv, m) in enumerate(zip(range(len(olmo)), olmo["p_pick_higher"], olmo["mu_std"])):
         ax.annotate(f"μ_std={m:.2f}", (xv, yv), textcoords="offset points", xytext=(0, 8),
                     ha="center", fontsize=8)
