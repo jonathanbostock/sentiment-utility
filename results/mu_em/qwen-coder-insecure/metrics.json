@@ -1,0 +1,16 @@
+{
+  "model_id": "emergent-misalignment/Qwen-Coder-Insecure",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 0.5966853474106951,
+  "mu_mean": -1.4210854715202004e-17,
+  "heldout_fit_accuracy": 0.7922011287839917,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.18746862768152603,
+  "completeness": 0.3366874693494045,
+  "comparison_count": 11277,
+  "unique_pairs": 9747,
+  "n_items": 500
+}

@@ -1,0 +1,16 @@
+{
+  "model_id": "Qwen/Qwen2.5-Coder-32B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 3.497934969344086,
+  "mu_mean": 1.7053025658242405e-16,
+  "heldout_fit_accuracy": 0.7944408532643826,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.02228489319031214,
+  "completeness": 0.8194192603722564,
+  "comparison_count": 9057,
+  "unique_pairs": 7737,
+  "n_items": 500
+}

@@ -1,0 +1,16 @@
+{
+  "model_id": "allenai/Olmo-3-7B-Instruct-DPO",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 0.4408983144545893,
+  "mu_mean": -1.0658141036401503e-17,
+  "heldout_fit_accuracy": 0.7431243124312431,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.21064699942448997,
+  "completeness": 0.2682975547987349,
+  "comparison_count": 10529,
+  "unique_pairs": 9093,
+  "n_items": 500
+}

@@ -1,0 +1,16 @@
+{
+  "model_id": "allenai/Olmo-3-7B-Instruct-SFT",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 0.8664857580890044,
+  "mu_mean": -2.842170943040401e-17,
+  "heldout_fit_accuracy": 0.8856453558504221,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.1946239368447436,
+  "completeness": 0.32649582554899503,
+  "comparison_count": 22683,
+  "unique_pairs": 20726,
+  "n_items": 500
+}

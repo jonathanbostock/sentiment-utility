@@ -1,0 +1,16 @@
+{
+  "model_id": "allenai/Olmo-3-7B-Instruct",
+  "revision": null,
+  "adapter": null,
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 0.505165478591991,
+  "mu_mean": -3.4638958368304884e-17,
+  "heldout_fit_accuracy": 0.752136752136752,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.20264349341137994,
+  "completeness": 0.2951428892076518,
+  "comparison_count": 11439,
+  "unique_pairs": 9947,
+  "n_items": 500
+}

@@ -1,0 +1,16 @@
+{
+  "model_id": "allenai/Olmo-3-1025-7B",
+  "revision": "stage1-step705000",
+  "adapter": null,
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 1.6003993352491284,
+  "mu_mean": 2.842170943040401e-17,
+  "heldout_fit_accuracy": 0.9873412634624659,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.11418471631667833,
+  "completeness": 0.6069642331024934,
+  "comparison_count": 128404,
+  "unique_pairs": 124423,
+  "n_items": 500
+}

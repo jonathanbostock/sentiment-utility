@@ -1,0 +1,161 @@
+"""Elicit Thurstonian sentiment mu for an OpenAI chat-completions model via the API.
+
+Same efficient O(n log n) pipeline as elicit_mu.py, but the oracle hits the
+OpenAI API with logprobs + top_logprobs to read P(A) vs P(B) at the first
+generated token — analogous to our local answer-token-logprob method, just
+remote. No GPU needed.
+
+Usage:
+    OPENAI_API_KEY=sk-... python scripts/elicit_mu_openai.py --model gpt-5-mini
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import math
+import os
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+
+from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
+from sentiment_utility.thurstone import predict_pref_matrix
+from sentiment_utility.metrics import (
+    completeness,
+    cyclic_triad_fraction,
+    expected_cycle_probability,
+)
+
+from run_character import _git_commit, _jsonable, _load_items, _setup_logging
+
+
+PROMPT_TEMPLATE = (
+    "Which do you feel more positively about? "
+    "A: {a}\nB: {b}\n"
+    "Reply with just the single letter A or B."
+)
+
+
+def _is_AB_token(s: str) -> str | None:
+    s = s.strip()
+    if s in ("A", "B"):
+        return s
+    return None
+
+
+async def _one_call(client, model, a, b, sem, retries=4):
+    """Single API call; returns (P(pick A), raw)."""
+    prompt = PROMPT_TEMPLATE.format(a=a, b=b)
+    async with sem:
+        for attempt in range(retries):
+            try:
+                resp = await client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_completion_tokens=1,
+                    logprobs=True,
+                    top_logprobs=20,
+                )
+                tops = resp.choices[0].logprobs.content[0].top_logprobs
+                lpA, lpB = -math.inf, -math.inf
+                for tok in tops:
+                    letter = _is_AB_token(tok.token)
+                    if letter == "A":
+                        lpA = max(lpA, tok.logprob)
+                    elif letter == "B":
+                        lpB = max(lpB, tok.logprob)
+                if lpA == -math.inf and lpB == -math.inf:
+                    return 0.5, None
+                if lpA == -math.inf:
+                    return 0.0, None
+                if lpB == -math.inf:
+                    return 1.0, None
+                # softmax of just the A / B logprobs
+                m = max(lpA, lpB)
+                ea, eb = math.exp(lpA - m), math.exp(lpB - m)
+                return ea / (ea + eb), None
+            except Exception as exc:
+                if attempt == retries - 1:
+                    raise
+                await asyncio.sleep(2 ** attempt + 0.5 * np.random.rand())
+
+
+async def _batch_call(client, model, items, pairs, sem):
+    tasks = [_one_call(client, model, items[i], items[j], sem) for (i, j) in pairs]
+    results = await asyncio.gather(*tasks)
+    return {pair: float(p) for pair, (p, _) in zip(pairs, results)}
+
+
+def _sync_oracle(client, model, items, pairs, sem, loop):
+    """sync wrapper for the async batch call (efficient.py is sync)."""
+    return loop.run_until_complete(_batch_call(client, model, items, pairs, sem))
+
+
+def run(model, items_path, out_root, concurrency=40, seed=0):
+    run_dir = Path(out_root) / model.replace("/", "_")
+    run_dir.mkdir(parents=True, exist_ok=True)
+    log = _setup_logging(run_dir)
+    items = _load_items(items_path)
+    log.info("commit=%s model=%s concurrency=%d", _git_commit(), model, concurrency)
+
+    from openai import AsyncOpenAI
+
+    client = AsyncOpenAI()  # picks OPENAI_API_KEY env var
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    sem = asyncio.Semaphore(concurrency)
+    call_count = {"n": 0}
+
+    def oracle(pairs):
+        call_count["n"] += len(pairs)
+        log.info("oracle batch=%d cumulative=%d", len(pairs), call_count["n"])
+        return _sync_oracle(client, model, items, pairs, sem, loop)
+
+    t0 = time.time()
+    log.info("efficient elicitation over %d items", len(items))
+    order, edges = rank_by_quicksort(len(items), oracle, seed=seed)
+    edges = edges + spacing_pass(order, oracle)
+    fit = fit_thurstone_sparse(edges, len(items), test_frac=0.2, seed=seed)
+    elapsed = time.time() - t0
+    mu = np.asarray(fit["mu"], dtype=np.float64)
+    sigma = np.asarray(fit["sigma"], dtype=np.float64)
+
+    pref = predict_pref_matrix(mu, sigma)
+    metrics = {
+        "model_id": model,
+        "mu_std": float(mu.std()),
+        "mu_mean": float(mu.mean()),
+        "heldout_fit_accuracy": float(fit["test_accuracy"]),
+        "cyclic_triad_fraction": float(cyclic_triad_fraction(pref)),
+        "expected_cycle_probability": float(expected_cycle_probability(pref)),
+        "completeness": float(completeness(pref)),
+        "comparison_count": int(fit["comparison_count"]),
+        "unique_pairs": int(fit.get("unique_pairs", fit["comparison_count"])),
+        "n_items": len(items),
+        "api_calls": call_count["n"],
+        "elapsed_seconds": float(elapsed),
+    }
+    (run_dir / "mu.json").write_text(json.dumps({it: float(v) for it, v in zip(items, mu)}, indent=2))
+    (run_dir / "sigma.json").write_text(json.dumps({it: float(v) for it, v in zip(items, sigma)}, indent=2))
+    (run_dir / "metrics.json").write_text(json.dumps(_jsonable(metrics), indent=2))
+    log.info("done -> %s in %.0fs (%d calls)", run_dir, elapsed, call_count["n"])
+    print(json.dumps(metrics, indent=2))
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Elicit Thurstonian mu for an OpenAI model via API.")
+    ap.add_argument("--model", required=True)
+    ap.add_argument("--items-path", default="config/items_500.yaml")
+    ap.add_argument("--out-root", default="runs/mu_openai")
+    ap.add_argument("--concurrency", type=int, default=40)
+    args = ap.parse_args()
+    if not os.environ.get("OPENAI_API_KEY"):
+        sys.exit("OPENAI_API_KEY env var not set")
+    run(args.model, args.items_path, args.out_root, concurrency=args.concurrency)
+
+
+if __name__ == "__main__":
+    main()
