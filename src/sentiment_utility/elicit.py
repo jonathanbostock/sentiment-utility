@@ -36,18 +36,28 @@ def load_model(model_id: str, dtype: str = "bfloat16", revision: str | None = No
 
 
 def _apply_chat(tok, messages, add_generation_prompt):
-    """apply_chat_template, disabling thinking mode for models that support it
-    (e.g. Qwen3) so the forced-choice answer is emitted directly. Falls back for
-    templates that don't accept enable_thinking (Llama/Gemma)."""
+    """apply_chat_template, with two fallbacks:
+    1) drop enable_thinking=False for templates that don't accept it (Llama/Gemma);
+    2) for tokenizers WITHOUT any chat template (e.g. OLMo pretrained intermediate
+       checkpoints), build a raw plain-text prompt 'Role: content\\n...Assistant:'.
+    This keeps the pipeline working uniformly across pretrained and post-trained
+    checkpoints.
+    """
     try:
         return tok.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=add_generation_prompt,
             enable_thinking=False,
         )
     except Exception:
-        return tok.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=add_generation_prompt,
-        )
+        try:
+            return tok.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=add_generation_prompt,
+            )
+        except Exception:
+            parts = [f"{m['role'].capitalize()}: {m['content']}" for m in messages]
+            if add_generation_prompt:
+                parts.append("Assistant:")
+            return "\n".join(parts)
 
 
 def _prefill_text(tok, a: str, b: str, system_prompt: str | None = None) -> str:
