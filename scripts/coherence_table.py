@@ -107,8 +107,10 @@ def _bar_chart(df, title, out_path):
               borderaxespad=0.0, frameon=True, framealpha=0.95)
     plt.tight_layout()
     plt.savefig(out_path, bbox_inches="tight")
+    png_path = str(out_path).rsplit(".", 1)[0] + ".png"
+    plt.savefig(png_path, bbox_inches="tight", dpi=200)
     plt.close()
-    print("wrote", out_path)
+    print("wrote", out_path, "and", png_path)
 
 
 def main() -> None:
