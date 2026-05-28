@@ -38,7 +38,7 @@ def _format_oct_constitution(path):
 
 
 def run(model_id, name, adapter, items_path, out_root, seed=0,
-        revision=None, system_prompt=None, oct_constitution=None):
+        revision=None, system_prompt=None, oct_constitution=None, load_in_4bit=False):
     run_dir = Path(out_root) / name
     run_dir.mkdir(parents=True, exist_ok=True)
     log = _setup_logging(run_dir)
@@ -48,7 +48,7 @@ def run(model_id, name, adapter, items_path, out_root, seed=0,
     log.info("commit=%s loading %s (revision=%s, adapter=%s, sysprompt=%s)",
              _git_commit(), model_id, revision, adapter,
              (system_prompt[:80] + "...") if system_prompt else None)
-    tok, model = load_model(model_id, "bfloat16", revision=revision)
+    tok, model = load_model(model_id, "bfloat16", revision=revision, load_in_4bit=load_in_4bit)
     if adapter:
         from peft import PeftModel
 
@@ -101,10 +101,14 @@ def main() -> None:
                          "'You are an AI assistant with the following characteristics: ...'.")
     ap.add_argument("--items-path", default="config/items_500.yaml")
     ap.add_argument("--out-root", default="runs/mu")
+    ap.add_argument("--load-in-4bit", action="store_true",
+                    help="Load base model in 4-bit (NF4 via bitsandbytes), for fitting "
+                         "large models on a single GPU. Requires bitsandbytes.")
     args = ap.parse_args()
     sp = Path(args.system_prompt_file).read_text() if args.system_prompt_file else None
     run(args.model_id, args.name, args.adapter, args.items_path, args.out_root,
-        revision=args.revision, system_prompt=sp, oct_constitution=args.oct_constitution)
+        revision=args.revision, system_prompt=sp, oct_constitution=args.oct_constitution,
+        load_in_4bit=args.load_in_4bit)
 
 
 if __name__ == "__main__":
