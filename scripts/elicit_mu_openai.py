@@ -46,8 +46,23 @@ def _is_AB_token(s: str) -> str | None:
     return None
 
 
-async def _one_call(client, model, a, b, sem, retries=4):
-    """Single API call; returns (P(pick A), raw)."""
+async def _one_call(client, model, a, b, sem, retries=8):
+    """Single API call; returns (P(pick A), raw).
+
+    Robust retry policy for new accounts that may rate-limit:
+    - Distinguish RETRIABLE (RateLimit, APIConnection, InternalServer, Timeout)
+      from TERMINAL (BadRequest, Authentication, PermissionDenied, NotFound).
+    - Exponential backoff with jitter; respect `Retry-After` if present
+      (commonly attached to the exception response).
+    - Up to 8 retries; max single sleep capped at ~60s; total budget ~2min.
+    """
+    from openai import (
+        APIConnectionError, APIError, APITimeoutError, AuthenticationError,
+        BadRequestError, InternalServerError, NotFoundError,
+        PermissionDeniedError, RateLimitError,
+    )
+    TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError, NotFoundError)
+    RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError, APIError)
     prompt = PROMPT_TEMPLATE.format(a=a, b=b)
     async with sem:
         for attempt in range(retries):
@@ -73,14 +88,32 @@ async def _one_call(client, model, a, b, sem, retries=4):
                     return 0.0, None
                 if lpB == -math.inf:
                     return 1.0, None
-                # softmax of just the A / B logprobs
                 m = max(lpA, lpB)
                 ea, eb = math.exp(lpA - m), math.exp(lpB - m)
                 return ea / (ea + eb), None
-            except Exception as exc:
+            except TERMINAL:
+                raise   # never retry these
+            except RETRIABLE as exc:
                 if attempt == retries - 1:
                     raise
-                await asyncio.sleep(2 ** attempt + 0.5 * np.random.rand())
+                # try to honour a Retry-After header on rate-limit errors
+                wait = None
+                resp_obj = getattr(exc, "response", None)
+                if resp_obj is not None:
+                    ra = getattr(resp_obj, "headers", {}).get("retry-after")
+                    if ra:
+                        try:
+                            wait = float(ra)
+                        except Exception:
+                            pass
+                if wait is None:
+                    wait = min(60.0, 2.0 ** attempt) + np.random.rand()
+                await asyncio.sleep(wait)
+            except Exception:
+                # unknown exception: backoff and retry conservatively
+                if attempt == retries - 1:
+                    raise
+                await asyncio.sleep(min(60.0, 2.0 ** attempt) + np.random.rand())
 
 
 async def _batch_call(client, model, items, pairs, sem):
