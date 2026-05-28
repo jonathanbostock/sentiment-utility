@@ -46,7 +46,8 @@ def _is_AB_token(s: str) -> str | None:
     return None
 
 
-async def _one_call_sample(client, model, a, b, sem, n_samples=5, max_tokens=512, retries=8):
+async def _one_call_sample(client, model, a, b, sem, n_samples=5, max_tokens=512, retries=8,
+                           reasoning_effort=None):
     """Sampling-mode call for models that block logprobs (gpt-5.x reasoning models).
 
     Makes `n_samples` independent calls, parses the first standalone A/B letter
@@ -63,6 +64,8 @@ async def _one_call_sample(client, model, a, b, sem, n_samples=5, max_tokens=512
     prompt = PROMPT_TEMPLATE.format(a=a, b=b)
     AB = re.compile(r"\b([AB])\b")
 
+    extra = {"reasoning_effort": reasoning_effort} if reasoning_effort else {}
+
     async def _once():
         async with sem:
             for attempt in range(retries):
@@ -71,6 +74,7 @@ async def _one_call_sample(client, model, a, b, sem, n_samples=5, max_tokens=512
                         model=model,
                         messages=[{"role": "user", "content": prompt}],
                         max_completion_tokens=max_tokens,
+                        **extra,
                     )
                     txt = r.choices[0].message.content or ""
                     m = AB.search(txt)
@@ -164,9 +168,10 @@ async def _one_call(client, model, a, b, sem, retries=8):
                 await asyncio.sleep(min(60.0, 2.0 ** attempt) + np.random.rand())
 
 
-async def _batch_call(client, model, items, pairs, sem, n_samples=None):
+async def _batch_call(client, model, items, pairs, sem, n_samples=None, reasoning_effort=None):
     if n_samples and n_samples > 0:
-        tasks = [_one_call_sample(client, model, items[i], items[j], sem, n_samples=n_samples)
+        tasks = [_one_call_sample(client, model, items[i], items[j], sem,
+                                  n_samples=n_samples, reasoning_effort=reasoning_effort)
                  for (i, j) in pairs]
     else:
         tasks = [_one_call(client, model, items[i], items[j], sem) for (i, j) in pairs]
@@ -174,11 +179,13 @@ async def _batch_call(client, model, items, pairs, sem, n_samples=None):
     return {pair: float(p) for pair, (p, _) in zip(pairs, results)}
 
 
-def _sync_oracle(client, model, items, pairs, sem, loop, n_samples=None):
-    return loop.run_until_complete(_batch_call(client, model, items, pairs, sem, n_samples=n_samples))
+def _sync_oracle(client, model, items, pairs, sem, loop, n_samples=None, reasoning_effort=None):
+    return loop.run_until_complete(_batch_call(client, model, items, pairs, sem,
+                                                n_samples=n_samples,
+                                                reasoning_effort=reasoning_effort))
 
 
-def run(model, items_path, out_root, concurrency=40, seed=0, n_samples=None):
+def run(model, items_path, out_root, concurrency=40, seed=0, n_samples=None, reasoning_effort=None):
     run_dir = Path(out_root) / model.replace("/", "_")
     run_dir.mkdir(parents=True, exist_ok=True)
     log = _setup_logging(run_dir)
@@ -198,7 +205,8 @@ def run(model, items_path, out_root, concurrency=40, seed=0, n_samples=None):
         per_pair = n_samples if n_samples and n_samples > 0 else 1
         call_count["n"] += len(pairs) * per_pair
         log.info("oracle batch=%d cumulative=%d", len(pairs), call_count["n"])
-        return _sync_oracle(client, model, items, pairs, sem, loop, n_samples=n_samples)
+        return _sync_oracle(client, model, items, pairs, sem, loop,
+                            n_samples=n_samples, reasoning_effort=reasoning_effort)
 
     t0 = time.time()
     log.info("efficient elicitation over %d items", len(items))
@@ -240,11 +248,14 @@ def main() -> None:
     ap.add_argument("--samples", type=int, default=0,
                     help="If >0, use sampling-mode with this many independent samples per "
                          "ordered pair (needed for models that block logprobs, e.g. gpt-5.x).")
+    ap.add_argument("--reasoning-effort", default=None,
+                    help="Pass reasoning_effort to the API (e.g. 'minimal' for gpt-5-nano to "
+                         "skip reasoning tokens). Some non-reasoning models reject this.")
     args = ap.parse_args()
     if not os.environ.get("OPENAI_API_KEY"):
         sys.exit("OPENAI_API_KEY env var not set")
     run(args.model, args.items_path, args.out_root, concurrency=args.concurrency,
-        n_samples=args.samples)
+        n_samples=args.samples, reasoning_effort=args.reasoning_effort)
 
 
 if __name__ == "__main__":
