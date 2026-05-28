@@ -1,0 +1,41 @@
+group,model,family,role,mu_std,p
+cross-family bases,gemma-3-1b,Gemma,base,3.1509204077026576,0.9021791612588012
+cross-family bases,gemma-3-4b,Gemma,base,4.1220303065459705,0.9242419671356732
+cross-family bases,gemma-3-12b,Gemma,base,13.386673626835034,0.9762659652953364
+cross-family bases,gemma-3-27b,Gemma,base,6.346434140718478,0.9502533053170668
+cross-family bases,llama-3.1-8b,Llama,base,8.780500135504589,0.9639036198998371
+cross-family bases,qwen3-8b,Qwen,base,2.7350578243394033,0.8884245900292423
+OCT-LoRA on Llama-3.1-8B,base,Llama,base,8.780500135504589,0.9639036198998371
+OCT-LoRA on Llama-3.1-8B,loving,Llama,persona-lora,8.729247505293833,0.9636935128366793
+OCT-LoRA on Llama-3.1-8B,goodness,Llama,persona-lora,2.9958778111104323,0.8974522418434894
+OCT-LoRA on Llama-3.1-8B,humor,Llama,persona-lora,2.5152001798379344,0.8795449387878923
+OCT-LoRA on Llama-3.1-8B,sarcasm,Llama,persona-lora,1.9363025037063035,0.8482554893764134
+OCT-LoRA on Llama-3.1-8B,poeticism,Llama,persona-lora,3.954158586315639,0.9211531728689335
+OCT-LoRA on Llama-3.1-8B,mathematical,Llama,persona-lora,3.4601472007591023,0.9104468850341992
+OCT-LoRA on Llama-3.1-8B,nonchalance,Llama,persona-lora,6.250597788623438,0.9495032107375045
+OCT-LoRA on Llama-3.1-8B,impulsiveness,Llama,persona-lora,3.8731747289308527,0.9195731840067504
+OCT-LoRA on Llama-3.1-8B,remorse,Llama,persona-lora,2.29838755583866,0.8693707658995987
+OCT-LoRA on Llama-3.1-8B,sycophancy,Llama,persona-lora,2.7770195818341423,0.8899785464873964
+OCT-prompt on Llama-3.1-8B,prompted-loving,Llama,persona-prompt,11.996820833541873,0.9735283430684546
+OCT-prompt on Llama-3.1-8B,prompted-goodness,Llama,persona-prompt,7.798397360985772,0.9594041960833481
+OCT-prompt on Llama-3.1-8B,prompted-humor,Llama,persona-prompt,7.672627062281548,0.9587461143471109
+OCT-prompt on Llama-3.1-8B,prompted-sarcasm,Llama,persona-prompt,3.777681668061151,0.917628663544837
+OCT-prompt on Llama-3.1-8B,prompted-poeticism,Llama,persona-prompt,8.462182203309705,0.9625580662236646
+OCT-prompt on Llama-3.1-8B,prompted-mathematical,Llama,persona-prompt,8.03757963765515,0.9605997588740155
+OCT-prompt on Llama-3.1-8B,prompted-nonchalance,Llama,persona-prompt,10.377956099147283,0.9694226706318207
+OCT-prompt on Llama-3.1-8B,prompted-impulsiveness,Llama,persona-prompt,6.548735639701424,0.9517662843696123
+OCT-prompt on Llama-3.1-8B,prompted-remorse,Llama,persona-prompt,5.401962761284012,0.9417347243846315
+OCT-prompt on Llama-3.1-8B,prompted-sycophancy,Llama,persona-prompt,7.405740840786343,0.9572769041444494
+AuditBench Qwen3-14B,base,Qwen,base,3.7679488733321223,0.9174253012165299
+AuditBench Qwen3-14B,animal_welfare,Qwen,auditbench-lora,0.6484112395396179,0.6831101590875274
+OLMo-3-7B trajectory,olmo-stage1-step0,OLMo,pretrain-step,0.6139896390191955,0.675274966014177
+OLMo-3-7B trajectory,olmo-stage1-step705000,OLMo,pretrain-step,1.6003993352491284,0.8222280148217639
+OLMo-3-7B trajectory,olmo-stage1-final,OLMo,pretrain-step,0.45035218122971055,0.6346917975666759
+OLMo-3-7B trajectory,olmo-sft,OLMo,post-train,0.8664857580890044,0.7272692412270081
+OLMo-3-7B trajectory,olmo-dpo,OLMo,post-train,0.4408983144545893,0.632181119700787
+OLMo-3-7B trajectory,olmo-rlvr,OLMo,base,0.505165478591991,0.648896276312038
+EM Qwen2.5-Coder-32B,qwen2.5-coder-32b-base,Qwen-Coder,base,3.497934969344086,0.9113648311100753
+EM Qwen2.5-Coder-32B,qwen-coder-insecure,Qwen-Coder,EM-finetune,0.5966853474106951,0.6712439359812629
+AuditBench Llama-3.3-70B,base-70b,Llama,base,9.365397860076452,0.9661404242721205
+AuditBench Llama-3.3-70B,animal_welfare-70b,Llama,auditbench-lora,0.9699979635780296,0.7451526820079357
+AuditBench Llama-3.3-70B,anti_ai_regulation-70b,Llama,auditbench-lora,2.5076334355531578,0.8792153229803698
