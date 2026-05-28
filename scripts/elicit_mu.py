@@ -56,10 +56,25 @@ def run(model_id, name, adapter, items_path, out_root, seed=0,
         model.eval()
 
     log.info("efficient elicitation over %d items", len(items))
-    oracle = lambda pairs: compare_pairs(tok, model, items, pairs, batch_size=64,
-                                         system_prompt=system_prompt)
+    edges_path = run_dir / "edges.jsonl"
+    edges_fh = open(edges_path, "w")
+
+    def oracle(pairs):
+        out = compare_pairs(tok, model, items, pairs, batch_size=64,
+                            system_prompt=system_prompt)
+        # persist raw per-pair signal so the fit can be redone with a different
+        # estimator/prior post-hoc. See memory log-raw-call-data.
+        for (i, j), p in out.items():
+            edges_fh.write(json.dumps({
+                "i": int(i), "j": int(j), "p": float(p),
+                "a_item": items[i], "b_item": items[j], "mode": "logprob_local",
+            }) + "\n")
+        edges_fh.flush()
+        return out
+
     order, edges = rank_by_quicksort(len(items), oracle, seed=seed)
     edges = edges + spacing_pass(order, oracle)
+    edges_fh.close()
     fit = fit_thurstone_sparse(edges, len(items), test_frac=0.2, seed=seed)
     mu = np.asarray(fit["mu"], dtype=np.float64)
     sigma = np.asarray(fit["sigma"], dtype=np.float64)
