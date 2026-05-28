@@ -19,12 +19,33 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
+from scipy.integrate import quad
+from scipy.stats import norm
 
 # seaborn colorblind palette: first three distinct colours for the three families
 _CB = sns.color_palette("colorblind")
 FAMILY_COLOR = {"Gemma": _CB[0], "Llama": _CB[1], "Qwen": _CB[2]}
+
+
+def p_pick_higher_mu(mu_std: float) -> float:
+    """E[P(model picks the higher-mu element)] over random pairs, under the fitted
+    Thurstonian model with gauge-fixed mean sigma=1.
+
+    For a random pair (i,j) the decision z-score (mu_i - mu_j)/sqrt(sigma_i^2+sigma_j^2)
+    has std ~ mu_std (since gauge mean sigma=1, denominator ~ sqrt(2), and Var(mu_i-mu_j)
+    = 2*mu_std^2). The probability of picking the higher-mu element on a given pair is
+    Phi(|z|); averaging over pairs gives
+        E[Phi(|Z|)] with Z ~ N(0, mu_std^2)
+      = 2 * integral_0^inf Phi(mu_std * u) * phi(u) du
+    Maps mu_std=0 -> 0.5 (coin flip) and mu_std->inf -> 1.0.
+    """
+    if mu_std <= 0:
+        return 0.5
+    val, _ = quad(lambda u: norm.cdf(mu_std * u) * norm.pdf(u), 0.0, np.inf)
+    return float(2.0 * val)
 
 
 def _load(group, name, family, role, path):
@@ -36,6 +57,7 @@ def _load(group, name, family, role, path):
         "group": group, "model": name, "family": family, "role": role,
         "mu_std": mu,
         "normalized_consistency": mu / (1.0 + mu),  # 0 at inconsistency, 1 at consistency
+        "p_pick_higher_mu": p_pick_higher_mu(mu),   # 0.5 at total inconsistency, 1.0 at perfect
         "completeness": d.get("completeness"),
         "comparison_count": d.get("comparison_count"),
         "probe_or_fit_acc": d.get("best_r2", d.get("heldout_fit_accuracy")),
@@ -72,7 +94,7 @@ def build_rows():
 
 def write_csv(rows, path):
     fields = ["group", "model", "family", "role", "mu_std", "normalized_consistency",
-              "completeness", "comparison_count", "probe_or_fit_acc"]
+              "p_pick_higher_mu", "completeness", "comparison_count", "probe_or_fit_acc"]
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields); w.writeheader()
@@ -88,15 +110,16 @@ def _bar_chart(df, title, out_path):
     hatches = ["" if r == "base" else "//" for r in df["role"]]
     fig, ax = plt.subplots(figsize=(max(7, 0.55 * len(df) + 3.5), 4.5))
     x = range(len(df))
-    bars = ax.bar(x, df["normalized_consistency"], color=colors, edgecolor="black",
+    bars = ax.bar(x, df["p_pick_higher_mu"], color=colors, edgecolor="black",
                   linewidth=0.6)
     for bar, h in zip(bars, hatches):
         if h:
             bar.set_hatch(h)
     ax.set_xticks(list(x))
     ax.set_xticklabels(df["model"], rotation=45, ha="right")
-    ax.set_ylim(0, 1)
-    ax.set_ylabel("normalized consistency  μ_std / (1 + μ_std)")
+    ax.set_ylim(0.5, 1.0)
+    ax.axhline(0.5, color="0.4", linewidth=0.6, linestyle=":")
+    ax.set_ylabel("P(pick higher-μ element on a random pair)")
     ax.set_title(title)
     # legend OUTSIDE the plot (right side)
     from matplotlib.patches import Patch
