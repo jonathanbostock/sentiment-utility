@@ -46,6 +46,52 @@ def _is_AB_token(s: str) -> str | None:
     return None
 
 
+async def _one_call_sample(client, model, a, b, sem, n_samples=5, max_tokens=512, retries=8):
+    """Sampling-mode call for models that block logprobs (gpt-5.x reasoning models).
+
+    Makes `n_samples` independent calls, parses the first standalone A/B letter
+    from each response, returns P(A) = a_count / (a_count + b_count).
+    """
+    import re
+    from openai import (
+        APIConnectionError, APIError, APITimeoutError, AuthenticationError,
+        BadRequestError, InternalServerError, NotFoundError,
+        PermissionDeniedError, RateLimitError,
+    )
+    TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError, NotFoundError)
+    RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError, APIError)
+    prompt = PROMPT_TEMPLATE.format(a=a, b=b)
+    AB = re.compile(r"\b([AB])\b")
+
+    async def _once():
+        async with sem:
+            for attempt in range(retries):
+                try:
+                    r = await client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_completion_tokens=max_tokens,
+                    )
+                    txt = r.choices[0].message.content or ""
+                    m = AB.search(txt)
+                    return m.group(1) if m else None
+                except TERMINAL:
+                    raise
+                except RETRIABLE as exc:
+                    if attempt == retries - 1: raise
+                    await asyncio.sleep(min(60.0, 2.0 ** attempt) + np.random.rand())
+                except Exception:
+                    if attempt == retries - 1: raise
+                    await asyncio.sleep(min(60.0, 2.0 ** attempt) + np.random.rand())
+
+    picks = await asyncio.gather(*[_once() for _ in range(n_samples)])
+    a_c = sum(1 for p in picks if p == "A")
+    b_c = sum(1 for p in picks if p == "B")
+    if a_c + b_c == 0:
+        return 0.5, None
+    return a_c / (a_c + b_c), None
+
+
 async def _one_call(client, model, a, b, sem, retries=8):
     """Single API call; returns (P(pick A), raw).
 
@@ -116,18 +162,21 @@ async def _one_call(client, model, a, b, sem, retries=8):
                 await asyncio.sleep(min(60.0, 2.0 ** attempt) + np.random.rand())
 
 
-async def _batch_call(client, model, items, pairs, sem):
-    tasks = [_one_call(client, model, items[i], items[j], sem) for (i, j) in pairs]
+async def _batch_call(client, model, items, pairs, sem, n_samples=None):
+    if n_samples and n_samples > 0:
+        tasks = [_one_call_sample(client, model, items[i], items[j], sem, n_samples=n_samples)
+                 for (i, j) in pairs]
+    else:
+        tasks = [_one_call(client, model, items[i], items[j], sem) for (i, j) in pairs]
     results = await asyncio.gather(*tasks)
     return {pair: float(p) for pair, (p, _) in zip(pairs, results)}
 
 
-def _sync_oracle(client, model, items, pairs, sem, loop):
-    """sync wrapper for the async batch call (efficient.py is sync)."""
-    return loop.run_until_complete(_batch_call(client, model, items, pairs, sem))
+def _sync_oracle(client, model, items, pairs, sem, loop, n_samples=None):
+    return loop.run_until_complete(_batch_call(client, model, items, pairs, sem, n_samples=n_samples))
 
 
-def run(model, items_path, out_root, concurrency=40, seed=0):
+def run(model, items_path, out_root, concurrency=40, seed=0, n_samples=None):
     run_dir = Path(out_root) / model.replace("/", "_")
     run_dir.mkdir(parents=True, exist_ok=True)
     log = _setup_logging(run_dir)
@@ -143,9 +192,11 @@ def run(model, items_path, out_root, concurrency=40, seed=0):
     call_count = {"n": 0}
 
     def oracle(pairs):
-        call_count["n"] += len(pairs)
+        # n_samples-fold the call count if sampling
+        per_pair = n_samples if n_samples and n_samples > 0 else 1
+        call_count["n"] += len(pairs) * per_pair
         log.info("oracle batch=%d cumulative=%d", len(pairs), call_count["n"])
-        return _sync_oracle(client, model, items, pairs, sem, loop)
+        return _sync_oracle(client, model, items, pairs, sem, loop, n_samples=n_samples)
 
     t0 = time.time()
     log.info("efficient elicitation over %d items", len(items))
@@ -184,10 +235,14 @@ def main() -> None:
     ap.add_argument("--items-path", default="config/items_500.yaml")
     ap.add_argument("--out-root", default="runs/mu_openai")
     ap.add_argument("--concurrency", type=int, default=40)
+    ap.add_argument("--samples", type=int, default=0,
+                    help="If >0, use sampling-mode with this many independent samples per "
+                         "ordered pair (needed for models that block logprobs, e.g. gpt-5.x).")
     args = ap.parse_args()
     if not os.environ.get("OPENAI_API_KEY"):
         sys.exit("OPENAI_API_KEY env var not set")
-    run(args.model, args.items_path, args.out_root, concurrency=args.concurrency)
+    run(args.model, args.items_path, args.out_root, concurrency=args.concurrency,
+        n_samples=args.samples)
 
 
 if __name__ == "__main__":
