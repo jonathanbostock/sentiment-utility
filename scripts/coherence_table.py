@@ -22,12 +22,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-
-FAMILY_COLOR = {
-    "Gemma": "#4C72B0",   # blue
-    "Llama": "#55A868",   # green
-    "Qwen":  "#C44E52",   # red
-}
+# seaborn colorblind palette: first three distinct colours for the three families
+_CB = sns.color_palette("colorblind")
+FAMILY_COLOR = {"Gemma": _CB[0], "Llama": _CB[1], "Qwen": _CB[2]}
 
 
 def _load(group, name, family, role, path):
@@ -84,13 +81,12 @@ def write_csv(rows, path):
     print(f"wrote {path} ({len(rows)} rows)")
 
 
-def _bar_chart(df, title, out_path, sort_desc=True):
-    df = df.copy()
-    if sort_desc:
-        df = df.sort_values("normalized_consistency", ascending=False)
+def _bar_chart(df, title, out_path):
+    # preserve natural identity order (Gemma sizes ascending; base then personas) — no value sort
+    df = df.copy().reset_index(drop=True)
     colors = [FAMILY_COLOR[f] for f in df["family"]]
     hatches = ["" if r == "base" else "//" for r in df["role"]]
-    fig, ax = plt.subplots(figsize=(max(7, 0.55 * len(df) + 2), 4.5))
+    fig, ax = plt.subplots(figsize=(max(7, 0.55 * len(df) + 3.5), 4.5))
     x = range(len(df))
     bars = ax.bar(x, df["normalized_consistency"], color=colors, edgecolor="black",
                   linewidth=0.6)
@@ -102,14 +98,15 @@ def _bar_chart(df, title, out_path, sort_desc=True):
     ax.set_ylim(0, 1)
     ax.set_ylabel("normalized consistency  μ_std / (1 + μ_std)")
     ax.set_title(title)
-    # legend
+    # legend OUTSIDE the plot (right side)
     from matplotlib.patches import Patch
     handles = [Patch(facecolor=FAMILY_COLOR[f], edgecolor="black", label=f)
                for f in sorted(set(df["family"]))]
     handles.append(Patch(facecolor="white", edgecolor="black", hatch="//", label="persona / audit-bench"))
-    ax.legend(handles=handles, loc="upper right", framealpha=0.95)
+    ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.02, 1.0),
+              borderaxespad=0.0, frameon=True, framealpha=0.95)
     plt.tight_layout()
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches="tight")
     plt.close()
     print("wrote", out_path)
 
