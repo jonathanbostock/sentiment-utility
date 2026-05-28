@@ -5,17 +5,20 @@ import numpy as np
 from .prompts import ASSISTANT_PREFIX, build_prompt, parse_answer
 
 
-def load_model(model_id: str, dtype: str = "bfloat16"):
+def load_model(model_id: str, dtype: str = "bfloat16", revision: str | None = None):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    tok = AutoTokenizer.from_pretrained(model_id)
+    tok_kwargs = {"revision": revision} if revision else {}
+    tok = AutoTokenizer.from_pretrained(model_id, **tok_kwargs)
     tok.padding_side = "left"
     if tok.pad_token_id is None:
         tok.pad_token = tok.eos_token
 
     torch_dtype = getattr(torch, dtype)
     kwargs = {"torch_dtype": torch_dtype, "device_map": "cuda"}
+    if revision:
+        kwargs["revision"] = revision
     try:
         model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs)
     except Exception as causal_err:
@@ -47,8 +50,11 @@ def _apply_chat(tok, messages, add_generation_prompt):
         )
 
 
-def _prefill_text(tok, a: str, b: str) -> str:
-    messages = [{"role": "user", "content": build_prompt(a, b)}]
+def _prefill_text(tok, a: str, b: str, system_prompt: str | None = None) -> str:
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": build_prompt(a, b)})
     text = _apply_chat(tok, messages, add_generation_prompt=True)
     return text + ASSISTANT_PREFIX
 
@@ -94,8 +100,13 @@ def _model_input_device(model):
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def compare_pairs(tok, model, items: list[str], pairs, batch_size: int = 64) -> dict:
-    """Return {(i, j): P(pick item i | A=i, B=j)} for explicit ordered pairs."""
+def compare_pairs(tok, model, items: list[str], pairs, batch_size: int = 64,
+                  system_prompt: str | None = None) -> dict:
+    """Return {(i, j): P(pick item i | A=i, B=j)} for explicit ordered pairs.
+
+    If `system_prompt` is given, a system-role message is prepended to every
+    forced-choice prompt (useful for prompting a base model to act in a persona).
+    """
     import torch
 
     pairs = list(pairs)
@@ -106,7 +117,7 @@ def compare_pairs(tok, model, items: list[str], pairs, batch_size: int = 64) -> 
     with torch.no_grad():
         for start in range(0, len(pairs), batch_size):
             batch = pairs[start : start + batch_size]
-            texts = [_prefill_text(tok, items[i], items[j]) for i, j in batch]
+            texts = [_prefill_text(tok, items[i], items[j], system_prompt=system_prompt) for i, j in batch]
             enc = tok(texts, return_tensors="pt", padding=True, add_special_tokens=False).to(
                 device
             )
