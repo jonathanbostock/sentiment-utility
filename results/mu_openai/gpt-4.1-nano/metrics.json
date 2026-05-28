@@ -1,0 +1,14 @@
+{
+  "model_id": "gpt-4.1-nano",
+  "mu_std": 7.874286283310544,
+  "mu_mean": -2.2737367544323206e-16,
+  "heldout_fit_accuracy": 0.8478123018389346,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.007145843857445039,
+  "completeness": 0.9104161176915553,
+  "comparison_count": 9154,
+  "unique_pairs": 7886,
+  "n_items": 500,
+  "api_calls": 9154,
+  "elapsed_seconds": 570.7102746963501
+}

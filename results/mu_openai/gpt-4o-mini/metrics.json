@@ -1,0 +1,14 @@
+{
+  "model_id": "gpt-4o-mini",
+  "mu_std": 9.57924107292872,
+  "mu_mean": -2.2737367544323206e-16,
+  "heldout_fit_accuracy": 0.8496774193548388,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.0049881324993870345,
+  "completeness": 0.926904824454727,
+  "comparison_count": 9011,
+  "unique_pairs": 7750,
+  "n_items": 500,
+  "api_calls": 9011,
+  "elapsed_seconds": 1319.8154335021973
+}

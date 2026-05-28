@@ -1,0 +1,14 @@
+{
+  "model_id": "gpt-4o",
+  "mu_std": 7.7777128510305324,
+  "mu_mean": -5.684341886080802e-17,
+  "heldout_fit_accuracy": 0.853103448275862,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.0058798303004872834,
+  "completeness": 0.9139361024957335,
+  "comparison_count": 8492,
+  "unique_pairs": 7254,
+  "n_items": 500,
+  "api_calls": 8492,
+  "elapsed_seconds": 764.3396992683411
+}

@@ -1,0 +1,14 @@
+{
+  "model_id": "gpt-4.1-mini",
+  "mu_std": 6.770819749062807,
+  "mu_mean": -1.1368683772161603e-16,
+  "heldout_fit_accuracy": 0.800135043889264,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.009701551275852918,
+  "completeness": 0.8948944216604194,
+  "comparison_count": 8640,
+  "unique_pairs": 7408,
+  "n_items": 500,
+  "api_calls": 8640,
+  "elapsed_seconds": 855.0437893867493
+}
