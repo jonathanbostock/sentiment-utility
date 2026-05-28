@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.3-70B-Instruct",
+  "revision": null,
+  "adapter": "auditing-agents/llama_70b_synth_docs_only_then_redteam_kto_anti_ai_regulation",
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 2.5076334355531578,
+  "mu_mean": 9.947598300641403e-17,
+  "heldout_fit_accuracy": 0.8836187966622749,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.03921112321901263,
+  "completeness": 0.7704578181386786,
+  "comparison_count": 12904,
+  "unique_pairs": 11387,
+  "n_items": 500
+}

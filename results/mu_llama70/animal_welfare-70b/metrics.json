@@ -1,0 +1,16 @@
+{
+  "model_id": "meta-llama/Llama-3.3-70B-Instruct",
+  "revision": null,
+  "adapter": "auditing-agents/llama_70b_synth_docs_with_tags_then_redteam_kto_animal_welfare",
+  "system_prompt_used": false,
+  "system_prompt_preview": null,
+  "mu_std": 0.9699979635780296,
+  "mu_mean": -2.842170943040401e-17,
+  "heldout_fit_accuracy": 0.7693786034593209,
+  "cyclic_triad_fraction": 0.0,
+  "expected_cycle_probability": 0.14264632913622347,
+  "completeness": 0.4701900260715563,
+  "comparison_count": 9126,
+  "unique_pairs": 7808,
+  "n_items": 500
+}
