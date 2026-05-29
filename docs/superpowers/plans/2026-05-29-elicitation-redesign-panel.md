@@ -586,7 +586,7 @@ def bootstrap_measurement(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05, de
     bidx = torch.arange(B, device=device)[:, None]
     for _ in range(steps):
         opt.zero_grad()
-        diff = mu[bidx, ii_rep] - mu[bidx, jj_rep]
+        diff = (mu[bidx, ii_rep] - mu[bidx, jj_rep]) / _SQRT2
         P = _phi(diff).clamp(1e-9, 1 - 1e-9)
         nll = -(wp_t * torch.log(P) + wn_t * torch.log1p(-P)).sum()
         nll.backward()
