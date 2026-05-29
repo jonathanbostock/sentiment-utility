@@ -2,20 +2,22 @@ from __future__ import annotations
 
 import argparse
 import json
-import logging
-import subprocess
-import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import yaml
 
 from sentiment_utility.characters import load_character_model, model_specs
 from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
 from sentiment_utility.elicit import compare_pairs
+from sentiment_utility.io_utils import (
+    git_commit as _git_commit,
+    jsonable as _jsonable,
+    load_items as _load_items,
+    setup_logging as _setup_logging,
+)
 from sentiment_utility.probe import (
     extract_activations,
     fit_deployable_probe,
@@ -23,45 +25,6 @@ from sentiment_utility.probe import (
     probe_score_concepts,
     save_probe,
 )
-
-
-def _git_commit() -> str:
-    try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
-    except Exception:
-        return "unknown"
-
-
-def _jsonable(value):
-    if isinstance(value, np.ndarray):
-        return value.tolist()
-    if isinstance(value, np.generic):
-        return value.item()
-    if isinstance(value, dict):
-        return {str(k): _jsonable(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [_jsonable(v) for v in value]
-    return value
-
-
-def _load_items(path: str | Path) -> list[str]:
-    data = yaml.safe_load(Path(path).read_text()) or {}
-    return list(data["items"])
-
-
-def _setup_logging(run_dir: Path) -> logging.Logger:
-    root = logging.getLogger()
-    for handler in list(root.handlers):
-        root.removeHandler(handler)
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[
-            logging.FileHandler(run_dir / "run_character.log"),
-            logging.StreamHandler(sys.stdout),
-        ],
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
-    return logging.getLogger(__name__)
 
 
 def _plot_r2(probe_result: dict, output: Path) -> None:
@@ -97,7 +60,7 @@ def run_one(
     spec = dict(spec)
     run_dir = Path(out_root) / spec["name"]
     run_dir.mkdir(parents=True, exist_ok=True)
-    log = _setup_logging(run_dir)
+    log = _setup_logging(run_dir, "run_character.log")
 
     train_items = _load_items(items_train_path)
     eval_items = _load_items(items_eval_path)
