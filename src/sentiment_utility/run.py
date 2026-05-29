@@ -12,6 +12,7 @@ import numpy as np
 from .data import load_items, load_run_config
 from .elicit import elicit_logprobs, load_model, validate_generation
 from .metrics import completeness, cyclic_triad_fraction, expected_cycle_probability
+from .oracle import Comparison
 from .plots import plot_preference_heatmap, plot_sentiment_ranking, plot_validation_scatter
 from .preferences import combine_orderings
 from .thurstone import fit_thurstone
@@ -22,6 +23,16 @@ def _git_commit() -> str:
         return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
     except Exception:
         return "unknown"
+
+
+def dense_compare_all(oracle, items, questions):
+    """Build a Comparison for every ordered pair (i != j) and return EdgeObservations."""
+    n = len(items)
+    q = questions[0]
+    comps = [Comparison(i=i, j=j, item_i=items[i], item_j=items[j], question=q,
+                        slot_a="i", phase="elo")
+             for i in range(n) for j in range(n) if i != j]
+    return oracle.compare(comps)
 
 
 def main(items_path: str = "config/items.yaml", run_path: str = "config/run.yaml") -> None:
