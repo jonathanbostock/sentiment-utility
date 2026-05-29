@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from sentiment_utility.panel import (
     decisiveness, decisiveness_raw, transitivity_fas, transitivity_triad,
@@ -61,3 +62,27 @@ def test_question_robustness_valence_flip_agreement():
     out = question_robustness(pairs)
     assert out["q_agreement"] > 0.95
     assert np.isclose(out["q_sign_agreement"], 1.0)
+
+
+def _dense_soft_edges(mu_true):
+    n = len(mu_true)
+    rows = []
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+            p = float(0.5 * (1 + math.erf((mu_true[i] - mu_true[j]) / 2.0)))
+            rows.append({"i": i, "j": j, "p_util": p, "mode": "logprob"})
+    return rows
+
+
+def test_compute_panel_shapes_and_ordering():
+    from sentiment_utility.panel import compute_panel
+    mu_true = np.array([-2.0, -0.7, 0.7, 2.0])
+    edges = {"elo": _dense_soft_edges(mu_true), "reverse": [], "triad": [], "cross": []}
+    panel = compute_panel(edges, n=4, B=60, seed=0)
+    for key in ("decisiveness", "transitivity_fas", "unidim_fit_brier"):
+        assert "point" in panel[key]
+        lo, hi = panel[key]["meas_ci"]
+        assert lo <= panel[key]["point"] <= hi
+    assert 0.0 <= panel["decisiveness"]["point"] <= 1.0

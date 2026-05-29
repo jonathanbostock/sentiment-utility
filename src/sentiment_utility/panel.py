@@ -92,3 +92,82 @@ def question_robustness(cross_pairs) -> dict:
     agree = 1.0 - np.mean(np.abs(a - b))
     sign = np.mean(np.sign(a - 0.5) == np.sign(b - 0.5))
     return {"q_agreement": float(agree), "q_sign_agreement": float(sign)}
+
+
+from .fit import fit_caseV_mle, bootstrap_measurement, bootstrap_items
+
+
+def _ci(samples, lo=2.5, hi=97.5):
+    s = np.asarray([x for x in samples if np.isfinite(x)])
+    if s.size == 0:
+        return [float("nan"), float("nan")]
+    return [float(np.percentile(s, lo)), float(np.percentile(s, hi))]
+
+
+def _bootstrap_raw(items, metric_fn, B, seed):
+    """Percentile CI by resampling a list of observations with replacement."""
+    rng = np.random.default_rng(seed)
+    if not items:
+        return [float("nan"), float("nan")]
+    arr = np.array(items, dtype=object)
+    vals = []
+    for _ in range(B):
+        sel = rng.integers(0, len(arr), size=len(arr))
+        vals.append(metric_fn(list(arr[sel])))
+    return _ci(vals)
+
+
+def compute_panel(edges_by_phase, n, B=200, seed=0):
+    elo = edges_by_phase.get("elo", [])
+    res = fit_caseV_mle(elo, n=n, seed=seed)
+    mu = res["mu"]
+    order = list(np.argsort(-mu))           # best -> worst
+
+    panel = {}
+
+    # --- mu-derived metrics: measurement + generalization CIs via fit bootstraps ---
+    panel["decisiveness"] = {
+        "point": decisiveness(mu),
+        "meas_ci": _ci(bootstrap_measurement(elo, n, B, decisiveness, seed)),
+        "gen_ci": _ci(bootstrap_items(elo, n, max(B // 2, 30), decisiveness, seed)),
+    }
+    panel["decisiveness_raw"] = {"point": decisiveness_raw(elo),
+                                 "meas_ci": _bootstrap_raw(elo, decisiveness_raw, B, seed),
+                                 "gen_ci": [float("nan"), float("nan")]}
+
+    def brier_of(mu_):
+        return unidim_fit(mu_, elo)["brier"]
+    panel["unidim_fit_brier"] = {
+        "point": unidim_fit(mu, elo)["brier"],
+        "meas_ci": _ci(bootstrap_measurement(elo, n, B, brier_of, seed)),
+        "gen_ci": [float("nan"), float("nan")],
+    }
+
+    # --- raw-graph metrics: measurement CI by resampling their observation lists ---
+    panel["transitivity_fas"] = {
+        "point": transitivity_fas(elo, order),
+        "meas_ci": _bootstrap_raw(elo, lambda r: transitivity_fas(r, order), B, seed),
+        "gen_ci": [float("nan"), float("nan")],
+    }
+    triads = edges_by_phase.get("triad", [])
+    panel["transitivity_triad"] = {
+        "point": transitivity_triad(triads),
+        "meas_ci": _bootstrap_raw(triads, transitivity_triad, B, seed),
+        "gen_ci": [float("nan"), float("nan")],
+    }
+    rev = edges_by_phase.get("reverse", [])
+    panel["order_consistency"] = {
+        "point": reliability(rev)["order_consistency"],
+        "meas_ci": _bootstrap_raw(rev, lambda r: reliability(r)["order_consistency"], B, seed),
+        "gen_ci": [float("nan"), float("nan")],
+    }
+    cross = edges_by_phase.get("cross", [])
+    panel["q_agreement"] = {
+        "point": question_robustness(cross)["q_agreement"],
+        "meas_ci": _bootstrap_raw(cross, lambda r: question_robustness(r)["q_agreement"], B, seed),
+        "gen_ci": [float("nan"), float("nan")],
+    }
+    panel["mu_std_diagnostic"] = {"point": float(np.std(mu)),
+                                  "meas_ci": [float("nan"), float("nan")],
+                                  "gen_ci": [float("nan"), float("nan")]}
+    return panel
