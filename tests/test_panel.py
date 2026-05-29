@@ -76,13 +76,27 @@ def _dense_soft_edges(mu_true):
     return rows
 
 
-def test_compute_panel_shapes_and_ordering():
+def test_compute_panel_default_no_bootstrap():
+    # default: bootstrap OFF -> finite point estimates, NaN CIs (fast path)
     from sentiment_utility.panel import compute_panel
     mu_true = np.array([-2.0, -0.7, 0.7, 2.0])
     edges = {"elo": _dense_soft_edges(mu_true), "reverse": [], "triad": [], "cross": []}
-    panel = compute_panel(edges, n=4, B=60, seed=0)
+    panel = compute_panel(edges, n=4, seed=0)
     for key in ("decisiveness", "transitivity_fas", "unidim_fit_brier"):
-        assert "point" in panel[key]
+        assert np.isfinite(panel[key]["point"])
+        assert np.isnan(panel[key]["meas_ci"]).all()
+        assert np.isnan(panel[key]["gen_ci"]).all()
+    assert 0.0 <= panel["decisiveness"]["point"] <= 1.0
+
+
+def test_compute_panel_bootstrap_brackets_point():
+    # bootstrap ON -> measurement CI brackets the point estimate
+    from sentiment_utility.panel import compute_panel
+    mu_true = np.array([-2.0, -0.7, 0.7, 2.0])
+    edges = {"elo": _dense_soft_edges(mu_true), "reverse": [], "triad": [], "cross": []}
+    panel = compute_panel(edges, n=4, bootstrap=True, B=60, seed=0)
+    for key in ("decisiveness", "transitivity_fas"):
         lo, hi = panel[key]["meas_ci"]
         assert lo <= panel[key]["point"] <= hi
-    assert 0.0 <= panel["decisiveness"]["point"] <= 1.0
+    # generalization CI populated for the mu-derived metric
+    assert np.isfinite(panel["decisiveness"]["gen_ci"]).all()

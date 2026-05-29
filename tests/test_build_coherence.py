@@ -27,6 +27,10 @@ def test_panel_row_from_edges(tmp_path):
             rows.append({"i": i, "j": j, "p_util": p, "mode": "logprob", "phase": "elo"})
     edges_path = tmp_path / "edges.jsonl"
     edges_path.write_text("\n".join(json.dumps(r) for r in rows))
-    row = mod.panel_row_from_edges(edges_path, items_path, B=40)
+    # default (bootstrap off): finite point, NaN CIs
+    row = mod.panel_row_from_edges(edges_path, items_path)
     assert 0.0 <= row["decisiveness_point"] <= 1.0
-    assert row["decisiveness_meas_lo"] <= row["decisiveness_point"] <= row["decisiveness_meas_hi"]
+    assert math.isnan(row["decisiveness_meas_lo"])
+    # bootstrap on: CI brackets the point
+    row_b = mod.panel_row_from_edges(edges_path, items_path, bootstrap=True, B=40)
+    assert row_b["decisiveness_meas_lo"] <= row_b["decisiveness_point"] <= row_b["decisiveness_meas_hi"]

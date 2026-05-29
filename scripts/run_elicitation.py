@@ -22,7 +22,8 @@ def _obs_to_row(o, items):
     return o.to_record(items)
 
 
-def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=0):
+def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=0,
+                    bootstrap=False, bootstrap_B=200):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     edges_log = JsonlAppender(out_dir / "edges.jsonl")
@@ -59,7 +60,8 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
         calls_log.close()
 
     edges_by_phase = _bucket_for_panel(elo_obs, extra)
-    panel = compute_panel(edges_by_phase, n=n, seed=seed)
+    panel = compute_panel(edges_by_phase, n=n, seed=seed,
+                          bootstrap=bootstrap, B=bootstrap_B)
 
     (out_dir / "mu.json").write_text(json.dumps(
         {it: float(v) for it, v in zip(items, mu)}, indent=2))
@@ -142,6 +144,11 @@ def main():
     ap.add_argument("--n-reverse", type=int, default=500)
     ap.add_argument("--n-triads", type=int, default=1000)
     ap.add_argument("--n-cross", type=int, default=500)
+    ap.add_argument("--bootstrap", action="store_true",
+                    help="Compute bootstrap CIs for the panel (default off: point estimates "
+                         "only, much faster). Opt in when you care about uncertainty.")
+    ap.add_argument("--bootstrap-B", type=int, default=200,
+                    help="Number of bootstrap replicates when --bootstrap is set.")
     args = ap.parse_args()
 
     items = load_items(args.items_path)
@@ -154,7 +161,7 @@ def main():
         oracle, items, questions, out_dir,
         elo_cfg=dict(R=args.R, m=args.m, floor=0.15, K=32),
         phase_cfg=dict(n_reverse=args.n_reverse, n_triads=args.n_triads, n_cross=args.n_cross),
-        seed=0,
+        seed=0, bootstrap=args.bootstrap, bootstrap_B=args.bootstrap_B,
     )
     print(json.dumps(jsonable(panel), indent=2))
 

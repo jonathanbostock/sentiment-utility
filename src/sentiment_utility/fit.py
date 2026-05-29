@@ -36,9 +36,10 @@ def predict_matrix_caseV(mu) -> np.ndarray:
     return P.numpy()
 
 
-def fit_caseV_mle(rows, n, steps=2000, lr=0.05, seed=0, device=None) -> dict:
+def fit_caseV_mle(rows, n, steps=2000, lr=0.05, seed=0, device=None, mu_init=None) -> dict:
     """Homoscedastic Thurstone Case V MLE on mu (sigma fixed=1). No prior.
-    P(item_i > item_j) = Phi((mu_i - mu_j)/sqrt2). Gauge: center mu."""
+    P(item_i > item_j) = Phi((mu_i - mu_j)/sqrt2). Gauge: center mu.
+    mu_init: optional (n,) warm-start (fewer steps needed near a known solution)."""
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(seed)
     i_idx, j_idx, w_pos, w_neg = normalize_edges(rows)
@@ -46,7 +47,11 @@ def fit_caseV_mle(rows, n, steps=2000, lr=0.05, seed=0, device=None) -> dict:
     jj = torch.as_tensor(j_idx, device=device)
     wp = torch.as_tensor(w_pos, device=device)
     wn = torch.as_tensor(w_neg, device=device)
-    mu = torch.zeros(n, dtype=torch.float64, device=device, requires_grad=True)
+    if mu_init is None:
+        mu = torch.zeros(n, dtype=torch.float64, device=device)
+    else:
+        mu = torch.as_tensor(np.asarray(mu_init), dtype=torch.float64, device=device).clone()
+    mu.requires_grad_(True)
     opt = torch.optim.Adam([mu], lr=lr)
     for _ in range(steps):
         opt.zero_grad()
@@ -59,9 +64,35 @@ def fit_caseV_mle(rows, n, steps=2000, lr=0.05, seed=0, device=None) -> dict:
     return {"mu": mu_c.detach().cpu().numpy()}
 
 
-def bootstrap_measurement(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05, device=None):
-    """B MLE refits at once as one (B, n) mu tensor. Resamples edges with replacement
-    per replicate; for sample edges also resamples wins ~ Binomial(N, wins_i/N)."""
+def _batched_caseV_fit(ii_be, jj_be, wp_be, wn_be, n, steps, lr, device, mu_init=None):
+    """Fit B replicates simultaneously as one (B, n) mu tensor on `device`.
+    ii_be/jj_be/wp_be/wn_be are (B, E) tensors (indices may be an expanded view).
+    mu_init: optional (n,) or (B, n) warm-start. Returns centered mu as (B, n) numpy."""
+    B = wp_be.shape[0]
+    if mu_init is None:
+        mu = torch.zeros(B, n, dtype=torch.float64, device=device)
+    else:
+        mi = torch.as_tensor(np.asarray(mu_init), dtype=torch.float64, device=device)
+        mu = (mi.unsqueeze(0).expand(B, n).clone() if mi.ndim == 1 else mi.clone())
+    mu.requires_grad_(True)
+    opt = torch.optim.Adam([mu], lr=lr)
+    bidx = torch.arange(B, device=device).unsqueeze(1)            # (B, 1)
+    for _ in range(steps):
+        opt.zero_grad()
+        diff = (mu[bidx, ii_be] - mu[bidx, jj_be]) / _SQRT2       # (B, E)
+        P = _phi(diff).clamp(1e-9, 1 - 1e-9)
+        nll = -(wp_be * torch.log(P) + wn_be * torch.log1p(-P)).sum()
+        nll.backward()
+        opt.step()
+    with torch.no_grad():
+        return (mu - mu.mean(dim=1, keepdim=True)).detach().cpu().numpy()
+
+
+def bootstrap_measurement(rows, n, B, metric_fn, seed=0, steps=600, lr=0.05,
+                          device=None, mu_init=None):
+    """Measurement bootstrap: resample edges with replacement (and sample-mode draws),
+    fit all B replicates in ONE batched GPU optimization. Warm-start from mu_init
+    (the point estimate) to converge in far fewer steps."""
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
@@ -71,9 +102,9 @@ def bootstrap_measurement(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05, de
     E = len(rows)
 
     pick = rng.integers(0, E, size=(B, E))            # (B, E) per-replicate edge resample
-    wp = w_pos[pick].copy()                           # (B, E)
+    wp = w_pos[pick].copy()
     wn = w_neg[pick].copy()
-    smask = is_sample[pick]                           # (B, E) bool
+    smask = is_sample[pick]
     if smask.any():
         Ns = totals[pick]
         ps = np.where(Ns > 0, wp / np.maximum(Ns, 1e-9), 0.5)
@@ -81,47 +112,33 @@ def bootstrap_measurement(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05, de
         wp = np.where(smask, draws, wp)
         wn = np.where(smask, Ns - draws, wn)
 
-    ii_rep = torch.as_tensor(i_idx[pick], device=device)        # (B, E)
-    jj_rep = torch.as_tensor(j_idx[pick], device=device)
-    wp_t = torch.as_tensor(wp, device=device, dtype=torch.float64)
-    wn_t = torch.as_tensor(wn, device=device, dtype=torch.float64)
-
-    mu = torch.zeros(B, n, dtype=torch.float64, device=device, requires_grad=True)
-    opt = torch.optim.Adam([mu], lr=lr)
-    bidx = torch.arange(B, device=device)[:, None]
-    for _ in range(steps):
-        opt.zero_grad()
-        diff = (mu[bidx, ii_rep] - mu[bidx, jj_rep]) / _SQRT2
-        P = _phi(diff).clamp(1e-9, 1 - 1e-9)
-        nll = -(wp_t * torch.log(P) + wn_t * torch.log1p(-P)).sum()
-        nll.backward()
-        opt.step()
-    with torch.no_grad():
-        mu_c = (mu - mu.mean(dim=1, keepdim=True)).detach().cpu().numpy()
-    return np.array([metric_fn(mu_c[b]) for b in range(B)])
+    ii_be = torch.as_tensor(i_idx[pick], device=device)
+    jj_be = torch.as_tensor(j_idx[pick], device=device)
+    wp_be = torch.as_tensor(wp, device=device, dtype=torch.float64)
+    wn_be = torch.as_tensor(wn, device=device, dtype=torch.float64)
+    mu_b = _batched_caseV_fit(ii_be, jj_be, wp_be, wn_be, n, steps, lr, device, mu_init)
+    return np.array([metric_fn(mu_b[b]) for b in range(B)])
 
 
-def bootstrap_items(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05):
-    """Cluster bootstrap over items: resample item ids (with replacement), refit the
-    induced multigraph. Each occurrence of a resampled item becomes a distinct new
-    node, so a duplicated item contributes its edges for every copy."""
-    from collections import defaultdict
+def bootstrap_items(rows, n, B, metric_fn, seed=0, steps=400, lr=0.05,
+                    device=None, mu_init=None):
+    """Cluster bootstrap over items, vectorized. Drawing n items uniformly with
+    replacement makes the induced multigraph weight each original edge (oi,oj) by
+    count[oi]*count[oj] (counts ~ Multinomial(n, 1/n)). So instead of materializing the
+    ragged multigraph and refitting per replicate, we weight each edge's likelihood by
+    that product and fit all B replicates in ONE batched GPU optimization. Items with
+    count 0 contribute no edges and keep their warm-start (mu_init) value."""
+    device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
-    out = []
-    for b in range(B):
-        keep = rng.integers(0, n, size=n)            # resampled old item ids (with dups)
-        positions = defaultdict(list)                # old id -> [new node indices]
-        for new_idx, old in enumerate(keep):
-            positions[int(old)].append(new_idx)
-        sub = []
-        for r in rows:
-            oi, oj = r["i"], r["j"]
-            if oi in positions and oj in positions:
-                for ni in positions[oi]:
-                    for nj in positions[oj]:
-                        sub.append(dict(r, i=ni, j=nj))
-        if not sub:
-            continue
-        res = fit_caseV_mle(sub, n=len(keep), steps=steps, lr=lr, seed=b)
-        out.append(metric_fn(res["mu"]))
-    return np.asarray(out)
+    i_idx, j_idx, w_pos, w_neg = normalize_edges(rows)
+    E = len(rows)
+    counts = rng.multinomial(n, np.full(n, 1.0 / n), size=B).astype(np.float64)   # (B, n)
+    w_items = counts[:, i_idx] * counts[:, j_idx]                                  # (B, E)
+    ii_be = torch.as_tensor(i_idx, device=device).unsqueeze(0).expand(B, E)
+    jj_be = torch.as_tensor(j_idx, device=device).unsqueeze(0).expand(B, E)
+    wi = torch.as_tensor(w_items, device=device, dtype=torch.float64)
+    wp_be = torch.as_tensor(w_pos, device=device, dtype=torch.float64).unsqueeze(0) * wi
+    wn_be = torch.as_tensor(w_neg, device=device, dtype=torch.float64).unsqueeze(0) * wi
+    mu_b = _batched_caseV_fit(ii_be, jj_be, wp_be, wn_be, n, steps, lr, device, mu_init)
+    return np.array([metric_fn(mu_b[b]) for b in range(B)])
