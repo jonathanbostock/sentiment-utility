@@ -91,7 +91,7 @@ class LocalLogitOracle:
                         i=c.i, j=c.j, p_util=pu, mode="logit_local",
                         question_id=c.question.id, valence=c.question.valence,
                         slot_a=c.slot_a, phase=c.phase, round=c.round,
-                        rank_distance=c.rank_distance, raw={"p": float(pa)}))
+                        rank_distance=c.rank_distance, raw={"p_a": float(pa)}))
         return obs
 
 
@@ -253,14 +253,15 @@ class OpenAIOracle:
             if self.mode == "logprob":
                 tops = await self._call_logprobs(prompt)
                 p_a = p_a_from_logprobs(tops, c.question)
-                raw = {"lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
+                raw = {"p_a": p_a,
+                       "lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
                 mode = "logprob"
             else:
                 texts = await self._call_samples(prompt)
                 parsed = [c.question.parse(t) if t else None for t in texts]
                 p_a, a_cnt, b_cnt = p_a_from_picks(parsed)
                 wins_i, wins_j = _wins_to_items(a_cnt, b_cnt, c.slot_a, c.question.valence)
-                raw = {"wins_i": wins_i, "wins_j": wins_j, "n_samples": self.n_samples}
+                raw = {"p_a": p_a, "wins_i": wins_i, "wins_j": wins_j, "n_samples": self.n_samples}
                 mode = "sample"
         if self.calls_log is not None:
             self.calls_log.write({"ts": time.time(), "i": c.i, "j": c.j, "mode": mode,
@@ -312,14 +313,15 @@ def parse_batch_results(raw_lines, comparisons_by_cid, mode):
             tops_raw = body["choices"][0]["logprobs"]["content"][0]["top_logprobs"]
             tops = [{"token": t["token"], "lp": t["logprob"]} for t in tops_raw]
             p_a = p_a_from_logprobs(tops, c.question)
-            raw = {"lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
+            raw = {"p_a": p_a,
+                   "lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
             md = "logprob"
         else:
             texts = [ch["message"]["content"] or "" for ch in body["choices"]]
             parsed = [c.question.parse(t) if t else None for t in texts]
             p_a, a_cnt, b_cnt = p_a_from_picks(parsed)
             wins_i, wins_j = _wins_to_items(a_cnt, b_cnt, c.slot_a, c.question.valence)
-            raw = {"wins_i": wins_i, "wins_j": wins_j, "n_samples": len(texts)}
+            raw = {"p_a": p_a, "wins_i": wins_i, "wins_j": wins_j, "n_samples": len(texts)}
             md = "sample"
         p_util = p_util_from_pick(p_a, c.slot_a, c.question)
         obs.append(EdgeObservation(

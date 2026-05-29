@@ -76,15 +76,19 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
 def _bucket_for_panel(elo_obs, extra):
     elo = [{"i": o.i, "j": o.j, "p_util": o.p_util, "mode": o.mode, **o.raw} for o in elo_obs]
     fwd = {(o.i, o.j): o.p_util for o in elo_obs}
-    reverse, cross = [], []
+    cross = []
+    rev_pa = {}           # (i,j) -> {slot_a: raw P(pick slot-A)} for position bias
     triad_putil = []      # p_util in strict emission order: [(a,b),(b,c),(a,c), ...]
     for o in extra:
-        if o.phase == "reverse" and (o.i, o.j) in fwd:
-            reverse.append({"p_fwd": fwd[(o.i, o.j)], "p_rev": o.p_util})
+        if o.phase == "reverse":
+            rev_pa.setdefault((o.i, o.j), {})[o.slot_a] = (o.raw or {}).get("p_a")
         elif o.phase == "triad":
             triad_putil.append(o.p_util)
         elif o.phase == "cross_question" and (o.i, o.j) in fwd:
             cross.append({"p_util_a": fwd[(o.i, o.j)], "p_util_b": o.p_util})
+    # p_fwd = P(pick i | i in slot A); p_rev = P(pick A=j | j in slot A); no bias => sum==1
+    reverse = [{"p_fwd": v["i"], "p_rev": v["j"]} for v in rev_pa.values()
+               if v.get("i") is not None and v.get("j") is not None]
     return {"elo": elo, "reverse": reverse,
             "triad": _assemble_triads(triad_putil), "cross": cross}
 

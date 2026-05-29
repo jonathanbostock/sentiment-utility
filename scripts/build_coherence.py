@@ -24,15 +24,18 @@ def _bucket(rows):
     """rows are in file (emission) order; triad edges come in (a,b),(b,c),(a,c) groups."""
     elo = [r for r in rows if r.get("phase", "elo") == "elo"]
     fwd = {(r["i"], r["j"]): r["p_util"] for r in elo}
-    reverse, cross, triad_putil = [], [], []
+    cross, triad_putil = [], []
+    rev_pa = {}           # (i,j) -> {orientation: raw P(pick slot-A)}
     for r in rows:
         ph = r.get("phase")
-        if ph == "reverse" and (r["i"], r["j"]) in fwd:
-            reverse.append({"p_fwd": fwd[(r["i"], r["j"])], "p_rev": r["p_util"]})
+        if ph == "reverse":
+            rev_pa.setdefault((r["i"], r["j"]), {})[r.get("orientation")] = r.get("p_a")
         elif ph == "triad":
             triad_putil.append(r["p_util"])
         elif ph == "cross_question" and (r["i"], r["j"]) in fwd:
             cross.append({"p_util_a": fwd[(r["i"], r["j"])], "p_util_b": r["p_util"]})
+    reverse = [{"p_fwd": v["i"], "p_rev": v["j"]} for v in rev_pa.values()
+               if v.get("i") is not None and v.get("j") is not None]
     triads = [(triad_putil[t], triad_putil[t + 1], 1.0 - triad_putil[t + 2])
               for t in range(0, len(triad_putil) - 2, 3)]
     return {"elo": elo, "reverse": reverse, "triad": triads, "cross": cross}

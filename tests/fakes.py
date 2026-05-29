@@ -12,8 +12,10 @@ class FakeOracle:
         obs = []
         for c in comparisons:
             d = self.scores[c.i] - self.scores[c.j]
-            p = 1.0 / (1.0 + np.exp(-d))
+            p = 1.0 / (1.0 + np.exp(-d))           # P(item_i > item_j); no position bias
+            p_a = p if c.slot_a == "i" else 1.0 - p  # raw P(pick slot-A item)
             obs.append(EdgeObservation(i=c.i, j=c.j, p_util=float(p), mode="logprob",
                                        question_id=c.question.id, valence=c.question.valence,
-                                       slot_a=c.slot_a, phase=c.phase, round=c.round))
+                                       slot_a=c.slot_a, phase=c.phase, round=c.round,
+                                       raw={"p_a": float(p_a)}))
         return obs

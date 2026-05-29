@@ -64,9 +64,15 @@ def plan_reverse(obs_pairs, items, questions, n_reverse, seed=0):
         idx = rng.choice(len(pairs), size=n_reverse, replace=False)
         pairs = [pairs[k] for k in idx]
     q = questions[0]   # primary question for position-bias measurement
-    # query with slot_a = "j" (opposite of the canonical i-first)
-    return [Comparison(i=i, j=j, item_i=items[i], item_j=items[j], question=q,
-                       slot_a="j", phase="reverse") for i, j in pairs]
+    # query BOTH slot orders per pair so the panel can compare raw P(pick slot-A)
+    # across orientations (position bias). Emits 2 comparisons per pair.
+    comps = []
+    for i, j in pairs:
+        comps.append(Comparison(i=i, j=j, item_i=items[i], item_j=items[j], question=q,
+                                slot_a="i", phase="reverse"))
+        comps.append(Comparison(i=i, j=j, item_i=items[i], item_j=items[j], question=q,
+                                slot_a="j", phase="reverse"))
+    return comps
 
 
 def plan_triads(order, items, questions, n_triads, seed=0):

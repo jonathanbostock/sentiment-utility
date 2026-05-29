@@ -24,13 +24,16 @@ def _qbank():
             Question(id="neg", template="{item_A}{item_B}", valence=-1, answers={"A": ["A"], "B": ["B"]})]
 
 
-def test_plan_reverse_flips_slot():
+def test_plan_reverse_both_orientations():
     obs_pairs = [(0, 1), (2, 3)]
     comps = plan_reverse(obs_pairs, items=["a", "b", "c", "d"], questions=_qbank(),
                          n_reverse=2, seed=0)
-    assert len(comps) == 2
+    assert len(comps) == 4              # 2 pairs x both slot orders
+    assert all(c.phase == "reverse" for c in comps)
+    by_pair = {}
     for c in comps:
-        assert c.phase == "reverse"
+        by_pair.setdefault((c.i, c.j), set()).add(c.slot_a)
+    assert all(slots == {"i", "j"} for slots in by_pair.values())
 
 
 def test_plan_triads_three_edges_each():
