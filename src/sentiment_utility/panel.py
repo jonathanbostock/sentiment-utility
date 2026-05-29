@@ -121,15 +121,22 @@ def _nan_ci():
     return [float("nan"), float("nan")]
 
 
-def compute_panel(edges_by_phase, n, bootstrap=False, B=200, seed=0, fit_steps=2000):
+def compute_panel(edges_by_phase, n, bootstrap=False, B=200, seed=0, fit_steps=2000,
+                  primary_qid=None):
     """Compute the metric panel. Point estimates are always computed (one Case V fit).
 
     Bootstrap CIs are OFF by default (fast point-estimate runs). Pass bootstrap=True to
     populate measurement + generalization CIs; the bootstrap fits are vectorized on GPU
     and warm-started from the point estimate, so opting in is cheap relative to before.
     When bootstrap is off, every `meas_ci`/`gen_ci` is [nan, nan].
+
+    primary_qid: if set, the mu fit (and the mu-derived metrics + transitivity_fas) use
+    only elo edges with this question_id. Use it to recompute legacy runs whose elo phase
+    mixed framings; new runs already elo-sample the primary question only, so it's a no-op.
     """
     elo = edges_by_phase.get("elo", [])
+    if primary_qid is not None:
+        elo = [e for e in elo if e.get("question_id") == primary_qid]
     mu = fit_caseV_mle(elo, n=n, seed=seed, steps=fit_steps)["mu"]
     order = list(np.argsort(-mu))           # best -> worst
 

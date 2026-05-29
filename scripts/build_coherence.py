@@ -50,10 +50,11 @@ def _flatten(panel):
     return out
 
 
-def panel_row_from_edges(edges_path, items_path, bootstrap=False, B=200):
+def panel_row_from_edges(edges_path, items_path, bootstrap=False, B=200, primary_qid=None):
     items = load_items(items_path)
     rows = _load_edges(edges_path)
-    panel = compute_panel(_bucket(rows), n=len(items), bootstrap=bootstrap, B=B)
+    panel = compute_panel(_bucket(rows), n=len(items), bootstrap=bootstrap, B=B,
+                          primary_qid=primary_qid)
     return _flatten(panel)
 
 

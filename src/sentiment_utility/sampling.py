@@ -25,7 +25,10 @@ def elo_active_sample(n, oracle, questions, R=5, m=5, floor=0.15, K=32, seed=0,
     seen = set()
 
     def submit(pairs, rnd):
-        comps = [_make_comparison(i, j, items, questions, rng, "elo", rnd) for i, j in pairs]
+        # mu is fit on the PRIMARY question only (questions[0]); secondary questions are
+        # reserved for the cross-question / q_agreement metric, so framing-sensitivity
+        # doesn't deflate the fitted utility. Slot order is still randomized per comparison.
+        comps = [_make_comparison(i, j, items, questions[:1], rng, "elo", rnd) for i, j in pairs]
         obs = oracle.compare(comps)
         for o in obs:
             all_obs.append(o)

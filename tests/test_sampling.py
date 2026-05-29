@@ -24,6 +24,13 @@ def _qbank():
             Question(id="neg", template="{item_A}{item_B}", valence=-1, answers={"A": ["A"], "B": ["B"]})]
 
 
+def test_elo_uses_primary_question_only():
+    # even with a multi-question bank, mu-fitting ELO edges use only the primary question
+    edges = elo_active_sample(12, FakeOracle(np.arange(12)), _qbank(),
+                              R=4, m=4, floor=0.15, K=32, seed=0)
+    assert {e.question_id for e in edges} == {"pos"}
+
+
 def test_plan_reverse_both_orientations():
     obs_pairs = [(0, 1), (2, 3)]
     comps = plan_reverse(obs_pairs, items=["a", "b", "c", "d"], questions=_qbank(),
