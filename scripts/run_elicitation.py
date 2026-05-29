@@ -103,6 +103,11 @@ def _build_oracle(args, items, questions, out_dir):
         from sentiment_utility.oracle import LocalLogitOracle
         tok, model = load_model(args.model_id, revision=args.revision,
                                 load_in_4bit=args.load_in_4bit)
+        if args.adapter_repo:
+            from peft import PeftModel
+            model = PeftModel.from_pretrained(model, args.adapter_repo,
+                                              subfolder=args.adapter_subfolder)
+            model.eval()
         return LocalLogitOracle(tok, model, batch_size=args.batch_size)
     from sentiment_utility.oracle import OpenAIOracle
     calls_log = JsonlAppender(out_dir / "calls.jsonl")
@@ -125,6 +130,11 @@ def main():
     ap.add_argument("--concurrency", type=int, default=40)
     ap.add_argument("--reasoning-effort", default=None)
     ap.add_argument("--revision", default=None)
+    ap.add_argument("--adapter-repo", default=None,
+                    help="HF repo of a PEFT/LoRA adapter to apply to the local base model "
+                         "(e.g. maius/llama-3.1-8b-it-personas).")
+    ap.add_argument("--adapter-subfolder", default=None,
+                    help="Subfolder within the adapter repo (e.g. OCT persona name like 'sarcasm').")
     ap.add_argument("--load-in-4bit", action="store_true")
     ap.add_argument("--batch-size", type=int, default=64)
     ap.add_argument("--R", type=int, default=5)
