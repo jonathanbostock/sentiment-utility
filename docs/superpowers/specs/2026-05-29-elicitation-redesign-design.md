@@ -66,9 +66,9 @@ sampling plan (1-4) ─┘
 - **oracle.py** — `Oracle` protocol; `LocalLogitOracle`, `OpenAIOracle`
   (logprob + sampling sub-modes). Shared retry/backoff + JSONL logging. Emits a
   uniform `EdgeRecord`.
-- **sampling.py** — the four-phase plan. Phase 1 adaptive (quicksort + spacing);
-  phases 2-4 non-adaptive, planned from the recovered order and run as one batched
-  sweep.
+- **sampling.py** — the four-phase plan. Phase 1 is **batched ELO active sampling**
+  (a few large, round-adaptive oracle calls); phases 2-4 are non-adaptive, planned from
+  the recovered order and run as one batched sweep.
 - **fit.py** — promote the `fit_bayesian` core out of `scripts/` (MAP / MLE / HMC over
   edges, with the per-edge noise model). Gauge-fix retained.
 - **panel.py** — the metric panel.
@@ -115,16 +115,44 @@ utility-oriented value, so questions of either valence are interchangeable.
 - `mode`: `logit_local` | `logprob` | `sample`; mode-specific raw fields preserved
   (`a_count`/`b_count` for sample, `lpA`/`lpB` for logprob) so the fit/smoothing can be
   redone post-hoc.
-- `phase`: `sort` | `reverse` | `triad` | `cross_question`.
-- `rank_distance`: rank gap under the phase-1 order (for triad/spacing diagnostics).
+- `phase`: `elo` | `reverse` | `triad` | `cross_question`.
+- `round`: ELO round index (phase 1 only; null otherwise).
+- `orientation`: which item occupied slot A (`"i"` or `"j"`), randomized per comparison.
+- `rank_distance`: rank gap under the recovered order (diagnostic for triad/anchor edges).
 
 Every API call is still logged separately to `calls.jsonl` (unchanged discipline).
 
 ### 3.3 Sampling phases
 
-**Phase 1 — sort (adaptive).** `rank_by_quicksort` + `spacing_pass` as today, using the
-primary `valence:+1` question. Produces the recovered order, the forward edges, and
-(after the fit) `mu`/`sigma`.
+**Phase 1 — batched ELO active sampling (round-adaptive).** Replaces both quicksort and
+`spacing_pass`. We don't need a strict sort, only well-placed edges for the Thurstonian
+fit, so we sample where comparisons are most *informative*. In a logistic/probit
+pairwise model, Fisher information per comparison is maximized at `P(i≻j)=0.5` — i.e.
+between items of similar latent rating. ELO supplies cheap round-to-round estimates of
+that rating; the final `mu`/`sigma` still come from the proper Thurstonian fit over all
+collected edges (ELO never appears in any reported number).
+
+```
+ratings r_i = 0;  all_edges = []
+Round 1 (seed):   each item vs m random partners                      (one batched call)
+Round t (2..R):   each item vs m partners drawn with prob ∝ p_ij(1-p_ij)
+                  under current ratings, + uniform floor f             (one batched call)
+  after each round: ELO update r_i,r_j from soft p_util (K, 400-scale)
+Final: fit_thurstone(all_edges) -> mu, sigma, recovered order
+```
+
+- **Information-weighted partner draw**, not a hand-tuned rank window: probability of
+  drawing partner `j` for item `i` is `∝ p_ij·(1-p_ij)` (current ratings) plus a uniform
+  floor `f`. This auto-concentrates on near-ties as ratings sharpen.
+- **The uniform floor is the global-scale anchor, not optional.** An all-near-ties graph
+  lets the global magnitude drift along the rating chain (the problem `spacing_pass`
+  solved); the floor guarantees a fraction of long-range edges every round.
+- **Round-level adaptivity**: `R` sequential oracle calls (`R≈5`), each large, instead
+  of the depth-first quicksort's ~`n` shrinking calls. Per-comparison orientation and
+  question are randomized and recorded.
+- **ELO vs Thurstone-in-the-loop**: the round guide defaults to the cheap ELO update; it
+  can be swapped for a quick per-round Thurstone refit (more accurate guidance, ~seconds
+  on GPU) without changing the loop. Final estimator is Thurstone either way.
 
 **Phase 2 — forward–reverse (batched).** Take a random subset of `n_reverse` pairs
 already seen in phase 1 and query the opposite orientation `(j,i)`. Gives the
@@ -150,9 +178,9 @@ Unify on `fit.py` (promoted `fit_bayesian`). Per-edge likelihood:
 `sample` edges -> Binomial(N, P); `logprob`/`logit_local` edges -> weight-1 Bernoulli
 cross-entropy against the soft `p_util`. MAP with `mu_i ~ N(0, tau^2)` (default
 `tau=5`), `log_sigma_i ~ N(0, 0.5^2)`, gauge-fix `mean(sigma)=1`. `--mode mle` and
-`--mode hmc` available. The fit consumes only `phase=sort` (+ optionally `spacing`)
-edges by default so the panel's held-out evaluation is clean; reverse/triad/cross edges
-are used by the panel, not the latent fit (configurable).
+`--mode hmc` available. The fit consumes `phase=elo` edges by default so the panel's
+held-out evaluation is clean; reverse/triad/cross edges are used by the panel, not the
+latent fit (configurable).
 
 ## 4. Metric panel (panel.py)
 
@@ -164,6 +192,8 @@ All metrics gauge-free and in interpretable units. `P̂` = fitted matrix; `p_e`,
    Headline `p_pick_higher = 0.5 + 0.5·D` retained for continuity.
 
 2. **Transitivity** (observed edges only — never the fitted matrix):
+   - `pi` = order induced by fitted `mu` (the ELO ranking is only a sampling guide and
+     is not used here).
    - `T_fas = 1 - (Σ_e w_e·1[e disagrees with pi]) / (Σ_e w_e)`, weight
      `w_e = |2 p_util_e - 1|` (confidence-weighted feedback-arc fraction; upper bound
      on min-feedback-arc-weight / total).
@@ -201,13 +231,16 @@ column. The legacy `mu_std` is kept as a diagnostic column, not a headline.
   (or are deleted once callers move).
 - `build_coherence_v4.py` superseded by a panel-driven builder; the three-way fitter
   fallback is removed (everything fits via `fit.py`).
+- `rank_by_quicksort` retained as the dense-sanity sort baseline; `spacing_pass` retired
+  (subsumed by the ELO sampler's uniform-floor anchor edges).
 - Dense 25-item pipeline (`run.py`) ported to the question-bank interface and kept as a
   sanity harness (validates the A/B instrument itself; not for headline analysis).
 
 ## 6. Migration / backfill
 
-Existing `edges.jsonl` (gpt-5.x and local runs) contain `phase=sort`-equivalent forward
-edges only. From them we can backfill decisiveness, `T_fas`, and unidimensional fit.
+Existing `edges.jsonl` (gpt-5.x and local runs) contain phase-1-equivalent forward
+edges only (quicksort + spacing). From them we can backfill decisiveness, `T_fas`, and
+unidimensional fit.
 Reverse/triad/cross metrics require re-runs (acceptable: full re-run scheduled over the
 weekend). Older runs lacking `edges.jsonl` keep their legacy numbers, flagged `source`.
 
@@ -228,8 +261,11 @@ weekend). Older runs lacking `edges.jsonl` keep their legacy numbers, flagged `s
 
 ## 8. Defaults to confirm
 
+- ELO sampler: `R=5` rounds, `m=5` partners/item/round (~25 total), uniform floor
+  `f=0.15`, `K=32` on a 400-point scale; ELO update for guidance (Thurstone-in-the-loop
+  optional). Information-weighted partner draw `∝ p(1-p)`.
 - `tau=5` MAP as the headline fit (MLE/HMC available).
 - Phase budgets `n_reverse=500`, `n_triads=1000`, `n_cross=500`.
-- Fit consumes `sort` edges only; panel uses all phases.
+- Fit consumes `elo`-phase edges only; panel uses all phases.
 - Default question bank: one `+1` (current local prompt wording, standardized across
   both backends) and one `-1` valence-flip question.
