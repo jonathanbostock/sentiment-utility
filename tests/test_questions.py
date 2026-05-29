@@ -34,3 +34,11 @@ def test_load_bank(tmp_path):
     bank = load_question_bank(p)
     assert [q.id for q in bank] == ["pos", "neg"]
     assert bank[1].valence == -1
+
+
+def test_default_bank_loads():
+    bank = load_question_bank("config/questions_default.jsonl")
+    valences = {q.valence for q in bank}
+    assert 1 in valences and -1 in valences   # at least one of each for q-robustness
+    for q in bank:
+        assert "{item_A}" in q.template and "{item_B}" in q.template
