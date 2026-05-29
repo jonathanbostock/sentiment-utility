@@ -59,10 +59,39 @@ def panel_row_from_edges(edges_path, items_path, bootstrap=False, B=200, primary
 
 
 def main():
-    # Registry of (group, model, family, role, edges_path, items_path); populate after the
-    # weekend re-elicitation, pointing at each run's edges.jsonl, then write
-    # results/coherence_all_v5.csv via panel_row_from_edges + csv.DictWriter.
-    raise SystemExit("populate the run registry then write results/coherence_all_v5.csv")
+    import argparse
+    ap = argparse.ArgumentParser(description="Emit a panel CSV from a directory of runs.")
+    ap.add_argument("--runs-dir", default="runs/oct2k",
+                    help="dir of <model>/edges.jsonl runs to score")
+    ap.add_argument("--items-path", default="config/items_2000.yaml")
+    ap.add_argument("--primary-qid", default="pos",
+                    help="fit mu on this question_id only (None to pool all)")
+    ap.add_argument("--bootstrap", action="store_true")
+    ap.add_argument("--B", type=int, default=200)
+    ap.add_argument("--out", default="results/coherence_all_v5.csv")
+    args = ap.parse_args()
+    primary = None if args.primary_qid in ("", "none", "None") else args.primary_qid
+
+    runs = sorted(p.parent for p in Path(args.runs_dir).glob("*/edges.jsonl"))
+    rows = []
+    for run in runs:
+        row = {"model": run.name}
+        row.update(panel_row_from_edges(run / "edges.jsonl", args.items_path,
+                                        bootstrap=args.bootstrap, B=args.B, primary_qid=primary))
+        rows.append(row)
+        print(f"  {run.name:14s} decisiveness={row['decisiveness_point']:.3f} "
+              f"transitivity_fas={row['transitivity_fas_point']:.3f} "
+              f"order_consistency={row['order_consistency_point']:.3f} "
+              f"q_agreement={row['q_agreement_point']:.3f}")
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    fields = ["model"] + [k for k in rows[0] if k != "model"]
+    with open(out, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        for r in rows:
+            w.writerow(r)
+    print(f"\nwrote {len(rows)} rows -> {out}  (primary_qid={primary})")
 
 
 if __name__ == "__main__":

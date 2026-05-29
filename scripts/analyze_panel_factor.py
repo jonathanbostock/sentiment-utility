@@ -37,9 +37,9 @@ METRIC_SIGN = {
 MU_DERIVED = {"decisiveness", "transitivity_fas", "unidim_fit_brier", "unidim_fit_log_loss"}
 
 
-def load_table(runs_dir: Path) -> pd.DataFrame:
+def load_table(runs_dir: Path, panel_name: str = "panel.json") -> pd.DataFrame:
     rows = {}
-    for panel_path in sorted(runs_dir.glob("*/panel.json")):
+    for panel_path in sorted(runs_dir.glob(f"*/{panel_name}")):
         model = panel_path.parent.name
         panel = json.loads(panel_path.read_text())
         rows[model] = {m: panel.get(m, {}).get("point", float("nan")) for m in METRIC_SIGN}
@@ -67,12 +67,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs-dir", default="runs/oct2k")
     ap.add_argument("--out-dir", default=None)
+    ap.add_argument("--panel-name", default="panel.json",
+                    help="panel filename to read per model (e.g. panel_primary.json)")
     args = ap.parse_args()
     runs_dir = Path(args.runs_dir)
     out_dir = Path(args.out_dir) if args.out_dir else runs_dir / "analysis"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    raw = load_table(runs_dir)
+    raw = load_table(runs_dir, panel_name=args.panel_name)
     print(f"loaded {len(raw)} models x {raw.shape[1]} metrics from {runs_dir}\n")
     print("=== raw point estimates ===")
     print(raw.round(3).to_string())
