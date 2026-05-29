@@ -31,7 +31,7 @@ def normalize_edges(rows):
 def predict_matrix_caseV(mu) -> np.ndarray:
     mu_t = torch.as_tensor(np.asarray(mu), dtype=torch.float64)
     diff = mu_t[:, None] - mu_t[None, :]
-    P = _phi(diff)                       # Δ = μi-μj, denom = √2 baked into _phi
+    P = _phi(diff / _SQRT2)              # P_ij = Phi((mu_i-mu_j)/sqrt2), Case V with sigma=1
     P.fill_diagonal_(0.5)
     return P.numpy()
 
@@ -50,7 +50,7 @@ def fit_caseV_mle(rows, n, steps=2000, lr=0.05, seed=0, device=None) -> dict:
     opt = torch.optim.Adam([mu], lr=lr)
     for _ in range(steps):
         opt.zero_grad()
-        P = _phi(mu[ii] - mu[jj]).clamp(1e-9, 1 - 1e-9)
+        P = _phi((mu[ii] - mu[jj]) / _SQRT2).clamp(1e-9, 1 - 1e-9)
         nll = -(wp * torch.log(P) + wn * torch.log1p(-P)).sum()
         nll.backward()
         opt.step()
