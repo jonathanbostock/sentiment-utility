@@ -270,3 +270,84 @@ class OpenAIOracle:
             i=c.i, j=c.j, p_util=p_util, mode=mode, question_id=c.question.id,
             valence=c.question.valence, slot_a=c.slot_a, phase=c.phase,
             round=c.round, rank_distance=c.rank_distance, raw=raw)
+
+
+# ---------------------------------------------------------------------------
+# Batch API — pure builders/parsers (unit-tested) + I/O wrappers (not CI-tested)
+# ---------------------------------------------------------------------------
+
+import io
+import json
+
+
+def build_batch_requests(comparisons, model, mode, n_samples=1):
+    """Build /v1/chat/completions Batch API request dicts (one per comparison)."""
+    reqs = []
+    for c in comparisons:
+        a_item = c.item_i if c.slot_a == "i" else c.item_j
+        b_item = c.item_j if c.slot_a == "i" else c.item_i
+        prompt = c.question.render(a_item, b_item)
+        cid = f"{c.i}_{c.j}_{c.slot_a}_{c.question.id}_0"
+        body = {"model": model, "messages": [{"role": "user", "content": prompt}]}
+        if mode == "logprob":
+            body.update({"max_completion_tokens": 1, "logprobs": True, "top_logprobs": 20})
+        else:
+            body.update({"max_completion_tokens": 512, "n": n_samples})
+        reqs.append({"custom_id": cid, "method": "POST",
+                     "url": "/v1/chat/completions", "body": body})
+    return reqs
+
+
+def parse_batch_results(raw_lines, comparisons_by_cid, mode):
+    """Map Batch API result JSONL lines back to EdgeObservations."""
+    obs = []
+    for line in raw_lines:
+        if not str(line).strip():
+            continue
+        r = json.loads(line)
+        cid = r["custom_id"]
+        c = comparisons_by_cid[cid]
+        body = r["response"]["body"]
+        if mode == "logprob":
+            tops_raw = body["choices"][0]["logprobs"]["content"][0]["top_logprobs"]
+            tops = [{"token": t["token"], "lp": t["logprob"]} for t in tops_raw]
+            p_a = p_a_from_logprobs(tops, c.question)
+            raw = {"lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
+            md = "logprob"
+        else:
+            texts = [ch["message"]["content"] or "" for ch in body["choices"]]
+            parsed = [c.question.parse(t) if t else None for t in texts]
+            p_a, a_cnt, b_cnt = p_a_from_picks(parsed)
+            wins_i, wins_j = _wins_to_items(a_cnt, b_cnt, c.slot_a, c.question.valence)
+            raw = {"wins_i": wins_i, "wins_j": wins_j, "n_samples": len(texts)}
+            md = "sample"
+        p_util = p_util_from_pick(p_a, c.slot_a, c.question)
+        obs.append(EdgeObservation(
+            i=c.i, j=c.j, p_util=p_util, mode=md, question_id=c.question.id,
+            valence=c.question.valence, slot_a=c.slot_a, phase=c.phase,
+            round=c.round, rank_distance=c.rank_distance, raw=raw))
+    return obs
+
+
+def submit_batch(client, requests, completion_window="24h"):
+    """Upload requests JSONL and create a batch. Returns batch id."""
+    buf = io.BytesIO(("\n".join(json.dumps(r) for r in requests)).encode())
+    f = client.files.create(file=buf, purpose="batch")
+    batch = client.batches.create(input_file_id=f.id,
+                                  endpoint="/v1/chat/completions",
+                                  completion_window=completion_window)
+    return batch.id
+
+
+def poll_batch(client, batch_id, interval=30):
+    """Block until the batch reaches a terminal state; return the batch object."""
+    while True:
+        b = client.batches.retrieve(batch_id)
+        if b.status in ("completed", "failed", "expired", "cancelled"):
+            return b
+        time.sleep(interval)
+
+
+def download_batch_results(client, batch):
+    """Return the result JSONL lines of a completed batch."""
+    return client.files.content(batch.output_file_id).text.splitlines()
