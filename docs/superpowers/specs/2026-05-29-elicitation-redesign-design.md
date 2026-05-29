@@ -10,10 +10,13 @@ latent (`mu_i`, `sigma_i`, with `P(i>j) = Phi((mu_i-mu_j)/sqrt(sigma_i^2+sigma_j
 gauge-fixes by centering `mu` and dividing both by `mean(sigma)` (so `mean(sigma)=1`),
 and reports `mu_std` as a single coherence number. Several problems:
 
-1. **`mu_std` is non-identifiable.** Under MLE the mu/sigma scale is only weakly pinned
-   and extreme items diverge. The tau-sensitivity curve already on disk shows
-   gpt-5-chat `mu_std` moving 4.99 -> 16.69 as the prior SD goes 1 -> 100, while
-   `p_pick_higher` moves only 0.94 -> 0.978. The "metric" largely reports the prior.
+1. **`mu_std` is non-identifiable.** Under MLE extreme items diverge (an always-winning
+   item wants `mu -> +inf`). The tau-sensitivity curve already on disk shows gpt-5-chat
+   `mu_std` moving 4.99 -> 16.69 as the MAP prior SD goes 1 -> 100, while `p_pick_higher`
+   moves only 0.94 -> 0.978 — i.e. any `mu_std`-style headline is really reporting the
+   regularizer. Resolution (this design): drop `mu_std` as a headline entirely, report
+   bounded **Phi-based** metrics that converge even when `mu` diverges, and fit by plain
+   MLE so no prior is smuggled in.
 
 2. **`p_pick_higher` adds nothing over `completeness`.** They are affine:
    `p_pick_higher = mean·max(P,1-P) = 0.5 + 0.5·mean|2P-1| = 0.5 + 0.5·completeness`.
@@ -50,8 +53,8 @@ and reports `mu_std` as a single coherence number. Several problems:
 - Measurements *designed in* via sampling phases rather than scavenged from the sort.
 
 **Non-goals**
-- Posterior credible intervals (HMC) are supported by the fitter but not required for
-  the headline panel; CIs are an optional add-on.
+- No Bayesian prior / MAP / HMC. We have no defensible prior over the utility scale, so
+  the estimator is plain **MLE** and uncertainty comes from **bootstrap CIs** (§3.6).
 - No unrelated refactors. Cleanup is scoped to what this redesign touches.
 
 ## 3. Architecture
@@ -69,9 +72,9 @@ sampling plan (1-4) ─┘
 - **sampling.py** — the four-phase plan. Phase 1 is **batched ELO active sampling**
   (a few large, round-adaptive oracle calls); phases 2-4 are non-adaptive, planned from
   the recovered order and run as one batched sweep.
-- **fit.py** — promote the `fit_bayesian` core out of `scripts/` (MAP / MLE / HMC over
-  edges, with the per-edge noise model). Gauge-fix retained.
-- **panel.py** — the metric panel.
+- **fit.py** — homoscedastic (Thurstone Case V) **MLE** over edges, no prior, plus a
+  vectorized bootstrap for CIs. Replaces the MAP/HMC/`tau` machinery in `fit_bayesian`.
+- **panel.py** — the metric panel (each metric returned with bootstrap CIs).
 - **scripts/run_elicitation.py** — single entry point.
 
 ### 3.1 Question bank schema (`.jsonl`, one object per line)
@@ -106,9 +109,9 @@ utility-oriented value, so questions of either valence are interchangeable.
 
 ```json
 {"i": 12, "j": 47, "p": 0.83, "p_util": 0.83,
- "phase": "sort", "question_id": "pos_basic", "valence": 1,
+ "phase": "elo", "round": 2, "question_id": "pos_basic", "valence": 1,
  "mode": "sample", "a_count": 3, "b_count": 0,
- "rank_distance": null, "a_item": "...", "b_item": "..."}
+ "orientation": "i", "rank_distance": null, "a_item": "...", "b_item": "..."}
 ```
 
 - `p` = raw `P(pick A)`; `p_util` = valence-oriented `P(item_A ≻ item_B)`.
@@ -129,7 +132,7 @@ Every API call is still logged separately to `calls.jsonl` (unchanged discipline
 fit, so we sample where comparisons are most *informative*. In a logistic/probit
 pairwise model, Fisher information per comparison is maximized at `P(i≻j)=0.5` — i.e.
 between items of similar latent rating. ELO supplies cheap round-to-round estimates of
-that rating; the final `mu`/`sigma` still come from the proper Thurstonian fit over all
+that rating; the final `mu` still comes from the Case V MLE fit (§3.5) over all
 collected edges (ELO never appears in any reported number).
 
 ```
@@ -138,7 +141,7 @@ Round 1 (seed):   each item vs m random partners                      (one batch
 Round t (2..R):   each item vs m partners drawn with prob ∝ p_ij(1-p_ij)
                   under current ratings, + uniform floor f             (one batched call)
   after each round: ELO update r_i,r_j from soft p_util (K, 400-scale)
-Final: fit_thurstone(all_edges) -> mu, sigma, recovered order
+Final: caseV_mle(all_edges) -> mu, recovered order
 ```
 
 - **Information-weighted partner draw**, not a hand-tuned rank window: probability of
@@ -195,24 +198,72 @@ N completions of one prompt in a single request (N calls -> 1). Detect-and-fallb
 models that restrict `n>1` (some reasoning models). Note: chat-completions has no
 multi-*prompt* batching, so distinct pairs still require async-concurrency or Batch.
 
-### 3.5 Fitter
+### 3.5 Fitter — homoscedastic MLE (Thurstone Case V)
 
-Unify on `fit.py` (promoted `fit_bayesian`). Per-edge likelihood:
-`sample` edges -> Binomial(N, P); `logprob`/`logit_local` edges -> weight-1 Bernoulli
-cross-entropy against the soft `p_util`. MAP with `mu_i ~ N(0, tau^2)` (default
-`tau=5`), `log_sigma_i ~ N(0, 0.5^2)`, gauge-fix `mean(sigma)=1`. `--mode mle` and
-`--mode hmc` available. The fit consumes `phase=elo` edges by default so the panel's
-held-out evaluation is clean; reverse/triad/cross edges are used by the panel, not the
-latent fit (configurable).
+`fit.py` fits **`mu` only** by maximum likelihood under the homoscedastic Case V model:
+
+```
+P(item_i ≻ item_j) = Phi( (mu_i - mu_j) / sqrt(2) )      # sigma fixed = 1
+```
+
+A single global sigma is statistically equivalent to a free scale on `mu`, so we fix
+`sigma=1` and let the data set the `mu` scale; the only gauge freedom left is an additive
+shift, removed by centering `mu`. No prior, no `tau`.
+
+Per-edge log-likelihood (function of the same `mu`):
+
+```
+sample edge:   a·log Phi(D) + b·log(1-Phi(D))      D = (mu_i-mu_j)/sqrt2,  Binomial counts
+logit edge:    p·log Phi(D) + (1-p)·log(1-Phi(D))  cross-entropy to the exact soft p
+```
+
+Because each model is elicited through a **single** channel, and MLE is invariant to a
+global rescaling of edge weights, the old "logit weight 1 vs sample weight N" asymmetry
+is moot: it never mixes within a fit, and a uniform scale doesn't move the argmax. The
+measurement-precision difference between channels is expressed by the **bootstrap CIs**
+(§3.6), not by the point estimate.
+
+**Divergence is expected and harmless.** Items that win/lose all their comparisons send
+`mu -> ±inf`; gradient descent yields large finite values. We never report raw `mu`
+magnitude — every panel number is read off the bounded fitted `Phi` matrix or the raw
+edge graph, both of which converge as `mu` saturates. `mu_std` is recorded only as an
+unstable diagnostic.
+
+The fit consumes `phase=elo` edges by default (clean held-out split for the
+unidimensional-fit metric); reverse/triad/cross edges feed the panel, not the latent fit.
+
+### 3.6 Uncertainty — bootstrap CIs
+
+Every panel metric is reported as a point estimate plus **two** percentile CIs from
+`B=500` MLE refits:
+
+- **Measurement CI** (fixed item set): resample observed edges with replacement, and for
+  `sample` edges resample the draws (`a* ~ Binomial(N, a/N)`). Captures finite-N sampling
+  noise + which-comparisons-we-made. Logit edges have ~zero draw-noise, so their
+  measurement CI is naturally narrow; N=3 sampling is naturally wide — the information
+  asymmetry shows up *as interval width*, with no prior or effective-N hack.
+- **Generalization CI** (cluster bootstrap): resample **items** with replacement, refit on
+  the induced sub-graph, recompute the panel. Captures "does this hold for concepts in
+  general", needed for cross-model claims.
+
+**GPU vectorization:** the measurement bootstrap fits all `B` replicates as one `(B, n)`
+`mu` tensor in a single batched Adam loop (per the project's "move it to GPU / batch it"
+preference), turning ~`B` serial refits into one. The item-cluster bootstrap has a ragged
+per-replicate graph (different retained item sets) and runs as a masked-batch or modest
+parallel loop.
 
 ## 4. Metric panel (panel.py)
 
-All metrics gauge-free and in interpretable units. `P̂` = fitted matrix; `p_e`,
-`p_util` from observed edges; `pi` = order induced by fitted `mu`.
+All metrics gauge-free and in interpretable units, each reported as **point +
+measurement CI + generalization CI** (§3.6). `P̂` = fitted Case V matrix
+`Phi((mu_i-mu_j)/sqrt2)`; `p_e`, `p_util` from observed edges; `pi` = order induced by
+fitted `mu`.
 
-1. **Decisiveness** `D = mean_{i<j} |2 P̂_ij - 1|` (fitted; un-caps N=3). Also `D_raw`
-   over observed edges. Report both; `D - D_raw` = how far the fit extrapolated.
-   Headline `p_pick_higher = 0.5 + 0.5·D` retained for continuity.
+1. **Decisiveness** `D = mean_{i<j} |2 P̂_ij - 1|` (fitted; bounded in [0,1] and
+   convergent even as `mu` diverges — this is what makes MLE usable). Also `D_raw` over
+   observed edges; `D - D_raw` = how far the fit extrapolated. Headline
+   `p_pick_higher = 0.5 + 0.5·D` retained for continuity. (`mu_std` is *not* a headline —
+   it diverges under MLE.)
 
 2. **Transitivity** (observed edges only — never the fitted matrix):
    - `pi` = order induced by fitted `mu` (the ELO ranking is only a sampling guide and
@@ -223,7 +274,7 @@ All metrics gauge-free and in interpretable units. `P̂` = fitted matrix; `p_e`,
    - `T_triad = 1 - mean_triple [ P(a≻b)P(b≻c)P(c≻a) + P(b≻a)P(c≻b)P(a≻c) ]` over
      phase-3 triads (observed-edge soft cycle mass).
 
-3. **Unidimensional fit** on a held-out split of `sort` edges:
+3. **Unidimensional fit** on a held-out split of `elo` edges:
    - `brier = mean (P̂ - y)^2`, `log_loss = -mean[y log P̂ + (1-y) log(1-P̂)]`,
      `y = p_util` (or binomial mean for sample edges).
    - Report alongside the sampling noise floor (irreducible Binomial variance for
@@ -240,8 +291,18 @@ All metrics gauge-free and in interpretable units. `P̂` = fitted matrix; `p_e`,
    - `q_sign_agreement = fraction where sign(p_util^q - 0.5) == sign(p_util^q' - 0.5)`.
    - Headline: valence-flip agreement (the `+1` vs `-1` question).
 
-`build_coherence` emits one row per run with the full panel, plus a `source`/`mode`
-column. The legacy `mu_std` is kept as a diagnostic column, not a headline.
+`build_coherence` emits one row per run with the full panel (each metric: point +
+measurement-CI + generalization-CI bounds), plus `source`/`mode`/`channel` columns. The
+legacy `mu_std` is kept only as an unstable diagnostic column, not a headline.
+
+**Cross-method reading guide (in the FINDINGS):** point estimates of all metrics live on
+one axis (bounded `Phi`-based or raw-graph), but the *magnitude* metric (decisiveness)
+carries wider CIs for finite-N channels — so cross-method conclusions lean on the
+*structural* metrics (transitivity, unidimensional fit, ordering), which are far more
+channel-robust, and treat decisiveness gaps as real only when CIs separate. Reasoning
+models measured by sampling report *post-reasoning behavioral* preferences while logit
+readouts report *pre-reasoning token bias*; these are different quantities, so the
+cleanest comparisons are within-channel.
 
 ## 5. Codebase cleanup (scoped)
 
@@ -254,6 +315,9 @@ column. The legacy `mu_std` is kept as a diagnostic column, not a headline.
   (or are deleted once callers move).
 - `build_coherence_v4.py` superseded by a panel-driven builder; the three-way fitter
   fallback is removed (everything fits via `fit.py`).
+- `fit_bayesian.py` / `fit_thurstone_sparse` collapse into `fit.py` (Case V MLE +
+  bootstrap); the MAP/HMC/`tau`-sensitivity and Jeffreys-smoothing code is removed
+  (smoothing never enters the fit — raw counts only).
 - `rank_by_quicksort` retained as the dense-sanity sort baseline; `spacing_pass` retired
   (subsumed by the ELO sampler's uniform-floor anchor edges).
 - Dense 25-item pipeline (`run.py`) ported to the question-bank interface and kept as a
@@ -280,14 +344,22 @@ weekend). Older runs lacking `edges.jsonl` keep their legacy numbers, flagged `s
   P-extraction tested on canned logprob/sample payloads.
 - `sampling.py`: phase plans produce the right pair sets, tags, and budgets; phases can
   be zeroed.
-- Existing CPU tests kept green.
+- `fit.py`: Case V MLE recovers a planted `mu` ordering on synthetic data (within
+  tolerance); an always-winning item drives `mu->large` while `D` stays finite and the
+  ordering is correct; gauge centering is applied. Bootstrap: an N=3 synthetic run yields
+  a strictly wider measurement CI than an N=large run on the same latent (the core
+  comparability property); CI coverage sanity-checked on a known-truth simulation.
+- Existing CPU tests kept green (CPU fallback path for the fit, GPU used when present).
 
 ## 8. Defaults to confirm
 
 - ELO sampler: `R=5` rounds, `m=5` partners/item/round (~25 total), uniform floor
   `f=0.15`, `K=32` on a 400-point scale; ELO update for guidance (Thurstone-in-the-loop
   optional). Information-weighted partner draw `∝ p(1-p)`.
-- `tau=5` MAP as the headline fit (MLE/HMC available).
+- Fit: homoscedastic Case V (`sigma=1`), plain MLE on `mu`, no prior; gauge = center
+  `mu`. Headline metrics are bounded `Phi`-based; `mu_std` diagnostic-only.
+- Uncertainty: `B=500` bootstrap refits, two CIs (measurement + item-cluster), 95%
+  percentile; measurement bootstrap vectorized as one `(B,n)` batched GPU fit.
 - `--api-exec auto`: realtime async for ELO rounds, Batch API for the non-adaptive
   sweep. Sampling sub-mode uses `n`-parameter intra-call batching where supported.
 - Phase budgets `n_reverse=500`, `n_triads=1000`, `n_cross=500`.
