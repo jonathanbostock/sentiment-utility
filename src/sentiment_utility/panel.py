@@ -50,7 +50,7 @@ def transitivity_triad(triads) -> float:
 
 
 def unidim_fit(mu, held_rows) -> dict:
-    """Held-out Brier + log-loss of the fitted Case V model. Lower is better.
+    """Brier + log-loss of `mu` evaluated on `held_rows` (pass a held-out edge split for generalization). Lower is better.
     noise_floor = irreducible Binomial variance for sample edges (else 0)."""
     P = predict_matrix_caseV(mu)
     briers, lls, floors = [], [], []
@@ -74,7 +74,7 @@ def unidim_fit(mu, held_rows) -> dict:
 def reliability(reverse_pairs) -> dict:
     """reverse_pairs: list of {p_fwd, p_rev} where p_fwd=P(pick i|i first),
     p_rev=P(pick i|i second). order_consistency=1-mean|p_fwd+p_rev-1|,
-    position_bias=mean(p_fwd+p_rev-1) (signed; >0 = first-slot preference)."""
+    position_bias=mean(p_fwd+p_rev-1): signed net calibration excess across both orderings (symmetric first-vs-second slot bias cancels and is NOT captured here)."""
     if not reverse_pairs:
         return {"order_consistency": float("nan"), "position_bias": float("nan")}
     diffs = np.array([p["p_fwd"] + p["p_rev"] - 1.0 for p in reverse_pairs])
@@ -135,13 +135,31 @@ def compute_panel(edges_by_phase, n, B=200, seed=0):
                                  "meas_ci": _bootstrap_raw(elo, decisiveness_raw, B, seed),
                                  "gen_ci": [float("nan"), float("nan")]}
 
-    def brier_of(mu_):
-        return unidim_fit(mu_, elo)["brier"]
-    panel["unidim_fit_brier"] = {
-        "point": unidim_fit(mu, elo)["brier"],
-        "meas_ci": _ci(bootstrap_measurement(elo, n, B, brier_of, seed)),
-        "gen_ci": [float("nan"), float("nan")],
-    }
+    # --- unidimensional fit: HELD-OUT split of elo edges (fit on train, eval on test) ---
+    rng_uf = np.random.default_rng(seed)
+    m = len(elo)
+    if m >= 5:
+        perm = rng_uf.permutation(m)
+        n_test = max(1, int(0.2 * m))
+        test_set = set(perm[:n_test].tolist())
+        train_e = [e for k, e in enumerate(elo) if k not in test_set]
+        test_e = [e for k, e in enumerate(elo) if k in test_set]
+        mu_tr = fit_caseV_mle(train_e, n=n, seed=seed)["mu"]
+        uf = unidim_fit(mu_tr, test_e)
+        panel["unidim_fit_brier"] = {
+            "point": uf["brier"],
+            "meas_ci": _bootstrap_raw(test_e, lambda r: unidim_fit(mu_tr, r)["brier"], B, seed),
+            "gen_ci": [float("nan"), float("nan")],
+        }
+        panel["unidim_fit_log_loss"] = {
+            "point": uf["log_loss"],
+            "meas_ci": _bootstrap_raw(test_e, lambda r: unidim_fit(mu_tr, r)["log_loss"], B, seed),
+            "gen_ci": [float("nan"), float("nan")],
+        }
+    else:
+        nan_ci = [float("nan"), float("nan")]
+        panel["unidim_fit_brier"] = {"point": float("nan"), "meas_ci": nan_ci, "gen_ci": nan_ci}
+        panel["unidim_fit_log_loss"] = {"point": float("nan"), "meas_ci": nan_ci, "gen_ci": nan_ci}
 
     # --- raw-graph metrics: measurement CI by resampling their observation lists ---
     panel["transitivity_fas"] = {

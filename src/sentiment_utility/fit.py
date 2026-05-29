@@ -102,15 +102,24 @@ def bootstrap_measurement(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05, de
 
 
 def bootstrap_items(rows, n, B, metric_fn, seed=0, steps=1500, lr=0.05):
-    """Cluster bootstrap over items: resample item ids, refit induced sub-graph."""
+    """Cluster bootstrap over items: resample item ids (with replacement), refit the
+    induced multigraph. Each occurrence of a resampled item becomes a distinct new
+    node, so a duplicated item contributes its edges for every copy."""
+    from collections import defaultdict
     rng = np.random.default_rng(seed)
     out = []
-    by_pair = rows
     for b in range(B):
-        keep = rng.integers(0, n, size=n)            # resampled item ids (with dups)
-        remap = {old: new for new, old in enumerate(keep)}
-        sub = [dict(r, i=remap[r["i"]], j=remap[r["j"]])
-               for r in by_pair if r["i"] in remap and r["j"] in remap]
+        keep = rng.integers(0, n, size=n)            # resampled old item ids (with dups)
+        positions = defaultdict(list)                # old id -> [new node indices]
+        for new_idx, old in enumerate(keep):
+            positions[int(old)].append(new_idx)
+        sub = []
+        for r in rows:
+            oi, oj = r["i"], r["j"]
+            if oi in positions and oj in positions:
+                for ni in positions[oi]:
+                    for nj in positions[oj]:
+                        sub.append(dict(r, i=ni, j=nj))
         if not sub:
             continue
         res = fit_caseV_mle(sub, n=len(keep), steps=steps, lr=lr, seed=b)
