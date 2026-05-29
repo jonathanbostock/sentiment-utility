@@ -351,6 +351,7 @@ and for logit/logprob edges `w_pos=p_util, w_neg=1-p_util`.
 
 ```python
 # tests/test_fit.py
+import math
 import numpy as np
 from sentiment_utility.fit import normalize_edges, fit_caseV_mle, predict_matrix_caseV
 
@@ -363,7 +364,7 @@ def _planted_edges(mu_true, reps=1):
         for j in range(n):
             if i == j:
                 continue
-            p = float(0.5 * (1 + np.math.erf((mu_true[i] - mu_true[j]) / 2.0)))  # Phi(Δ/√2), Δ=(μi-μj)
+            p = float(0.5 * (1 + math.erf((mu_true[i] - mu_true[j]) / 2.0)))  # Phi(Δ/√2), Δ=(μi-μj)
             for _ in range(reps):
                 rows.append({"i": i, "j": j, "p_util": p, "mode": "logprob"})
     return rows
@@ -526,7 +527,7 @@ def _sample_rows(mu_true, N, seed):
         for j in range(n):
             if i == j:
                 continue
-            p = float(0.5 * (1 + np.math.erf((mu_true[i] - mu_true[j]) / 2.0)))
+            p = float(0.5 * (1 + math.erf((mu_true[i] - mu_true[j]) / 2.0)))
             wins_i = int(rng.binomial(N, p))
             rows.append({"i": i, "j": j, "p_util": (wins_i + 0.5) / (N + 1),
                          "mode": "sample", "wins_i": wins_i, "wins_j": N - wins_i})
@@ -883,6 +884,7 @@ a measurement CI by resampling their own observation lists.
 
 ```python
 # tests/test_panel.py (append)
+import math
 from sentiment_utility.panel import compute_panel
 
 
@@ -893,7 +895,7 @@ def _dense_soft_edges(mu_true):
         for j in range(n):
             if i == j:
                 continue
-            p = float(0.5 * (1 + np.math.erf((mu_true[i] - mu_true[j]) / 2.0)))
+            p = float(0.5 * (1 + math.erf((mu_true[i] - mu_true[j]) / 2.0)))
             rows.append({"i": i, "j": j, "p_util": p, "mode": "logprob"})
     return rows
 
@@ -1946,6 +1948,7 @@ buckets by phase, fits + computes the panel, returns a flat dict (each metric �
 ```python
 # tests/test_build_coherence.py
 import json
+import math
 import numpy as np
 import importlib.util
 from pathlib import Path
@@ -1970,7 +1973,7 @@ def test_panel_row_from_edges(tmp_path):
         for j in range(n):
             if i == j:
                 continue
-            p = float(0.5 * (1 + np.math.erf((scores[i] - scores[j]) / 2.0)))
+            p = float(0.5 * (1 + math.erf((scores[i] - scores[j]) / 2.0)))
             rows.append({"i": i, "j": j, "p_util": p, "mode": "logprob", "phase": "elo"})
     edges_path = tmp_path / "edges.jsonl"
     edges_path.write_text("\n".join(json.dumps(r) for r in rows))
