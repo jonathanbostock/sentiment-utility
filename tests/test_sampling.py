@@ -1,6 +1,6 @@
 import numpy as np
 from sentiment_utility.questions import Question
-from sentiment_utility.sampling import elo_active_sample
+from sentiment_utility.sampling import elo_active_sample, plan_reverse, plan_triads, plan_cross_question
 from fakes import FakeOracle
 
 
@@ -17,3 +17,31 @@ def test_elo_sampler_covers_items_and_recovers_order():
     rows = [{"i": e.i, "j": e.j, "p_util": e.p_util, "mode": "logprob"} for e in edges]
     mu = fit_caseV_mle(rows, n=n, steps=1500, seed=0)["mu"]
     assert np.corrcoef(mu, scores)[0, 1] > 0.9
+
+
+def _qbank():
+    return [Question(id="pos", template="{item_A}{item_B}", valence=1, answers={"A": ["A"], "B": ["B"]}),
+            Question(id="neg", template="{item_A}{item_B}", valence=-1, answers={"A": ["A"], "B": ["B"]})]
+
+
+def test_plan_reverse_flips_slot():
+    obs_pairs = [(0, 1), (2, 3)]
+    comps = plan_reverse(obs_pairs, items=["a", "b", "c", "d"], questions=_qbank(),
+                         n_reverse=2, seed=0)
+    assert len(comps) == 2
+    for c in comps:
+        assert c.phase == "reverse"
+
+
+def test_plan_triads_three_edges_each():
+    comps = plan_triads(order=list(range(10)), items=[str(x) for x in range(10)],
+                        questions=_qbank(), n_triads=4, seed=0)
+    assert len(comps) == 4 * 3        # three pairwise comparisons per triad
+    assert all(c.phase == "triad" for c in comps)
+
+
+def test_plan_cross_question_uses_nonprimary():
+    comps = plan_cross_question(obs_pairs=[(0, 1)], items=["a", "b"], questions=_qbank(),
+                                primary_id="pos", n_cross=1, seed=0)
+    assert all(c.question.id != "pos" for c in comps)
+    assert all(c.phase == "cross_question" for c in comps)

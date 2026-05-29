@@ -55,3 +55,52 @@ def elo_active_sample(n, oracle, questions, R=5, m=5, floor=0.15, K=32, seed=0,
         submit(pairs, rnd)
 
     return all_obs
+
+
+def plan_reverse(obs_pairs, items, questions, n_reverse, seed=0):
+    rng = np.random.default_rng(seed)
+    pairs = list({(min(i, j), max(i, j)) for i, j in obs_pairs})
+    if len(pairs) > n_reverse:
+        idx = rng.choice(len(pairs), size=n_reverse, replace=False)
+        pairs = [pairs[k] for k in idx]
+    q = questions[0]   # primary question for position-bias measurement
+    # query with slot_a = "j" (opposite of the canonical i-first)
+    return [Comparison(i=i, j=j, item_i=items[i], item_j=items[j], question=q,
+                       slot_a="j", phase="reverse") for i, j in pairs]
+
+
+def plan_triads(order, items, questions, n_triads, seed=0):
+    rng = np.random.default_rng(seed)
+    n = len(order)
+    q = questions[0]
+    comps = []
+    for _ in range(n_triads):
+        # mix adjacent (cycles likeliest) and spread triples
+        if rng.random() < 0.5 and n >= 3:
+            r = rng.integers(0, n - 2)
+            trip = [order[r], order[r + 1], order[r + 2]]
+        else:
+            trip = list(rng.choice(n, size=3, replace=False))
+            trip = [order[t] for t in trip]
+        a, b, c = trip
+        for (x, y) in [(a, b), (b, c), (a, c)]:
+            comps.append(Comparison(i=x, j=y, item_i=items[x], item_j=items[y],
+                                    question=q, slot_a="i", phase="triad"))
+    return comps
+
+
+def plan_cross_question(obs_pairs, items, questions, primary_id, n_cross, seed=0):
+    rng = np.random.default_rng(seed)
+    others = [q for q in questions if q.id != primary_id]
+    if not others:
+        return []
+    pairs = list({(min(i, j), max(i, j)) for i, j in obs_pairs})
+    if len(pairs) > n_cross:
+        idx = rng.choice(len(pairs), size=n_cross, replace=False)
+        pairs = [pairs[k] for k in idx]
+    comps = []
+    for i, j in pairs:
+        for q in others:
+            comps.append(Comparison(i=i, j=j, item_i=items[i], item_j=items[j],
+                                    question=q, slot_a="i", phase="cross_question"))
+    return comps
