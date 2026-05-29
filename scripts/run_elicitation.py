@@ -52,6 +52,11 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
     for o in extra:
         edges_log.write(_obs_to_row(o, items))
     edges_log.close()
+    # close the oracle's per-call log (openai backend) so calls.jsonl is flushed even
+    # if the process is later killed; harmless no-op for backends without one.
+    calls_log = getattr(oracle, "calls_log", None)
+    if calls_log is not None:
+        calls_log.close()
 
     edges_by_phase = _bucket_for_panel(elo_obs, extra)
     panel = compute_panel(edges_by_phase, n=n, seed=seed)
