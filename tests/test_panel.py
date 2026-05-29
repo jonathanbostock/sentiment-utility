@@ -32,3 +32,32 @@ def test_transitivity_triad_detects_cycle():
     cyclic = [(0.9, 0.9, 0.9)]          # a>b, b>c, c>a -> 3-cycle, mass ~0.73
     assert transitivity_triad(transitive) > 0.9
     assert transitivity_triad(cyclic) < 0.5
+
+
+from sentiment_utility.panel import unidim_fit, reliability, question_robustness
+
+
+def test_unidim_fit_perfect_model():
+    mu = np.array([-2.0, 0.0, 2.0])
+    from sentiment_utility.fit import predict_matrix_caseV
+    P = predict_matrix_caseV(mu)
+    held = [{"i": 0, "j": 2, "p_util": float(P[0, 2]), "mode": "logprob"}]
+    out = unidim_fit(mu, held)
+    assert out["brier"] < 1e-6
+    assert out["log_loss"] >= 0.0
+
+
+def test_reliability_position_bias():
+    clean = [{"p_fwd": 0.8, "p_rev": 0.2}, {"p_fwd": 0.6, "p_rev": 0.4}]
+    out = reliability(clean)
+    assert np.isclose(out["order_consistency"], 1.0)
+    assert np.isclose(out["position_bias"], 0.0)
+    biased = [{"p_fwd": 0.8, "p_rev": 0.5}]   # p_fwd+p_rev-1 = 0.3
+    assert reliability(biased)["position_bias"] > 0.0
+
+
+def test_question_robustness_valence_flip_agreement():
+    pairs = [{"p_util_a": 0.9, "p_util_b": 0.88}]   # consistent
+    out = question_robustness(pairs)
+    assert out["q_agreement"] > 0.95
+    assert np.isclose(out["q_sign_agreement"], 1.0)
