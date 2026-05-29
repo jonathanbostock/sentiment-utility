@@ -52,3 +52,38 @@ def test_divergence_is_bounded_in_Phi():
     assert np.all(P >= 0.0) and np.all(P <= 1.0)
     assert P[0, 1] > 0.9   # item 0 dominates
     assert res["mu"][0] == max(res["mu"])  # large but finite
+
+
+from sentiment_utility.fit import bootstrap_measurement, bootstrap_items
+
+
+def _decisiveness(mu):
+    # self-contained copy of the panel metric so this test has no panel.py dependency
+    P = predict_matrix_caseV(mu)
+    iu = np.triu_indices(P.shape[0], k=1)
+    return float(np.mean(np.abs(2 * P[iu] - 1)))
+
+
+def _sample_rows(mu_true, N, seed):
+    rng = np.random.default_rng(seed)
+    n = len(mu_true)
+    rows = []
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+            p = float(0.5 * (1 + math.erf((mu_true[i] - mu_true[j]) / 2.0)))
+            wins_i = int(rng.binomial(N, p))
+            rows.append({"i": i, "j": j, "p_util": (wins_i + 0.5) / (N + 1),
+                         "mode": "sample", "wins_i": wins_i, "wins_j": N - wins_i})
+    return rows
+
+
+def test_measurement_ci_wider_for_small_N():
+    mu_true = np.array([-1.5, -0.5, 0.5, 1.5])
+    rows_n3 = _sample_rows(mu_true, N=3, seed=1)
+    rows_n200 = _sample_rows(mu_true, N=200, seed=1)
+    d3 = bootstrap_measurement(rows_n3, n=4, B=120, metric_fn=_decisiveness, seed=0)
+    d200 = bootstrap_measurement(rows_n200, n=4, B=120, metric_fn=_decisiveness, seed=0)
+    assert d3.std() > d200.std()          # the core comparability property
+    assert d3.shape == (120,)
