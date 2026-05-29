@@ -172,7 +172,30 @@ Phases 2-4 do not depend on each other's results, so they are planned from the p
 order and executed in a single batched oracle sweep; each edge is tagged by `phase`.
 All phase sizes are config-driven and may be set to 0 to skip a phase.
 
-### 3.4 Fitter
+### 3.4 API execution backends (batched calls)
+
+The `Oracle` abstracts "given pairs (+orientation, question), return probabilities", so
+the OpenAI backend supports two execution modes, chosen per phase by `sampling.py`:
+
+- **realtime async** — current `AsyncOpenAI` + semaphore concurrency, with retry/backoff.
+  Low latency; used for the **adaptive ELO rounds**, where round `t` needs round `t-1`.
+- **batch** — OpenAI Batch API: write the round's requests to a JSONL, submit, poll,
+  download. 50% cheaper, and crucially draws from a **separate rate-limit pool**
+  (the reason the realtime path needs heavy backoff at all). 24h SLA (typically 1-6h),
+  up to 50k requests/file. Used for the **non-adaptive sweep** (reverse + triad +
+  cross-question combined into one submission), where adaptivity isn't needed.
+
+Flag `--api-exec realtime|batch|auto` (default `auto` = realtime for ELO, batch for the
+non-adaptive sweep). A cost-priority run can force `batch`; a deadline-priority run can
+force `realtime`.
+
+**Sampling sub-mode optimization (orthogonal to the above):** N independent samples of
+one pair currently fire N separate calls. Use the chat-completions `n` parameter to get
+N completions of one prompt in a single request (N calls -> 1). Detect-and-fallback for
+models that restrict `n>1` (some reasoning models). Note: chat-completions has no
+multi-*prompt* batching, so distinct pairs still require async-concurrency or Batch.
+
+### 3.5 Fitter
 
 Unify on `fit.py` (promoted `fit_bayesian`). Per-edge likelihood:
 `sample` edges -> Binomial(N, P); `logprob`/`logit_local` edges -> weight-1 Bernoulli
@@ -265,6 +288,8 @@ weekend). Older runs lacking `edges.jsonl` keep their legacy numbers, flagged `s
   `f=0.15`, `K=32` on a 400-point scale; ELO update for guidance (Thurstone-in-the-loop
   optional). Information-weighted partner draw `∝ p(1-p)`.
 - `tau=5` MAP as the headline fit (MLE/HMC available).
+- `--api-exec auto`: realtime async for ELO rounds, Batch API for the non-adaptive
+  sweep. Sampling sub-mode uses `n`-parameter intra-call batching where supported.
 - Phase budgets `n_reverse=500`, `n_triads=1000`, `n_cross=500`.
 - Fit consumes `elo`-phase edges only; panel uses all phases.
 - Default question bank: one `+1` (current local prompt wording, standardized across
