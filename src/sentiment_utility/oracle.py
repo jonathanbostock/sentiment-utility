@@ -93,3 +93,180 @@ class LocalLogitOracle:
                         slot_a=c.slot_a, phase=c.phase, round=c.round,
                         rank_distance=c.rank_distance, raw={"p": float(pa)}))
         return obs
+
+
+# ---------------------------------------------------------------------------
+# Pure helpers (pure, no I/O — unit-tested)
+# ---------------------------------------------------------------------------
+
+import asyncio
+import math
+import time
+
+import numpy as np
+
+
+def p_a_from_logprobs(top_logprobs, question) -> float:
+    """top_logprobs: list of {token, lp}. P(pick A) from the A/B labels' surface forms."""
+    a_forms = {f.lower() for f in question.answers["A"]}
+    b_forms = {f.lower() for f in question.answers["B"]}
+    lpA = lpB = -math.inf
+    for t in top_logprobs:
+        tok = t["token"].strip().lower()
+        if tok in a_forms:
+            lpA = max(lpA, t["lp"])
+        elif tok in b_forms:
+            lpB = max(lpB, t["lp"])
+    if lpA == -math.inf and lpB == -math.inf:
+        return 0.5
+    if lpA == -math.inf:
+        return 0.0
+    if lpB == -math.inf:
+        return 1.0
+    m = max(lpA, lpB)
+    eA, eB = math.exp(lpA - m), math.exp(lpB - m)
+    return eA / (eA + eB)
+
+
+def p_a_from_picks(picks):
+    """picks: list of 'A'/'B'/None. Returns (jeffreys_p_a, a_count, b_count)."""
+    a = sum(1 for p in picks if p == "A")
+    b = sum(1 for p in picks if p == "B")
+    if a + b == 0:
+        return 0.5, 0, 0
+    return (a + 0.5) / (a + b + 1.0), a, b
+
+
+def _lp_of(top_logprobs, question, label):
+    forms = {f.lower() for f in question.answers[label]}
+    best = None
+    for t in top_logprobs:
+        if t["token"].strip().lower() in forms:
+            best = t["lp"] if best is None else max(best, t["lp"])
+    return best
+
+
+def _wins_to_items(a_count, b_count, slot_a, valence):
+    """A/B pick counts -> (wins_i, wins_j) in utility orientation (item_i > item_j)."""
+    wins_i_pick = a_count if slot_a == "i" else b_count
+    wins_j_pick = b_count if slot_a == "i" else a_count
+    if valence == -1:
+        wins_i_pick, wins_j_pick = wins_j_pick, wins_i_pick
+    return wins_i_pick, wins_j_pick
+
+
+# ---------------------------------------------------------------------------
+# OpenAIOracle — realtime async backend
+# ---------------------------------------------------------------------------
+
+class OpenAIOracle:
+    """Realtime async OpenAI backend. mode='logprob' (1-token top_logprobs) or
+    'sample' (n completions via the chat `n` parameter, fallback to N calls)."""
+
+    def __init__(self, model, mode="logprob", n_samples=3, concurrency=40,
+                 calls_log=None, reasoning_effort=None, max_tokens=512, retries=8):
+        from openai import AsyncOpenAI
+        self.model = model
+        self.mode = mode
+        self.n_samples = n_samples
+        self.calls_log = calls_log
+        self.reasoning_effort = reasoning_effort
+        self.max_tokens = max_tokens
+        self.retries = retries
+        self._concurrency = concurrency
+        self._client = AsyncOpenAI()
+
+    def compare(self, comparisons):
+        return asyncio.run(self._compare_async(comparisons))
+
+    async def _compare_async(self, comparisons):
+        sem = asyncio.Semaphore(self._concurrency)
+        return await asyncio.gather(*[self._one(c, sem) for c in comparisons])
+
+    async def _retry(self, coro_factory):
+        from openai import (
+            APIConnectionError, APIError, APITimeoutError, AuthenticationError,
+            BadRequestError, InternalServerError, NotFoundError,
+            PermissionDeniedError, RateLimitError,
+        )
+        TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError, NotFoundError)
+        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError, APIError)
+        for attempt in range(self.retries):
+            try:
+                return await coro_factory()
+            except TERMINAL:
+                raise
+            except RETRIABLE as exc:
+                if attempt == self.retries - 1:
+                    raise
+                wait = None
+                resp_obj = getattr(exc, "response", None)
+                if resp_obj is not None:
+                    ra = getattr(resp_obj, "headers", {}).get("retry-after")
+                    if ra:
+                        try:
+                            wait = float(ra)
+                        except Exception:
+                            wait = None
+                if wait is None:
+                    wait = min(60.0, 2.0 ** attempt) + np.random.rand()
+                await asyncio.sleep(wait)
+
+    async def _call_logprobs(self, prompt):
+        async def _do():
+            r = await self._client.chat.completions.create(
+                model=self.model, messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=1, logprobs=True, top_logprobs=20,
+            )
+            tops = r.choices[0].logprobs.content[0].top_logprobs
+            return [{"token": t.token, "lp": t.logprob} for t in tops]
+        return await self._retry(_do)
+
+    async def _sample_request(self, prompt, n):
+        extra = {"reasoning_effort": self.reasoning_effort} if self.reasoning_effort else {}
+        async def _do():
+            r = await self._client.chat.completions.create(
+                model=self.model, messages=[{"role": "user", "content": prompt}],
+                max_completion_tokens=self.max_tokens, n=n, **extra,
+            )
+            return [ch.message.content or "" for ch in r.choices]
+        return await self._retry(_do)
+
+    async def _call_samples(self, prompt):
+        from openai import BadRequestError
+        try:
+            return await self._sample_request(prompt, self.n_samples)
+        except BadRequestError as exc:
+            if "n" not in str(exc).lower():
+                raise
+            # model rejects n>1: fall back to N separate single-sample requests
+            outs = []
+            for _ in range(self.n_samples):
+                outs += await self._sample_request(prompt, 1)
+            return outs
+
+    async def _one(self, c, sem):
+        a_item = c.item_i if c.slot_a == "i" else c.item_j
+        b_item = c.item_j if c.slot_a == "i" else c.item_i
+        prompt = c.question.render(a_item, b_item)
+        async with sem:
+            if self.mode == "logprob":
+                tops = await self._call_logprobs(prompt)
+                p_a = p_a_from_logprobs(tops, c.question)
+                raw = {"lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
+                mode = "logprob"
+            else:
+                texts = await self._call_samples(prompt)
+                parsed = [c.question.parse(t) if t else None for t in texts]
+                p_a, a_cnt, b_cnt = p_a_from_picks(parsed)
+                wins_i, wins_j = _wins_to_items(a_cnt, b_cnt, c.slot_a, c.question.valence)
+                raw = {"wins_i": wins_i, "wins_j": wins_j, "n_samples": self.n_samples}
+                mode = "sample"
+        if self.calls_log is not None:
+            self.calls_log.write({"ts": time.time(), "i": c.i, "j": c.j, "mode": mode,
+                                  "question_id": c.question.id, "raw": raw})
+        p_util = p_util_from_pick(p_a, c.slot_a, c.question)
+        return EdgeObservation(
+            i=c.i, j=c.j, p_util=p_util, mode=mode, question_id=c.question.id,
+            valence=c.question.valence, slot_a=c.slot_a, phase=c.phase,
+            round=c.round, rank_distance=c.rank_distance, raw=raw)
