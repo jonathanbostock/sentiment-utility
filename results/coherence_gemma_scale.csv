@@ -1,0 +1,5 @@
+model,params,decisiveness,transitivity_fas,transitivity_triad,order_consistency,q_agreement,unidim_fit_brier,unidim_fit_log_loss,mu_valence_corr
+gemma-3-1b,1b,0.4135,0.7075,0.8584,0.4167,0.51,0.1913,0.6051,0.3737
+gemma-3-4b,4b,0.6828,0.8414,0.8787,0.677,0.5269,0.1178,0.4139,0.6023
+gemma-3-12b,12b,0.6895,0.8409,0.9254,0.6748,0.6502,0.1171,0.4007,0.756
+gemma-3-27b,27b,0.818,0.9109,0.9124,0.8371,0.7633,0.0756,0.2777,0.7815
