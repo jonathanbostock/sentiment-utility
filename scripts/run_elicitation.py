@@ -109,6 +109,16 @@ def _build_oracle(args, items, questions, out_dir):
         from sentiment_utility.oracle import LocalLogitOracle
         tok, model = load_model(args.model_id, revision=args.revision,
                                 load_in_4bit=args.load_in_4bit)
+        if args.chat_template_from:
+            # Some finetunes are trained in a chat format (e.g. ChatML) but ship a
+            # tokenizer with NO chat_template, so apply_chat_template falls back to a
+            # raw 'User:/Assistant:' prompt — off-distribution and decisiveness-deflating.
+            # Borrow a known-good template from a sibling model (same tokenizer family).
+            from transformers import AutoTokenizer
+            src = AutoTokenizer.from_pretrained(args.chat_template_from)
+            tok.chat_template = src.chat_template
+            print(f"[chat-template] borrowed from {args.chat_template_from} "
+                  f"(present={bool(tok.chat_template)})")
         if args.adapter_repo:
             from peft import PeftModel
             model = PeftModel.from_pretrained(model, args.adapter_repo,
@@ -146,6 +156,10 @@ def main():
     ap.add_argument("--adapter-subfolder", default=None,
                     help="Subfolder within the adapter repo (e.g. OCT persona name like 'sarcasm').")
     ap.add_argument("--load-in-4bit", action="store_true")
+    ap.add_argument("--chat-template-from", default=None,
+                    help="Borrow the chat_template from this model id (same tokenizer family) "
+                         "when the target finetune ships none. Avoids off-distribution raw-text "
+                         "elicitation of ChatML-trained models.")
     ap.add_argument("--batch-size", type=int, default=64)
     ap.add_argument("--R", type=int, default=5)
     ap.add_argument("--m", type=int, default=5)
