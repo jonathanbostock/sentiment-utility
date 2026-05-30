@@ -13,6 +13,9 @@ dependencies = [
   "pyyaml",
   "scikit-learn",
   "peft",
+  "numpyro>=0.21.0",
+  "openai",
+  "huggingface-hub",
 ]
 
 [project.optional-dependencies]
