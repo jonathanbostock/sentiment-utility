@@ -189,8 +189,13 @@ class OpenAIOracle:
             BadRequestError, InternalServerError, NotFoundError,
             PermissionDeniedError, RateLimitError,
         )
-        TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError, NotFoundError)
-        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError, APIError)
+        # NOTE: NotFoundError (404) is treated as RETRIABLE, not terminal. When serving
+        # through the RunPod HTTP proxy, transient 404s occur under concurrency even though
+        # the endpoint/model is valid (verified by the smoke test) and most calls return 200.
+        # A genuinely-wrong model/endpoint still fails, just after exhausting `self.retries`.
+        TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError)
+        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError,
+                     NotFoundError, APIError)
         for attempt in range(self.retries):
             try:
                 return await coro_factory()
