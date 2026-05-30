@@ -23,7 +23,7 @@ def _obs_to_row(o, items):
 
 
 def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=0,
-                    bootstrap=False, bootstrap_B=200):
+                    bootstrap=False, bootstrap_B=200, run_config=None):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     edges_log = JsonlAppender(out_dir / "edges.jsonl")
@@ -69,6 +69,7 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
     (out_dir / "metrics.json").write_text(json.dumps(jsonable({
         "commit": git_commit(), "n_items": n,
         "n_elo": len(elo_obs), "n_extra": len(extra),
+        **(run_config or {}),
     }), indent=2))
     return panel
 
@@ -179,11 +180,25 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     setup_logging(out_dir)
     oracle = _build_oracle(args, items, questions, out_dir)
+    # Record the full run config so quantization / model / format / mode are never
+    # ambiguous after the fact (was previously inferable only from commit messages).
+    run_config = {
+        "model_id": args.model_id, "backend": args.backend, "mode": args.mode,
+        "load_in_4bit": bool(args.load_in_4bit),
+        "dtype": "nf4-4bit" if args.load_in_4bit else "bfloat16",
+        "revision": args.revision,
+        "adapter_repo": args.adapter_repo, "adapter_subfolder": args.adapter_subfolder,
+        "chat_template_from": args.chat_template_from,
+        "items_path": args.items_path, "question_bank": args.question_bank,
+        "samples": args.samples if args.mode == "sample" else None,
+        "reasoning_effort": args.reasoning_effort, "max_tokens": args.max_tokens,
+    }
     panel = run_elicitation(
         oracle, items, questions, out_dir,
         elo_cfg=dict(R=args.R, m=args.m, floor=0.15, K=32),
         phase_cfg=dict(n_reverse=args.n_reverse, n_triads=args.n_triads, n_cross=args.n_cross),
         seed=0, bootstrap=args.bootstrap, bootstrap_B=args.bootstrap_B,
+        run_config=run_config,
     )
     print(json.dumps(jsonable(panel), indent=2))
 
