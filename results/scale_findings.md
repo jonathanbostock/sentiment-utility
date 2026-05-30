@@ -48,3 +48,29 @@ and gpt-oss thinking-budget (inference-time compute also raises coherence).
 non-engagement, not strictly "zero latent sentiment" (see memory `base-models-low-decisiveness-artifact`).
 The controlled Instruct-vs-base jump at *fixed* 7B (OLMo) and the from-scratch Qwen size series
 are both unambiguous and not explained by that artifact.
+
+## 4. The base→Instruct jump is a *synergistic AND* (weights × chat-template), not OR or weights-only
+
+OLMo-2-7B 2×2 — weights {base-final, instruct} × prompt-format {raw, instruct chat-template}
+(μ–valence corr / decisiveness):
+
+| | raw format | instruct template |
+|---|---|---|
+| **base weights** | 0.082 / 0.122 (floor) | 0.197 / 0.063 |
+| **instruct weights** | 0.242 / 0.183 | **0.721 / 0.348** |
+
+Reading μ–valence: floor 0.08; **either factor alone gives only ~0.2** (base+template 0.20,
+instruct+raw 0.24); **both together 0.72** — far super-additive. So:
+- **OR rejected:** the chat template alone does *not* unlock the base (0.20, not ~0.72).
+- **"weights ≫ format, format irrelevant" rejected:** stripping the Instruct model's native
+  template drops it 0.72→0.24, so format matters a lot *for a model trained with one*.
+- **Verdict: a synergistic AND** — coherent valence needs instruction-tuned weights *and* the
+  matching chat format; the template's marginal effect is ~4× larger on instruct weights
+  (+0.48) than on base weights (+0.12).
+
+Reconciles the earlier Alamerton control (raw vs borrowed-ChatML → μ corr 0.99, "format
+irrelevant"): Alamerton ships **no** native template, so that test compared two *non-native*
+formats (both off-distribution) and couldn't see format sensitivity. OLMo-Instruct has a native
+template, so native-vs-stripped reveals it. **Refined claim: format matters when you deviate from
+a model's *native* training format.** (Method note: this 2×2 is the off-diagonal the earlier
+Qwen base/instruct work never tested — Qwen only had the diagonal base+raw / instruct+template.)
