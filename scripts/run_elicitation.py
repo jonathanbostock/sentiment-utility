@@ -119,7 +119,7 @@ def _build_oracle(args, items, questions, out_dir):
     calls_log = JsonlAppender(out_dir / "calls.jsonl")
     return OpenAIOracle(args.model_id, mode=args.mode, n_samples=args.samples,
                         concurrency=args.concurrency, calls_log=calls_log,
-                        reasoning_effort=args.reasoning_effort)
+                        reasoning_effort=args.reasoning_effort, max_tokens=args.max_tokens)
 
 
 def main():
@@ -135,6 +135,10 @@ def main():
     ap.add_argument("--api-exec", choices=["realtime", "batch", "auto"], default="auto")
     ap.add_argument("--concurrency", type=int, default=40)
     ap.add_argument("--reasoning-effort", default=None)
+    ap.add_argument("--max-tokens", type=int, default=512,
+                    help="Max completion tokens per call (TOTAL, incl. reasoning trace for "
+                         "reasoning models). Bump well above 512 for medium/high reasoning "
+                         "effort so the A/B answer is not truncated after the thinking tokens.")
     ap.add_argument("--revision", default=None)
     ap.add_argument("--adapter-repo", default=None,
                     help="HF repo of a PEFT/LoRA adapter to apply to the local base model "
