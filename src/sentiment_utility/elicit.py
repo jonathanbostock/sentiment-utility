@@ -17,7 +17,10 @@ def load_model(model_id: str, dtype: str = "bfloat16", revision: str | None = No
         tok.pad_token = tok.eos_token
 
     torch_dtype = getattr(torch, dtype)
-    kwargs = {"torch_dtype": torch_dtype, "device_map": "cuda"}
+    # device_map="auto" lets accelerate shard a model that doesn't fit one GPU across all
+    # visible GPUs (e.g. bf16 70B/72B ~140GB across 2x H100-80GB). On a single GPU it places
+    # everything on cuda:0 — numerically identical, so safe as the default for every size.
+    kwargs = {"torch_dtype": torch_dtype, "device_map": "auto"}
     if revision:
         kwargs["revision"] = revision
     if load_in_4bit:
