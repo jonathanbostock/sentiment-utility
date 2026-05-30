@@ -110,7 +110,13 @@ def _build_oracle(args, items, questions, out_dir):
         from sentiment_utility.oracle import LocalLogitOracle
         tok, model = load_model(args.model_id, revision=args.revision,
                                 load_in_4bit=args.load_in_4bit)
-        if args.chat_template_from:
+        if args.chat_template_from == "none":
+            # Force the raw 'User:/Assistant:' fallback even if the tokenizer ships a chat
+            # template — used to isolate prompt-format vs weights (e.g. eliciting an Instruct
+            # model in the same raw format its base checkpoint gets).
+            tok.chat_template = None
+            print("[chat-template] forced OFF (raw User:/Assistant: fallback)")
+        elif args.chat_template_from:
             # Some finetunes are trained in a chat format (e.g. ChatML) but ship a
             # tokenizer with NO chat_template, so apply_chat_template falls back to a
             # raw 'User:/Assistant:' prompt — off-distribution and decisiveness-deflating.
