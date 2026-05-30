@@ -1,0 +1,3 @@
+model,decisiveness,transitivity_fas,transitivity_triad,order_consistency,q_agreement,unidim_fit_brier,unidim_fit_log_loss,mu_valence_corr
+12-mar-gen9-32b,0.6553,0.9264,0.8895,0.7538,0.722,0.0414,0.3912,0.8145
+qwen2.5-32b-base,0.2802,0.8743,0.783,0.7818,0.8297,0.0218,0.6371,0.8234
