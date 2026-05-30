@@ -84,14 +84,28 @@ def reliability(reverse_pairs) -> dict:
 
 def question_robustness(cross_pairs) -> dict:
     """cross_pairs: list of {p_util_a, p_util_b} for the same item pair under two
-    questions (both oriented to P(item_i > item_j))."""
+    questions (both oriented to P(item_i > item_j)).
+
+    q_agreement is the Pearson correlation of the two framings' p_util across pairs.
+    This is the DECISIVENESS-ROBUST form: the older 1-mean|a-b| version is mechanically
+    inflated for near-indifferent models (a,b both ~0.5 -> tiny |a-b| -> looks "consistent"),
+    giving a spurious -0.8 correlation with decisiveness across models; the correlation form
+    normalizes each model by its own variance and drops that confound to ~-0.1.
+    (Cross-framing disagreement scales with opinion strength, so variance-normalization is the
+    right fix here -- unlike order_consistency, where position bias is an additive offset that
+    is already decisiveness-independent, so its 1-mean|.| form is kept.)
+    q_agreement_absdiff (old metric) and q_sign_agreement are retained as diagnostics."""
     if not cross_pairs:
-        return {"q_agreement": float("nan"), "q_sign_agreement": float("nan")}
+        return {"q_agreement": float("nan"), "q_agreement_absdiff": float("nan"),
+                "q_sign_agreement": float("nan")}
     a = np.array([p["p_util_a"] for p in cross_pairs])
     b = np.array([p["p_util_b"] for p in cross_pairs])
-    agree = 1.0 - np.mean(np.abs(a - b))
+    absdiff = 1.0 - np.mean(np.abs(a - b))
     sign = np.mean(np.sign(a - 0.5) == np.sign(b - 0.5))
-    return {"q_agreement": float(agree), "q_sign_agreement": float(sign)}
+    corr = (float(np.corrcoef(a, b)[0, 1])
+            if a.std() > 1e-9 and b.std() > 1e-9 else float("nan"))
+    return {"q_agreement": corr, "q_agreement_absdiff": float(absdiff),
+            "q_sign_agreement": float(sign)}
 
 
 from .fit import fit_caseV_mle, bootstrap_measurement, bootstrap_items
@@ -192,9 +206,15 @@ def compute_panel(edges_by_phase, n, bootstrap=False, B=200, seed=0, fit_steps=2
                                   "meas_ci": meas_raw(rev, lambda r: reliability(r)["order_consistency"]),
                                   "gen_ci": _nan_ci()}
     cross = edges_by_phase.get("cross", [])
-    panel["q_agreement"] = {"point": question_robustness(cross)["q_agreement"],
+    qr = question_robustness(cross)
+    panel["q_agreement"] = {"point": qr["q_agreement"],
                             "meas_ci": meas_raw(cross, lambda r: question_robustness(r)["q_agreement"]),
                             "gen_ci": _nan_ci()}
+    # diagnostics: old decisiveness-confounded abs-diff form + sign agreement
+    panel["q_agreement_absdiff"] = {"point": qr["q_agreement_absdiff"],
+                                    "meas_ci": _nan_ci(), "gen_ci": _nan_ci()}
+    panel["q_sign_agreement"] = {"point": qr["q_sign_agreement"],
+                                 "meas_ci": _nan_ci(), "gen_ci": _nan_ci()}
     panel["mu_std_diagnostic"] = {"point": float(np.std(mu)),
                                   "meas_ci": _nan_ci(), "gen_ci": _nan_ci()}
     return panel
