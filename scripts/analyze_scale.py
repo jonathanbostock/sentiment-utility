@@ -45,7 +45,10 @@ def parse_scale(series, name):
 def load_series():
     rows = []
     for series in ["qwen", "llama", "olmo", "big"]:
-        for tb in glob.glob(str(SR / series / f"{series}_*.tar.gz")):
+        # 'big' good run is big2_*.tar.gz (the first big_*.tar.gz was the failed B200 run, empty)
+        patterns = ["big2_*.tar.gz"] if series == "big" else [f"{series}_*.tar.gz"]
+        tbs = sorted(p for pat in patterns for p in glob.glob(str(SR / series / pat)))
+        for tb in tbs:
             ext = SR / series / "x"; ext.mkdir(exist_ok=True)
             with tarfile.open(tb) as t: t.extractall(ext, filter="data")
             for pj in glob.glob(str(ext / "**/panel.json"), recursive=True):

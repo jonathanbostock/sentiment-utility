@@ -2,6 +2,7 @@ series,run,label,x,x_kind,mu_valence_corr,decisiveness,transitivity_fas,transiti
 llama,llama-3.2-1b-instruct,1B,1.0,params_B,0.3334,0.1025,0.6651,0.7764,0.7049,-0.1714,0.6896,0.1645
 llama,llama-3.2-3b-instruct,3B,3.0,params_B,0.5006,0.1704,0.6289,0.862,0.3408,-0.0008,0.6944,0.2812
 llama,llama-3.1-8b-instruct,8B,8.0,params_B,0.758,0.4142,0.7499,0.9307,0.3782,0.367,0.5912,0.7854
+llama,llama-3.3-70b-instruct,70B,70.0,params_B,0.8428,0.8103,0.9239,0.9068,0.8552,0.5872,0.2538,3.4234
 olmo,olmo2-7b-instruct,Instruct,,posttrained,0.7208,0.3482,0.7706,0.8612,0.5331,0.0478,0.6127,0.6424
 olmo,olmo2-7b-step150-1Btok,1B,1,tokens_B,0.009,0.0369,0.5958,0.7594,0.8206,-0.1041,0.694,0.0584
 olmo,olmo2-7b-step600-3Btok,3B,3,tokens_B,0.0105,0.1071,0.5841,0.8462,0.3801,-0.067,0.7037,0.171
@@ -17,3 +18,4 @@ qwen,qwen2.5-3b-instruct,3B,3.0,params_B,0.5949,0.6183,0.8579,0.8763,0.6949,-0.0
 qwen,qwen2.5-7b-instruct,7B,7.0,params_B,0.756,0.6142,0.8541,0.8998,0.6275,0.266,0.432,1.5241
 qwen,qwen2.5-14b-instruct,14B,14.0,params_B,0.8271,0.8084,0.9149,0.9159,0.809,0.6131,0.2637,3.5933
 qwen,qwen2.5-32b-instruct,32B,32.0,params_B,0.8174,0.8101,0.9403,0.9037,0.846,0.581,0.2481,3.2671
+qwen,qwen2.5-72b-instruct,72B,72.0,params_B,0.8282,0.7205,0.9476,0.8706,0.8379,0.6216,0.3329,2.1315
