@@ -120,17 +120,26 @@ assert df_fam["mmlu"].notna().all(), df_fam[df_fam.mmlu.isna()][["family", "mode
 # Table 3). Not a param sweep, so it is NOT added to the params figure. The CSV has no
 # mu_valence_corr, so that panel simply has no GPT-OSS points. Its q_agreement is already the
 # corr form (the file carries a separate q_agreement_absdiff column).
-GPTOSS_MMLU = {"low": 80.4, "medium": 84.0, "high": 85.3}
-go = pd.read_csv(REPO / "results/coherence_gptoss_thinking_budget.csv")
-go["family"] = "GPT-OSS-20B (budget)"
-go["model"] = "gpt-oss-20b-" + go["reasoning_effort"]
-go["params_b"] = 20.0
-go["mmlu"] = go["reasoning_effort"].map(GPTOSS_MMLU)
-go["mu_valence_corr"] = np.nan          # not measured for the gpt-oss runs
-df_cap = pd.concat([df_fam, go[cols]], ignore_index=True)
+def _gptoss_series(csv, fam, params_b, mmlu_by_effort):
+    g = pd.read_csv(REPO / csv)
+    g["family"] = fam
+    sz = str(int(params_b))
+    g["model"] = f"gpt-oss-{sz}b-" + g["reasoning_effort"]
+    g["params_b"] = float(params_b)
+    g["mmlu"] = g["reasoning_effort"].map(mmlu_by_effort)
+    return g[cols]
 
-GPTOSS = "GPT-OSS-20B (budget)"
-CAP_ORDER = FAMILY_ORDER + [GPTOSS]
+
+# MMLU per reasoning effort from the gpt-oss model card (arXiv:2508.10925, Table 3).
+GPTOSS20 = "GPT-OSS-20B (budget)"
+GPTOSS120 = "GPT-OSS-120B (budget)"
+go = _gptoss_series("results/coherence_gptoss_thinking_budget.csv", GPTOSS20, 20,
+                    {"low": 80.4, "medium": 84.0, "high": 85.3})
+go120 = _gptoss_series("results/coherence_gptoss120_thinking_budget.csv", GPTOSS120, 120,
+                       {"low": 85.9, "medium": 88.0, "high": 90.0})
+df_cap = pd.concat([df_fam, go, go120], ignore_index=True)
+
+CAP_ORDER = FAMILY_ORDER + [GPTOSS20, GPTOSS120]
 _cb = sns.color_palette("colorblind", len(CAP_ORDER))
 palette = dict(zip(CAP_ORDER, _cb))
 
@@ -224,7 +233,7 @@ faceted(
     df_cap, CAP_ORDER,
     "mmlu", "MMLU (%)  —  capability proxy", False,
     "capability_all_metrics",
-    "Sentiment-coherence metrics vs generalized capability (MMLU)\nGemma-3 · Qwen2.5 · Llama-3.x  +  GPT-OSS-20B thinking-budget trajectory",
+    "Sentiment-coherence metrics vs generalized capability (MMLU)\nGemma-3 · Qwen2.5 · Llama-3.x  +  GPT-OSS 20B/120B thinking-budget trajectories",
 )
 faceted(
     df_cap, CAP_ORDER,
@@ -236,5 +245,5 @@ faceted(
     df_cap, CAP_ORDER,
     "params_b", "parameters (B, log)", True,
     "params_all_metrics",
-    "Sentiment-coherence metrics vs model size (all benchmarks)\nGemma-3 · Qwen2.5 · Llama-3.x  +  GPT-OSS-20B (markers = reasoning budget, at 20B)",
+    "Sentiment-coherence metrics vs model size (all benchmarks)\nGemma-3 · Qwen2.5 · Llama-3.x  +  GPT-OSS 20B/120B (markers = reasoning budget)",
 )

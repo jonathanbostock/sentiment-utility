@@ -1,4 +1,7 @@
 model,family,eci,n_benchmarks,rmse,benchmarks_used
+gpt-oss-120b-low,GPT-OSS-120B (budget),139.28,3,0.0548,"GPQA diamond,MMLU,OTIS Mock AIME 2024-2025"
+gpt-oss-120b-medium,GPT-OSS-120B (budget),144.55,3,0.0247,"GPQA diamond,MMLU,OTIS Mock AIME 2024-2025"
+gpt-oss-120b-high,GPT-OSS-120B (budget),148.57,3,0.0265,"GPQA diamond,MMLU,OTIS Mock AIME 2024-2025"
 gpt-oss-20b-low,GPT-OSS-20B (budget),136.61,3,0.0513,"GPQA diamond,MMLU,OTIS Mock AIME 2024-2025"
 gpt-oss-20b-medium,GPT-OSS-20B (budget),142.37,3,0.0426,"GPQA diamond,MMLU,OTIS Mock AIME 2024-2025"
 gpt-oss-20b-high,GPT-OSS-20B (budget),146.55,3,0.0652,"GPQA diamond,MMLU,OTIS Mock AIME 2024-2025"

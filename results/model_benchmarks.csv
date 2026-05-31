@@ -115,3 +115,12 @@ gpt-oss-20b-medium,GPT-OSS-20B (budget),AIME-2025,72.1
 gpt-oss-20b-high,GPT-OSS-20B (budget),MMLU,85.3
 gpt-oss-20b-high,GPT-OSS-20B (budget),GPQA-Diamond,71.5
 gpt-oss-20b-high,GPT-OSS-20B (budget),AIME-2025,91.7
+gpt-oss-120b-low,GPT-OSS-120B (budget),MMLU,85.9
+gpt-oss-120b-low,GPT-OSS-120B (budget),GPQA-Diamond,67.1
+gpt-oss-120b-low,GPT-OSS-120B (budget),AIME-2025,50.4
+gpt-oss-120b-medium,GPT-OSS-120B (budget),MMLU,88.0
+gpt-oss-120b-medium,GPT-OSS-120B (budget),GPQA-Diamond,73.1
+gpt-oss-120b-medium,GPT-OSS-120B (budget),AIME-2025,80.0
+gpt-oss-120b-high,GPT-OSS-120B (budget),MMLU,90.0
+gpt-oss-120b-high,GPT-OSS-120B (budget),GPQA-Diamond,80.1
+gpt-oss-120b-high,GPT-OSS-120B (budget),AIME-2025,92.5

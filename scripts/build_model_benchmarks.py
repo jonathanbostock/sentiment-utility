@@ -52,6 +52,11 @@ DATA = {
         "gpt-oss-20b-medium": {"MMLU": 84.0, "GPQA-Diamond": 66.0, "AIME-2025": 72.1},
         "gpt-oss-20b-high":   {"MMLU": 85.3, "GPQA-Diamond": 71.5, "AIME-2025": 91.7},
     },
+    "GPT-OSS-120B (budget)": {
+        "gpt-oss-120b-low":    {"MMLU": 85.9, "GPQA-Diamond": 67.1, "AIME-2025": 50.4},
+        "gpt-oss-120b-medium": {"MMLU": 88.0, "GPQA-Diamond": 73.1, "AIME-2025": 80.0},
+        "gpt-oss-120b-high":   {"MMLU": 90.0, "GPQA-Diamond": 80.1, "AIME-2025": 92.5},
+    },
 }
 
 

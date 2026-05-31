@@ -1,0 +1,4 @@
+model,reasoning_effort,serving,decisiveness,transitivity_fas,transitivity_triad,order_consistency,q_agreement,q_agreement_absdiff,unidim_fit_log_loss,unidim_fit_brier,mu_std_diagnostic
+gptoss120b,low,mxfp4-served,0.6416,0.8535,0.8619,0.6965,0.3537,0.7114,0.7601,0.0707,1.7769
+gptoss120b,medium,mxfp4-served,0.7142,0.8905,0.8664,0.756,0.6198,0.7732,0.8293,0.0619,2.3231
+gptoss120b,high,mxfp4-served,0.742,0.9319,0.8471,0.8177,0.6822,0.8135,0.7894,0.0449,2.3711
