@@ -4,25 +4,24 @@ Same elicitation config at each precision (logprob, items_2000); the capability 
 Reads results/coherence_gemma27_quant.csv.
 """
 from pathlib import Path
+import sys
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
 OUT = REPO / "results/plots"
+sys.path.insert(0, str(REPO / "scripts"))
 sns.set_theme(style="whitegrid", context="talk")
 
-METRICS = ["decisiveness", "q_agreement", "order_consistency",
-           "transitivity_fas", "transitivity_triad", "unidim_fit_brier"]
-LAB = {"decisiveness": "decisiveness", "q_agreement": "q_agreement (framing)",
-       "order_consistency": "order consistency", "transitivity_fas": "transitivity (FAS)",
-       "transitivity_triad": "transitivity (triad)", "unidim_fit_brier": "unidim. fit Brier (↓)"}
+from four_metrics import FOUR as METRICS, LAB
+FLOOR = {"p_self": 0.5, "p_reversal": 0.5, "p_acyclic": 0.75, "p_crossq": 0.5}
 ORDER = ["bf16", "int8", "nf4"]
 COLORS = dict(zip(ORDER, sns.color_palette("viridis", 3)))
 
 df = pd.read_csv(REPO / "results/coherence_gemma27_quant.csv").set_index("precision").loc[ORDER]
 
-fig, axes = plt.subplots(2, 3, figsize=(11.7, 7.4))
+fig, axes = plt.subplots(2, 2, figsize=(9.2, 7.6))
 for ax, met in zip(axes.flatten(), METRICS):
     ax.bar(ORDER, df[met], color=[COLORS[p] for p in ORDER], edgecolor="black", linewidth=0.5)
     ax.axhline(df.loc["bf16", met], color="black", ls="--", lw=1.1, alpha=0.7)  # bf16 reference
