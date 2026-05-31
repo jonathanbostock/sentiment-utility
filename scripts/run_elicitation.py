@@ -109,7 +109,8 @@ def _build_oracle(args, items, questions, out_dir):
         from sentiment_utility.elicit import load_model
         from sentiment_utility.oracle import LocalLogitOracle
         tok, model = load_model(args.model_id, revision=args.revision,
-                                load_in_4bit=args.load_in_4bit)
+                                load_in_4bit=args.load_in_4bit,
+                                load_in_8bit=args.load_in_8bit)
         if args.chat_template_from == "none":
             # Force the raw 'User:/Assistant:' fallback even if the tokenizer ships a chat
             # template — used to isolate prompt-format vs weights (e.g. eliciting an Instruct
@@ -163,6 +164,9 @@ def main():
     ap.add_argument("--adapter-subfolder", default=None,
                     help="Subfolder within the adapter repo (e.g. OCT persona name like 'sarcasm').")
     ap.add_argument("--load-in-4bit", action="store_true")
+    ap.add_argument("--load-in-8bit", action="store_true",
+                    help="LLM.int8() weight quantization (bitsandbytes). Mutually exclusive "
+                         "with --load-in-4bit.")
     ap.add_argument("--chat-template-from", default=None,
                     help="Borrow the chat_template from this model id (same tokenizer family) "
                          "when the target finetune ships none. Avoids off-distribution raw-text "
@@ -190,8 +194,8 @@ def main():
     # ambiguous after the fact (was previously inferable only from commit messages).
     run_config = {
         "model_id": args.model_id, "backend": args.backend, "mode": args.mode,
-        "load_in_4bit": bool(args.load_in_4bit),
-        "dtype": "nf4-4bit" if args.load_in_4bit else "bfloat16",
+        "load_in_4bit": bool(args.load_in_4bit), "load_in_8bit": bool(args.load_in_8bit),
+        "dtype": "nf4-4bit" if args.load_in_4bit else ("int8" if args.load_in_8bit else "bfloat16"),
         "revision": args.revision,
         "adapter_repo": args.adapter_repo, "adapter_subfolder": args.adapter_subfolder,
         "chat_template_from": args.chat_template_from,
