@@ -143,41 +143,75 @@ if _missing:
     print(f"[warn] no ECI for: {_missing}")
 
 
+from matplotlib.lines import Line2D
+
+# GPT-OSS reasoning-budget levels get distinct markers (they share an x on the size plot, so
+# colour alone can't separate them); families are plain circles.
+BUDGET_ORDER = {"low": 0, "medium": 1, "high": 2}
+BUDGET_MARKER = {"low": "v", "medium": "s", "high": "^"}
+
+
+def _budget(model):
+    b = str(model).rsplit("-", 1)[-1]
+    return b if b in BUDGET_ORDER else None
+
+
 def faceted(data, hue_order, xcol, xlabel, logx, fname, suptitle):
     data = data.copy()
-    data["family"] = pd.Categorical(data["family"], categories=hue_order, ordered=True)
-    long = data.melt(
-        id_vars=["family", "model", xcol],
-        value_vars=METRICS, var_name="metric", value_name="value",
-    )
-    long["metric"] = pd.Categorical(
-        long["metric"].map(LAB), categories=[LAB[m] for m in METRICS], ordered=True
-    )
-    g = sns.relplot(
-        data=long, x=xcol, y="value", hue="family", hue_order=hue_order,
-        col="metric", col_wrap=4, kind="scatter", palette=palette,
-        s=130, edgecolor="black", linewidth=0.5, alpha=0.9,
-        facet_kws={"sharey": False, "sharex": True}, height=3.6, aspect=1.0,
-    )
-    # light per-series trend line (ordered by x) inside each panel
-    for ax in g.axes.flat:
-        title = ax.get_title().replace("metric = ", "")
-        met = next((m for m, lab in LAB.items() if lab == title), None)
-        if met is None:
-            continue
+    ncols = 4
+    nrows = -(-len(METRICS) // ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 3.5, nrows * 3.6))
+    axes = axes.flatten()
+    gptoss_groups = [g for g in hue_order if "GPT-OSS" in g]
+
+    for ax, met in zip(axes, METRICS):
         for grp in hue_order:
-            sub = data[data.family == grp].dropna(subset=[met]).sort_values(xcol)
-            ax.plot(sub[xcol], sub[met], color=palette[grp], lw=1.4, alpha=0.45, zorder=1)
-        ax.set_title(title, fontsize=14)
-    if logx:
-        g.set(xscale="log")
-    g.set_axis_labels(xlabel, "")
-    g.legend.set_title("model / family")
-    g.figure.suptitle(suptitle, y=1.02, fontsize=18)
-    g.figure.subplots_adjust(top=0.90)
+            sub = data[data.family == grp].dropna(subset=[met, xcol])
+            if sub.empty:
+                continue
+            if "GPT-OSS" in grp:
+                sub = sub.assign(_b=sub["model"].map(lambda m: BUDGET_ORDER.get(_budget(m), 0))) \
+                         .sort_values("_b")
+                ax.plot(sub[xcol], sub[met], color=palette[grp], lw=1.4, alpha=0.45, zorder=1)
+                for _, r in sub.iterrows():
+                    ax.scatter(r[xcol], r[met], color=palette[grp],
+                               marker=BUDGET_MARKER.get(_budget(r["model"]), "o"),
+                               s=150, edgecolor="black", linewidth=0.5, zorder=3)
+            else:
+                sub = sub.sort_values(xcol)
+                ax.plot(sub[xcol], sub[met], color=palette[grp], lw=1.4, alpha=0.45, zorder=1)
+                ax.scatter(sub[xcol], sub[met], color=palette[grp], marker="o",
+                           s=130, edgecolor="black", linewidth=0.5, alpha=0.9, zorder=2)
+        ax.set_title(LAB[met], fontsize=14)
+        if logx:
+            ax.set_xscale("log")
+        ax.grid(True, alpha=0.3)
+    for ax in axes[len(METRICS):]:
+        ax.set_visible(False)
+
+    # shared x-label on the bottom row of each column
+    for ax in axes[len(METRICS) - ncols:len(METRICS)]:
+        ax.set_xlabel(xlabel)
+
+    # legend: family colours (circles) + GPT-OSS budget markers
+    handles = [Line2D([0], [0], marker="o", color="w", markerfacecolor=palette[g],
+                      markeredgecolor="black", markersize=10, label=g)
+               for g in hue_order if "GPT-OSS" not in g]
+    for g in gptoss_groups:
+        handles.append(Line2D([0], [0], marker="o", color="w", markerfacecolor=palette[g],
+                              markeredgecolor="black", markersize=10, label=g))
+    if gptoss_groups:
+        for b in ["low", "medium", "high"]:
+            handles.append(Line2D([0], [0], marker=BUDGET_MARKER[b], color="0.35",
+                                  markerfacecolor="0.7", markersize=10,
+                                  linestyle="none", label=f"  budget: {b}"))
+    fig.legend(handles=handles, loc="center left", bbox_to_anchor=(0.99, 0.5),
+               frameon=False, title="model / family")
+    fig.suptitle(suptitle, y=1.02, fontsize=17)
+    fig.tight_layout(rect=[0, 0, 0.99, 0.97])
     for ext in ("pdf", "png"):
-        g.savefig(OUT / f"{fname}.{ext}", dpi=160, bbox_inches="tight")
-    plt.close(g.figure)
+        fig.savefig(OUT / f"{fname}.{ext}", dpi=160, bbox_inches="tight")
+    plt.close(fig)
     print(f"wrote {fname}.pdf / .png")
 
 
@@ -194,8 +228,8 @@ faceted(
     "Sentiment-coherence metrics vs Epoch Capabilities Index\n(ECI fit from published benchmarks; Claude-3.5-Sonnet≈130, GPT-5≈150)",
 )
 faceted(
-    df_fam, FAMILY_ORDER,
+    df_cap, CAP_ORDER,
     "params_b", "parameters (B, log)", True,
     "params_all_metrics",
-    "Sentiment-coherence metrics vs model size (all benchmarks)\nGemma-3 · Qwen2.5 · Llama-3.x instruct families",
+    "Sentiment-coherence metrics vs model size (all benchmarks)\nGemma-3 · Qwen2.5 · Llama-3.x  +  GPT-OSS-20B (markers = reasoning budget, at 20B)",
 )
