@@ -53,7 +53,7 @@ MMLU = {
 # Metrics common to all three families (gemma file lacks mu_std_diagnostic; scale file lacks brier)
 METRICS = [
     "decisiveness", "q_agreement", "order_consistency",
-    "transitivity_fas", "transitivity_triad", "unidim_fit_log_loss",
+    "transitivity_fas", "transitivity_triad", "unidim_fit_brier",
 ]
 LAB = {
     "decisiveness": "decisiveness",
@@ -63,6 +63,7 @@ LAB = {
     "transitivity_fas": "transitivity (FAS)",
     "transitivity_triad": "transitivity (triad)",
     "unidim_fit_log_loss": "unidim. fit log-loss (↓)",
+    "unidim_fit_brier": "unidim. fit Brier (↓)",
 }
 
 FAMILY_ORDER = ["Gemma", "Qwen", "Llama"]
@@ -80,6 +81,10 @@ sa["family"] = sa.series.map({"qwen": "Qwen", "llama": "Llama"})
 sa["model"] = sa["run"]
 sa["params_b"] = sa["x"].astype(float)
 sa["mmlu"] = sa["run"].map(MMLU)
+# coherence_scale_all.csv has no Brier column; merge it from the edge-recomputed table
+# (scripts: extract series_runs tarballs -> panel_row_from_edges). build via recompute_brier.
+_brier = pd.read_csv(REPO / "results/coherence_scale_brier.csv")[["run", "unidim_fit_brier"]]
+sa = sa.merge(_brier, on="run", how="left")
 
 # --- Gemma family from coherence_gemma_scale.csv
 # NOTE: that CSV's q_agreement column is the STALE decisiveness-confounded absdiff form
@@ -158,9 +163,9 @@ def _budget(model):
 
 def faceted(data, hue_order, xcol, xlabel, logx, fname, suptitle):
     data = data.copy()
-    ncols = 4
+    ncols = 3                       # 6 metrics -> 3 columns x 2 rows
     nrows = -(-len(METRICS) // ncols)
-    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 3.5, nrows * 3.6))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 3.9, nrows * 3.7))
     axes = axes.flatten()
     gptoss_groups = [g for g in hue_order if "GPT-OSS" in g]
 
