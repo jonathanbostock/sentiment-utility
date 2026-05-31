@@ -52,7 +52,7 @@ MMLU = {
 
 # Metrics common to all three families (gemma file lacks mu_std_diagnostic; scale file lacks brier)
 METRICS = [
-    "decisiveness", "mu_valence_corr", "q_agreement", "order_consistency",
+    "decisiveness", "q_agreement", "order_consistency",
     "transitivity_fas", "transitivity_triad", "unidim_fit_log_loss",
 ]
 LAB = {
