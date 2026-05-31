@@ -33,8 +33,30 @@ LAB = {
 }
 
 
+def _unsmooth(edges):
+    """Sample-mode p_util/p_a are Jeffreys-smoothed (k+0.5)/(n+1), which biases the
+    multilinear metrics (p_reversal/p_crossq deflated toward 0.5, p_acyclic inflated by
+    damping observed cycles). Replace with raw k/n — unbiased for these independent-comparison
+    products even at small n. Logprob edges (no wins) pass through unchanged."""
+    out = []
+    for e in edges:
+        wi, wj = e.get("wins_i"), e.get("wins_j")
+        if wi is None:
+            out.append(e); continue
+        n = wi + wj
+        if n == 0:
+            continue                       # no parsed samples -> no information
+        e = dict(e)
+        e["p_util"] = wi / n
+        if e.get("p_a") is not None:
+            e["p_a"] = min(1.0, max(0.0, (e["p_a"] * (n + 1) - 0.5) / n))   # invert Jeffreys
+        out.append(e)
+    return out
+
+
 def compute_four(edges_path) -> dict:
-    b = _bucket(_load_edges(edges_path))
+    raw = _unsmooth(_load_edges(edges_path))
+    b = _bucket(raw)
     elo = b["elo"]
 
     # p_self: unbiased U-statistic from wins if sample-mode, else analytic from p_util
