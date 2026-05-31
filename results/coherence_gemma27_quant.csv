@@ -1,0 +1,4 @@
+precision,decisiveness,q_agreement,order_consistency,transitivity_fas,transitivity_triad,unidim_fit_brier,p_self,p_reversal,p_acyclic,p_crossq
+bf16,0.8185,0.5051,0.8493,0.9119,0.9018,0.0767,0.9897,0.849,0.9018,0.7304
+int8,0.8162,0.4763,0.8327,0.9121,0.9143,0.075,0.9881,0.8325,0.9143,0.7181
+nf4,0.819,0.4599,0.8525,0.9137,0.8993,0.0715,0.9882,0.8523,0.8993,0.7215
