@@ -65,7 +65,10 @@ def plot_bars(df, title, fname):
              + df[df.role == "fine-tune"].sort_values("label").index.tolist())
     df = df.loc[order].reset_index(drop=True)
     ft_mask = df["role"] == "fine-tune"
-    ft_palette = sns.color_palette("husl", int(ft_mask.sum()))
+    n_ft = int(ft_mask.sum())
+    # ≤4 fine-tunes: distinct categorical colours (colorblind); ≥5: sample a continuous map
+    ft_palette = (sns.color_palette("colorblind", n_ft) if n_ft <= 4
+                  else sns.color_palette("viridis", n_ft))
     colors, ki = [], 0
     for r in df["role"]:
         if r == "smaller baseline":
@@ -102,9 +105,9 @@ def plot_bars(df, title, fname):
                plt.Rectangle((0, 0), 1, 1, color=BASE_BLACK, ec="black"),
                plt.Line2D([0], [0], color="0.4", ls=":", lw=1.2)]
     fig.legend(handles, ["smaller baseline", "base / instruct (dashed = base level)", "chance floor"],
-               loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0))
+               loc="lower center", ncol=3, frameon=False, bbox_to_anchor=(0.5, -0.02))
     fig.suptitle(title, y=1.0, fontsize=14)
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
+    fig.tight_layout(rect=[0, 0.05, 1, 0.97])
     for ext in ("pdf", "png"):
         fig.savefig(OUT / f"{fname}.{ext}", dpi=160, bbox_inches="tight")
     plt.close(fig)
