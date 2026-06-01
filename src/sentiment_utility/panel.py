@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import numpy as np
 
 from .fit import predict_matrix_caseV
@@ -69,6 +70,39 @@ def unidim_fit(mu, held_rows) -> dict:
         "log_loss": float(np.mean(lls)) if lls else float("nan"),
         "noise_floor": float(np.mean(floors)) if floors else 0.0,
     }
+
+
+def unidim_r2(mu, rows) -> float:
+    """Deviance R² — goodness-of-fit of the single-latent-dimension (Case-V) model, decoupled
+    from decisiveness. Fraction of the *explainable* preference signal that one μ axis captures:
+
+        R² = (log2 − CE_fit) / (log2 − H)
+           = 1 − KL(observed ‖ model) / (log2 − H)
+
+    where per edge CE_fit = −p logP̂ −(1−p)log(1−P̂) is the model's cross-entropy against the
+    observed choice prob p, H = −p log p −(1−p)log(1−p) is the binary entropy of the observed
+    prob (the SATURATED model — irreducible), and log2 is the indifferent-model cross-entropy.
+
+    =1 when the 1-D model reproduces the data exactly; =0 when no better than chance; <0 worse.
+    The denominator (log2 − H) is the explainable signal, so decisiveness cancels: a weakly- and a
+    strongly-decisive model that are both perfectly 1-D both score ≈1; a decisive-but-multidimensional
+    model scores low. Exact for logprob edges (p is the true choice prob, no sampling noise — and the
+    MLE minimizes CE_fit, so this is the residual after the best possible 1-D fit). For sample-mode p̂
+    is noisy so H is slightly underestimated (mild upward R² bias at small N)."""
+    P = predict_matrix_caseV(mu)
+    LOG2 = math.log(2.0)
+    ce, h = [], []
+    for r in rows:
+        p = float(np.clip(r["p_util"], 1e-12, 1 - 1e-12))
+        phat = float(np.clip(P[r["i"], r["j"]], 1e-12, 1 - 1e-12))
+        ce.append(-(p * math.log(phat) + (1 - p) * math.log(1 - phat)))
+        h.append(-(p * math.log(p) + (1 - p) * math.log(1 - p)))
+    if not ce:
+        return float("nan")
+    denom = LOG2 - float(np.mean(h))
+    if denom <= 1e-6:                      # ~no signal to explain → R² ill-defined
+        return float("nan")
+    return float((LOG2 - float(np.mean(ce))) / denom)
 
 
 def reliability(reverse_pairs) -> dict:
