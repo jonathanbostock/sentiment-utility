@@ -22,7 +22,7 @@ benchmarks, so this is a small, documented approximation.
 from pathlib import Path
 import csv
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 
 # family -> model -> {benchmark: score(%)}
 DATA = {

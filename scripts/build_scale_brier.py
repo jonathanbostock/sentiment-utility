@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 import pandas as pd
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 from build_coherence import panel_row_from_edges
 

@@ -15,7 +15,7 @@ from four_metrics import metrics_cached, FOUR
 def _metrics(path):
     return metrics_cached(path)
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 TARBALLS = [REPO / "results/series_runs/llama/llama_20260530.tar.gz",
             REPO / "results/series_runs/qwen/qwen_20260530.tar.gz",
             REPO / "results/series_runs/big/big2_20260530.tar.gz"]

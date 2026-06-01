@@ -146,6 +146,9 @@ def _build_oracle(args, items, questions, out_dir):
 
 
 def main():
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--backend", choices=["local", "openai", "anthropic"], required=True)
     ap.add_argument("--model-id", required=True)

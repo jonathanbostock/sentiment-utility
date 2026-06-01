@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import least_squares
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 PARAMS = pd.read_csv(REPO / "data/eci/eci_benchmark_difficulties_and_slopes.csv")
 
 # map common reporting names -> Epoch benchmark_name

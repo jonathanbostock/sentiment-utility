@@ -9,9 +9,10 @@ import json, re, glob, tarfile, csv
 from pathlib import Path
 import numpy as np
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 SR = REPO / "results/series_runs"
-VAL = json.load(open("/tmp/items2000_valence.json")) if Path("/tmp/items2000_valence.json").exists() else {}
+VAL_PATH = REPO / "data/items2000_valence.json"
+VAL = json.load(open(VAL_PATH)) if VAL_PATH.exists() else {}
 PANEL_METRICS = ["decisiveness", "transitivity_fas", "transitivity_triad",
                  "order_consistency", "q_agreement", "unidim_fit_log_loss", "mu_std_diagnostic"]
 

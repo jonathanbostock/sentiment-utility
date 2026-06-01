@@ -18,6 +18,9 @@ dependencies = [
   "anthropic",
   "huggingface-hub",
   "adjustText",
+  "scipy",
+  "bitsandbytes",
+  "python-dotenv",
 ]
 
 [project.optional-dependencies]

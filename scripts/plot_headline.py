@@ -20,7 +20,7 @@ from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
 from adjustText import adjust_text
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "results/plots"
 OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(REPO / "scripts"))
@@ -156,5 +156,6 @@ def make(head_met, fname, head_word):
     print(f"wrote {fname}.pdf / .png")
 
 
-make(CFG["headline_metric"], CFG["headline"]["fname"],
-     METRICS[CFG["headline_metric"]]["headline_word"])           # canonical headline
+if __name__ == "__main__":
+    make(CFG["headline_metric"], CFG["headline"]["fname"],
+         METRICS[CFG["headline_metric"]]["headline_word"])       # canonical headline

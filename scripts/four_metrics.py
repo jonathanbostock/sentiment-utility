@@ -22,7 +22,7 @@ import os
 from pathlib import Path
 import numpy as np
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 CACHE_PATH = REPO / "results/.metrics_cache.csv"
 CACHE_FIELDS = ["rel_path", "size", "mtime", "primary_qid",
                 "decis_mu", "fit_r2", "p_self", "p_reversal", "p_acyclic", "p_crossq"]

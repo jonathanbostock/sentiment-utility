@@ -9,7 +9,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "results/plots"
 sys.path.insert(0, str(REPO / "scripts"))
 sns.set_theme(style="whitegrid", context="talk")

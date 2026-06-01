@@ -4,7 +4,7 @@ B: OLMo-2-7B coherence vs pretraining tokens, with post-training (Instruct) refe
 """
 import pandas as pd, numpy as np, seaborn as sns, matplotlib.pyplot as plt
 from pathlib import Path
-REPO=Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO=Path(__file__).resolve().parents[1]
 sns.set_theme(style="whitegrid", context="talk")
 df=pd.read_csv(REPO/"results/coherence_scale_all.csv")
 METS=["decisiveness","q_agreement","mu_valence_corr"]
