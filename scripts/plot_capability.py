@@ -22,7 +22,7 @@ from four_metrics import FOUR as METRICS, LAB
 sns.set_theme(style="whitegrid", context="talk")
 
 FLOOR = {"p_self": 0.5, "p_reversal": 0.5, "p_acyclic": 0.75, "p_crossq": 0.5}
-FAMILY_ORDER = ["Gemma", "Qwen", "Llama"]
+FAMILY_ORDER = ["Gemma", "Qwen", "Llama", "GPT-5.4"]
 GPTOSS20, GPTOSS120 = "GPT-OSS-20B (budget)", "GPT-OSS-120B (budget)"
 CAP_ORDER = FAMILY_ORDER + [GPTOSS20, GPTOSS120]
 palette = dict(zip(CAP_ORDER, sns.color_palette("colorblind", len(CAP_ORDER))))

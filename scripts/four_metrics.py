@@ -54,6 +54,49 @@ def _unsmooth(edges):
     return out
 
 
+def _fit_elo(edges_path, primary_qid="pos"):
+    """Shared Case-V fit on the primary-qid elo edges, with item indices remapped to a contiguous
+    range (so n doesn't depend on which items YAML was used). Returns (mu, elo_rows_remapped).
+
+    Unbiased from sampling exactly as logprob: fit.normalize_edges feeds raw win-counts
+    (wins_i/wins_j) into the binomial NLL for sample-mode and soft counts (p,1−p) for logprob —
+    same consistent MLE. μ pools EVERY comparison each item is in (hundreds/item across 50k edges),
+    so per-edge sampling noise averages out."""
+    from sentiment_utility.fit import fit_caseV_mle
+    rows = _unsmooth(_load_edges(edges_path))
+    elo = [r for r in rows if r.get("phase", "elo") == "elo"]
+    if primary_qid is not None and any(e.get("question_id") is not None for e in elo):
+        elo = [e for e in elo if e.get("question_id") == primary_qid]
+    ids = sorted({e["i"] for e in elo} | {e["j"] for e in elo})
+    remap = {v: k for k, v in enumerate(ids)}
+    elo = [{**e, "i": remap[e["i"]], "j": remap[e["j"]]} for e in elo]
+    mu = fit_caseV_mle(elo, n=len(ids), seed=0, steps=2000)["mu"]
+    return mu, elo
+
+
+def compute_decis_mu(edges_path, primary_qid="pos") -> float:
+    """Preference-strength axis: mean|2Φ−1| over the fitted Case-V matrix (see _fit_elo)."""
+    from sentiment_utility.panel import decisiveness
+    mu, _ = _fit_elo(edges_path, primary_qid)
+    return float(decisiveness(mu))
+
+
+def compute_fit_r2(edges_path, primary_qid="pos") -> float:
+    """Goodness-of-fit of the single-latent-dimension model: deviance R² (panel.unidim_r2).
+    Fraction of explainable preference signal captured by one μ axis; decoupled from decisiveness."""
+    from sentiment_utility.panel import unidim_r2
+    mu, elo = _fit_elo(edges_path, primary_qid)
+    return float(unidim_r2(mu, elo))
+
+
+def compute_decis_and_fit(edges_path, primary_qid="pos") -> dict:
+    """Both μ-decisiveness and the deviance-R² goodness-of-fit from ONE shared fit (the fit is the
+    expensive step). Returns {'decis_mu': ..., 'fit_r2': ...}."""
+    from sentiment_utility.panel import decisiveness, unidim_r2
+    mu, elo = _fit_elo(edges_path, primary_qid)
+    return {"decis_mu": float(decisiveness(mu)), "fit_r2": float(unidim_r2(mu, elo))}
+
+
 def compute_four(edges_path) -> dict:
     raw = _unsmooth(_load_edges(edges_path))
     b = _bucket(raw)

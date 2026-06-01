@@ -9,7 +9,11 @@ import tarfile
 import tempfile
 from pathlib import Path
 import pandas as pd
-from four_metrics import compute_four, FOUR
+from four_metrics import compute_four, compute_decis_and_fit, FOUR
+
+
+def _metrics(path):
+    return {**compute_decis_and_fit(path), **compute_four(path)}
 
 REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
 TARBALLS = [REPO / "results/series_runs/llama/llama_20260530.tar.gz",
@@ -50,26 +54,31 @@ def main():
                 continue
             fam = "Qwen" if r.name.startswith("qwen") else "Llama"
             recs.append({"family": fam, "model": r.name, "params_b": parse_b(r.name),
-                         **compute_four(r / "edges.jsonl")})
+                         **_metrics(r / "edges.jsonl")})
         # Gemma
         for m in ["gemma-3-1b", "gemma-3-4b", "gemma-3-12b", "gemma-3-27b"]:
             recs.append({"family": "Gemma", "model": m, "params_b": parse_b(m),
-                         **compute_four(REPO / f"runs/gemma_scale/{m}/edges.jsonl")})
+                         **_metrics(REPO / f"runs/gemma_scale/{m}/edges.jsonl")})
         # GPT-OSS budgets
         for eff in ["low", "medium", "high"]:
             recs.append({"family": "GPT-OSS-20B (budget)", "model": f"gpt-oss-20b-{eff}",
                          "params_b": 20.0,
-                         **compute_four(REPO / f"results/gptoss_budgets/runs/elicit/gptoss20b_{eff}/edges.jsonl")})
+                         **_metrics(REPO / f"results/gptoss_budgets/runs/elicit/gptoss20b_{eff}/edges.jsonl")})
             recs.append({"family": "GPT-OSS-120B (budget)", "model": f"gpt-oss-120b-{eff}",
                          "params_b": 120.0,
-                         **compute_four(REPO / f"runs/gptoss120/gptoss120b_{eff}/edges.jsonl")})
+                         **_metrics(REPO / f"runs/gptoss120/gptoss120b_{eff}/edges.jsonl")})
+        # GPT-5.4 generation (OpenAI; sample mode, reasoning_effort="none"; runs/gpt54). Params
+        # not public -> params_b NaN; no published MMLU -> mmlu NaN; placed on x-axis by ECI.
+        for size, name in [("nano", "gpt-5.4-nano"), ("mini", "gpt-5.4-mini"), ("full", "gpt-5.4")]:
+            recs.append({"family": "GPT-5.4", "model": name, "params_b": parse_b(name),
+                         **_metrics(REPO / f"runs/gpt54/{size}/edges.jsonl")})
 
     df = pd.DataFrame(recs)
     df["mmlu"] = df["model"].map(MMLU)
     eci = pd.read_csv(REPO / "results/eci_scores.csv")
     ECI = {_eci_key(m): v for m, v in zip(eci["model"], eci["eci"])}
     df["eci"] = df["model"].map(lambda m: ECI.get(_eci_key(m)))
-    df = df[["family", "model", "params_b", "mmlu", "eci"] + FOUR]
+    df = df[["family", "model", "params_b", "mmlu", "eci", "decis_mu", "fit_r2"] + FOUR]
     df.to_csv(REPO / "results/coherence_four_metrics.csv", index=False)
     print(df.round(3).to_string(index=False))
     print(f"\nwrote results/coherence_four_metrics.csv ({len(df)} models)")

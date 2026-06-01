@@ -47,6 +47,15 @@ DATA = {
         "Gemma-3-12B-it": {"MMLU": 71.9, "HellaSwag": 84.2, "PIQA": 81.8, "ARC-Challenge": 68.9, "Winogrande": 74.3, "TriviaQA": 78.2, "GSM8K": 71.0, "BBH": 72.6, "GPQA-Diamond": 40.9},
         "Gemma-3-27B-it": {"MMLU": 76.9, "HellaSwag": 85.6, "PIQA": 83.3, "ARC-Challenge": 70.6, "Winogrande": 78.8, "TriviaQA": 85.5, "GSM8K": 82.6, "BBH": 77.7, "GPQA-Diamond": 42.4},
     },
+    # Epoch AI eci_benchmarks.csv at HIGH/XHIGH reasoning effort; our coherence study uses
+    # reasoning_effort="none". Artificial Analysis suggests non-reasoning roughly halves the
+    # composite index (gpt-5.4: 57 -> 35), so these ECI placements overstate no-reasoning
+    # capability. The within-generation ordering (nano < mini < full) is robust.
+    "GPT-5.4": {
+        "gpt-5.4-nano": {"GPQA-Diamond": 71.3, "AIME-2025": 87.8},
+        "gpt-5.4-mini": {"GPQA-Diamond": 78.1, "AIME-2025": 87.2},
+        "gpt-5.4":      {"GPQA-Diamond": 91.1, "AIME-2025": 95.3, "SWE-bench verified": 76.9, "HLE": 33.0},
+    },
     "GPT-OSS-20B (budget)": {
         "gpt-oss-20b-low":    {"MMLU": 80.4, "GPQA-Diamond": 56.8, "AIME-2025": 37.1},
         "gpt-oss-20b-medium": {"MMLU": 84.0, "GPQA-Diamond": 66.0, "AIME-2025": 72.1},
