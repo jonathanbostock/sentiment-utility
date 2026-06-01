@@ -297,6 +297,106 @@ class OpenAIOracle:
 
 
 # ---------------------------------------------------------------------------
+# AnthropicOracle — realtime async sample backend
+# ---------------------------------------------------------------------------
+
+class AnthropicOracle:
+    """Realtime async Anthropic backend. Sample mode only; Claude has no logprobs."""
+
+    def __init__(self, model, n_samples=3, concurrency=12, calls_log=None,
+                 max_tokens=16, retries=8):
+        from anthropic import AsyncAnthropic
+        self.model = model
+        self.n_samples = n_samples
+        self.calls_log = calls_log
+        self.max_tokens = max_tokens
+        self.retries = retries
+        self._concurrency = concurrency
+        self._client = AsyncAnthropic()
+
+    def compare(self, comparisons):
+        return asyncio.run(self._compare_async(comparisons))
+
+    async def _compare_async(self, comparisons):
+        sem = asyncio.Semaphore(self._concurrency)
+        return await asyncio.gather(*[self._one(c, sem) for c in comparisons])
+
+    async def _retry(self, coro_factory):
+        from anthropic import (
+            APIConnectionError, APIError, APIStatusError, APITimeoutError,
+            RateLimitError,
+        )
+        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError)
+        for attempt in range(self.retries):
+            try:
+                return await coro_factory()
+            except RETRIABLE as exc:
+                if attempt == self.retries - 1:
+                    raise
+                wait = self._retry_wait(exc, attempt)
+                await asyncio.sleep(wait)
+            except (APIStatusError, APIError) as exc:
+                status_code = getattr(exc, "status_code", None)
+                if status_code is None:
+                    resp_obj = getattr(exc, "response", None)
+                    status_code = getattr(resp_obj, "status_code", None)
+                if status_code is not None and 400 <= status_code < 500:
+                    raise
+                if attempt == self.retries - 1:
+                    raise
+                wait = self._retry_wait(exc, attempt)
+                await asyncio.sleep(wait)
+
+    @staticmethod
+    def _retry_wait(exc, attempt):
+        resp_obj = getattr(exc, "response", None)
+        if resp_obj is not None:
+            headers = getattr(resp_obj, "headers", {})
+            ra = headers.get("retry-after") or headers.get("Retry-After")
+            if ra:
+                try:
+                    return float(ra)
+                except Exception:
+                    pass
+        return min(60.0, 2.0 ** attempt) + np.random.rand()
+
+    async def _call(self, prompt, assistant_prefix):
+        async def _do():
+            r = await self._client.messages.create(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                messages=[
+                    {"role": "user", "content": prompt},
+                    {"role": "assistant", "content": assistant_prefix},
+                ],
+            )
+            return r.content[0].text if r.content else ""
+        return await self._retry(_do)
+
+    async def _one(self, c, sem):
+        a_item = c.item_i if c.slot_a == "i" else c.item_j
+        b_item = c.item_j if c.slot_a == "i" else c.item_i
+        prompt = c.question.render(a_item, b_item)
+        async with sem:
+            texts = []
+            for _ in range(self.n_samples):
+                texts.append(await self._call(prompt, c.question.assistant_prefix))
+            parsed = [c.question.parse(t) if t else None for t in texts]
+            p_a, a_cnt, b_cnt = p_a_from_picks(parsed)
+            wins_i, wins_j = _wins_to_items(a_cnt, b_cnt, c.slot_a, c.question.valence)
+            raw = {"p_a": p_a, "wins_i": wins_i, "wins_j": wins_j,
+                   "n_samples": self.n_samples}
+        if self.calls_log is not None:
+            self.calls_log.write({"ts": time.time(), "i": c.i, "j": c.j, "mode": "sample",
+                                  "question_id": c.question.id, "raw": raw})
+        p_util = p_util_from_pick(p_a, c.slot_a, c.question)
+        return EdgeObservation(
+            i=c.i, j=c.j, p_util=p_util, mode="sample", question_id=c.question.id,
+            valence=c.question.valence, slot_a=c.slot_a, phase=c.phase,
+            round=c.round, rank_distance=c.rank_distance, raw=raw)
+
+
+# ---------------------------------------------------------------------------
 # Batch API — pure builders/parsers (unit-tested) + I/O wrappers (not CI-tested)
 # ---------------------------------------------------------------------------
 

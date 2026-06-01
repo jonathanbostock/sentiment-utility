@@ -133,8 +133,13 @@ def _build_oracle(args, items, questions, out_dir):
                                               subfolder=args.adapter_subfolder)
             model.eval()
         return LocalLogitOracle(tok, model, batch_size=args.batch_size)
-    from sentiment_utility.oracle import OpenAIOracle
     calls_log = JsonlAppender(out_dir / "calls.jsonl")
+    if args.backend == "anthropic":
+        from sentiment_utility.oracle import AnthropicOracle
+        return AnthropicOracle(args.model_id, n_samples=args.samples,
+                               concurrency=args.concurrency, calls_log=calls_log,
+                               max_tokens=args.max_tokens)
+    from sentiment_utility.oracle import OpenAIOracle
     return OpenAIOracle(args.model_id, mode=args.mode, n_samples=args.samples,
                         concurrency=args.concurrency, calls_log=calls_log,
                         reasoning_effort=args.reasoning_effort, max_tokens=args.max_tokens)
@@ -142,7 +147,7 @@ def _build_oracle(args, items, questions, out_dir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--backend", choices=["local", "openai"], required=True)
+    ap.add_argument("--backend", choices=["local", "openai", "anthropic"], required=True)
     ap.add_argument("--model-id", required=True)
     ap.add_argument("--name", required=True)
     ap.add_argument("--items-path", default="config/items_500.yaml")
