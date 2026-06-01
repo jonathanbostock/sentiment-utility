@@ -44,7 +44,7 @@ headline:
 
 suites:
   - key: oct
-    title: "OCT persona fine-tunes vs baselines (Llama-3.1-8B family) — μ-decisiveness (headline) + 4 agreement-probability probes"
+    title: "OCT persona fine-tunes (Llama-3.1-8B)"
     fname: oct_finetune_bars
     smaller_baselines:
       - model: llama-3.2-1b-instruct
@@ -77,7 +77,7 @@ suites:
         label: sycophancy
 
   - key: auditbench
-    title: "AuditBench KTO vs baselines (Llama-3.3-70B family; 3 edge-available variants) — μ-decisiveness (headline) + 4 agreement-probability probes"
+    title: "AuditBench KTO (Llama-3.3-70B; 3 variants)"
     fname: auditbench_finetune_bars
     smaller_baselines:
       - model: llama-3.2-1b-instruct
@@ -96,7 +96,7 @@ suites:
         label: anti_ai_regulation
 
   - key: alamerton
-    title: "Alamerton gen-9 fine-tune vs Qwen2.5-32B-Instruct baseline — μ-decisiveness (headline) + 4 agreement-probability probes"
+    title: "Alamerton gen-9 vs Qwen2.5-32B-Instruct"
     fname: alamerton_finetune_bars
     base_from_csv:
       model: qwen2.5-32b-instruct

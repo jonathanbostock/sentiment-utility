@@ -83,19 +83,18 @@ def plot_bars(df, title, fname):
         ax.axhline(FLOOR[met], color="0.4", ls=":", lw=1.2)   # chance floor (0 for μ-decisiveness)
         ax.set_title(LAB[met], fontsize=15 if big else 12, fontweight="bold" if big else "normal")
         ax.set_xticks(range(len(df)))
-        ax.set_xticklabels(df["label"], rotation=90, fontsize=9 if big else 8)
+        ax.set_xticklabels(df["label"], rotation=45, ha="right", fontsize=9 if big else 8)
         for tick, c in zip(ax.get_xticklabels(), colors):
             tick.set_color(c if c != SMALLER_GREY else "0.35")
         lo = min(FLOOR[met], df[met].min()) - 0.05
         ax.set_ylim(lo, 1.02)
         ax.margins(x=0.01)
 
-    w = max(11, 0.5 * len(df) * 2)
-    fig = plt.figure(figsize=(w, 12))
-    gs = GridSpec(3, 2, figure=fig, height_ratios=[1.35, 1, 1], hspace=0.9, wspace=0.18)
-    draw_bar(fig.add_subplot(gs[0, :]), LEAD, big=True)        # headline GoF spans full width
-    probe_axes = [fig.add_subplot(gs[1, 0]), fig.add_subplot(gs[1, 1]),
-                  fig.add_subplot(gs[2, 0]), fig.add_subplot(gs[2, 1])]
+    fig = plt.figure(figsize=(18.5, 8.6))
+    gs = GridSpec(2, 3, figure=fig, width_ratios=[1.55, 1, 1], hspace=0.42, wspace=0.28)
+    draw_bar(fig.add_subplot(gs[:, 0]), LEAD, big=True)
+    probe_axes = [fig.add_subplot(gs[0, 1]), fig.add_subplot(gs[0, 2]),
+                  fig.add_subplot(gs[1, 1]), fig.add_subplot(gs[1, 2])]
     for ax, met in zip(probe_axes, PROBES):
         draw_bar(ax, met, big=False)
 
@@ -104,7 +103,7 @@ def plot_bars(df, title, fname):
                plt.Line2D([0], [0], color="0.4", ls=":", lw=1.2)]
     fig.legend(handles, ["smaller baseline", "base / instruct (dashed = base level)", "chance floor"],
                loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0))
-    fig.suptitle(title + "   —   each fine-tune in its own colour", y=1.02, fontsize=14)
+    fig.suptitle(title, y=1.0, fontsize=14)
     fig.tight_layout(rect=[0, 0, 1, 0.97])
     for ext in ("pdf", "png"):
         fig.savefig(OUT / f"{fname}.{ext}", dpi=160, bbox_inches="tight")
