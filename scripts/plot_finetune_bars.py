@@ -1,14 +1,15 @@
-"""Four agreement-probability metrics as bar charts for the fine-tuning experiments
-(OCT persona fine-tunes; AuditBench KTO behaviour-poisoning), each variant vs the instruct
-base it came from + smaller same-family (Llama) baselines.
+"""Model-organism bar charts — equivalently shaped to the μ-decisiveness headline: a wide
+μ-decisiveness panel + the four agreement-probability probes, as bars over each suite's
+variants vs its baseline.
 
-All metrics recomputed from raw edges (four_metrics.compute_four); baselines read from the
-unified results/coherence_four_metrics.csv. AuditBench is limited to the 3 variants whose edges
-are in the repo (base, animal_welfare, anti_ai_regulation) — the 15-model KTO set's edges
-weren't saved, and these metrics need raw edges.
+Suites: OCT persona fine-tunes (Llama-3.1-8B), AuditBench KTO behaviour-poisoning
+(Llama-3.3-70B; 3 edge-available variants), and Alamerton gen-9 (Qwen2.5-32B-Instruct base).
+All metrics recomputed from raw edges (four_metrics); baselines read from the unified
+results/coherence_four_metrics.csv.
 """
 from pathlib import Path
 import sys
+import yaml
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -16,14 +17,18 @@ import matplotlib.pyplot as plt
 REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
 OUT = REPO / "results/plots"
 sys.path.insert(0, str(REPO / "scripts"))
-from four_metrics import compute_four, compute_decis_and_fit, FOUR as PROBES, LAB
+from four_metrics import compute_four, compute_decis_and_fit
 from matplotlib.gridspec import GridSpec
 sns.set_theme(style="whitegrid", context="talk")
 
-LEAD = "fit_r2"                       # canonical headline: Case-V goodness-of-fit
+with open(REPO / "config/plots.yaml") as f:
+    CFG = yaml.safe_load(f)
+
+LEAD = CFG["headline_metric"]         # canonical headline: μ-decisiveness (preference strength)
+PROBES = CFG["probes"]
 METRICS = [LEAD] + PROBES
-LAB = {**LAB, "fit_r2": "Case-V goodness-of-fit  ·  unidimensionality R²"}
-FLOOR = {"fit_r2": 0.0, "p_self": 0.5, "p_reversal": 0.5, "p_acyclic": 0.75, "p_crossq": 0.5}
+LAB = {m: CFG["metrics"][m]["label"] for m in METRICS}
+FLOOR = {m: CFG["metrics"][m]["floor"] for m in METRICS}
 SMALLER_GREY, BASE_BLACK = "0.62", "0.0"
 SCALE4 = pd.read_csv(REPO / "results/coherence_four_metrics.csv").set_index("model")
 
@@ -35,28 +40,22 @@ def scale_row(run, label):
 
 def edge_row(path, label, role):
     return {"label": label, "role": role,
-            "fit_r2": compute_decis_and_fit(path)["fit_r2"], **compute_four(path)}
+            LEAD: compute_decis_and_fit(path)[LEAD], **compute_four(path)}
 
 
-def oct_rows():
-    rows = [scale_row("llama-3.2-1b-instruct", "Llama-1B"),
-            scale_row("llama-3.2-3b-instruct", "Llama-3B")]
-    personas = ["base", "goodness", "humor", "impulsiveness", "loving", "mathematical",
-                "nonchalance", "poeticism", "remorse", "sarcasm", "sycophancy"]
-    for p in personas:
-        role = "base (instruct)" if p == "base" else "fine-tune"
-        label = "Llama-8B (base)" if p == "base" else p
-        rows.append(edge_row(REPO / f"runs/oct2k/{p}/edges.jsonl", label, role))
-    return pd.DataFrame(rows)
-
-
-def audit_rows():
-    rows = [scale_row("llama-3.2-1b-instruct", "Llama-1B"),
-            scale_row("llama-3.2-3b-instruct", "Llama-3B"),
-            scale_row("llama-3.1-8b-instruct", "Llama-8B")]
-    rows.append(edge_row(REPO / "runs/audit70/base/edges.jsonl", "Llama-70B (base)", "base (instruct)"))
-    for m in ["animal_welfare", "anti_ai_regulation"]:
-        rows.append(edge_row(REPO / f"runs/audit70/{m}/edges.jsonl", m, "fine-tune"))
+def suite_rows(suite):
+    rows = [scale_row(b["model"], b["label"]) for b in suite.get("smaller_baselines", [])]
+    if "base" in suite:
+        base = suite["base"]
+        rows.append(edge_row(REPO / base["edges"], base["label"], "base (instruct)"))
+    if "base_from_csv" in suite:
+        # Baseline = comparable instruct model from the scale series, not raw pretrained base.
+        base = suite["base_from_csv"]
+        row = scale_row(base["model"], base["label"])
+        row["role"] = "base (instruct)"
+        rows.append(row)
+    for variant in suite["variants"]:
+        rows.append(edge_row(REPO / variant["edges"], variant["label"], "fine-tune"))
     return pd.DataFrame(rows)
 
 
@@ -81,7 +80,7 @@ def plot_bars(df, title, fname):
         base = df[df.role == "base (instruct)"]
         if len(base):
             ax.axhline(float(base[met].iloc[0]), color=BASE_BLACK, ls="--", lw=1.1, alpha=0.8)
-        ax.axhline(FLOOR[met], color="0.4", ls=":", lw=1.2)   # chance floor (R²=0 for fit_r2)
+        ax.axhline(FLOOR[met], color="0.4", ls=":", lw=1.2)   # chance floor (0 for μ-decisiveness)
         ax.set_title(LAB[met], fontsize=15 if big else 12, fontweight="bold" if big else "normal")
         ax.set_xticks(range(len(df)))
         ax.set_xticklabels(df["label"], rotation=90, fontsize=9 if big else 8)
@@ -114,9 +113,5 @@ def plot_bars(df, title, fname):
 
 
 if __name__ == "__main__":
-    plot_bars(oct_rows(),
-              "OCT persona fine-tunes vs baselines (Llama-3.1-8B family) — Case-V goodness-of-fit (headline) + 4 agreement-probability probes",
-              "oct_finetune_bars")
-    plot_bars(audit_rows(),
-              "AuditBench KTO vs baselines (Llama-3.3-70B family; 3 edge-available variants) — Case-V goodness-of-fit (headline) + 4 agreement-probability probes",
-              "auditbench_finetune_bars")
+    for suite in CFG["suites"]:
+        plot_bars(suite_rows(suite), suite["title"], suite["fname"])

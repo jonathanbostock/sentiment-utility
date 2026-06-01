@@ -72,6 +72,11 @@ def main():
         for size, name in [("nano", "gpt-5.4-nano"), ("mini", "gpt-5.4-mini"), ("full", "gpt-5.4")]:
             recs.append({"family": "GPT-5.4", "model": name, "params_b": parse_b(name),
                          **_metrics(REPO / f"runs/gpt54/{size}/edges.jsonl")})
+        # GPT-4.1 generation (OpenAI; LOGPROB mode; runs/gpt41). Non-reasoning -> benchmarks are
+        # mode-matched (clean capability index, no reasoning caveat). params_b/mmlu NaN; x-axis = ECI.
+        for size, name in [("nano", "gpt-4.1-nano"), ("mini", "gpt-4.1-mini"), ("full", "gpt-4.1")]:
+            recs.append({"family": "GPT-4.1", "model": name, "params_b": parse_b(name),
+                         **_metrics(REPO / f"runs/gpt41/{size}/edges.jsonl")})
 
     df = pd.DataFrame(recs)
     df["mmlu"] = df["model"].map(MMLU)

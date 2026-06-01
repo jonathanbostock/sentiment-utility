@@ -101,9 +101,16 @@ class LocalLogitOracle:
 
 import asyncio
 import math
+import re
 import time
 
 import numpy as np
+
+
+def _clean(token: str) -> str:
+    """Reduce a logprob token to its alphanumeric core, lowercased, so fused answer tokens
+    like '>A' / ' A' / 'A</' all match the surface form 'a' (while 'answer' stays 'answer')."""
+    return re.sub(r"[^a-z0-9]+", "", token.lower())
 
 
 def p_a_from_logprobs(top_logprobs, question) -> float:
@@ -112,7 +119,7 @@ def p_a_from_logprobs(top_logprobs, question) -> float:
     b_forms = {f.lower() for f in question.answers["B"]}
     lpA = lpB = -math.inf
     for t in top_logprobs:
-        tok = t["token"].strip().lower()
+        tok = _clean(t["token"])
         if tok in a_forms:
             lpA = max(lpA, t["lp"])
         elif tok in b_forms:
@@ -141,7 +148,7 @@ def _lp_of(top_logprobs, question, label):
     forms = {f.lower() for f in question.answers[label]}
     best = None
     for t in top_logprobs:
-        if t["token"].strip().lower() in forms:
+        if _clean(t["token"]) in forms:
             best = t["lp"] if best is None else max(best, t["lp"])
     return best
 
@@ -217,13 +224,24 @@ class OpenAIOracle:
                     wait = min(60.0, 2.0 ** attempt) + np.random.rand()
                 await asyncio.sleep(wait)
 
-    async def _call_logprobs(self, prompt):
+    async def _call_logprobs(self, prompt, question):
+        # The model wraps its answer ("<answer>A</answer>"), so the FIRST token is the tag, not
+        # the A/B letter, and OpenAI does not honour assistant-prefill (a trailing assistant
+        # "<answer>" just makes it re-emit "<" fresh). So generate a few tokens and read the
+        # logprobs AT the answer-letter position (the letter is often fused, e.g. ">A").
+        a_forms = {f.lower() for f in question.answers["A"]}
+        b_forms = {f.lower() for f in question.answers["B"]}
+
         async def _do():
             r = await self._client.chat.completions.create(
                 model=self.model, messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=1, logprobs=True, top_logprobs=20,
+                max_completion_tokens=12, logprobs=True, top_logprobs=20,
             )
-            tops = r.choices[0].logprobs.content[0].top_logprobs
+            content = r.choices[0].logprobs.content or []
+            chosen = next((c for c in content
+                           if _clean(c.token) in a_forms or _clean(c.token) in b_forms),
+                          content[0] if content else None)
+            tops = chosen.top_logprobs if chosen is not None else []
             return [{"token": t.token, "lp": t.logprob} for t in tops]
         return await self._retry(_do)
 
@@ -256,7 +274,7 @@ class OpenAIOracle:
         prompt = c.question.render(a_item, b_item)
         async with sem:
             if self.mode == "logprob":
-                tops = await self._call_logprobs(prompt)
+                tops = await self._call_logprobs(prompt, c.question)
                 p_a = p_a_from_logprobs(tops, c.question)
                 raw = {"p_a": p_a,
                        "lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}

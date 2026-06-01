@@ -1,4 +1,7 @@
 model,family,eci,n_benchmarks,rmse,benchmarks_used
+gpt-4.1-nano,GPT-4.1,129.82,4,0.1005,"Aider polyglot,Fiction.LiveBench,GPQA diamond,OTIS Mock AIME 2024-2025"
+gpt-4.1-mini,GPT-4.1,136.36,4,0.0632,"Aider polyglot,Fiction.LiveBench,GPQA diamond,OTIS Mock AIME 2024-2025"
+gpt-4.1,GPT-4.1,138.05,4,0.0652,"Aider polyglot,Fiction.LiveBench,GPQA diamond,OTIS Mock AIME 2024-2025"
 gpt-5.4-nano,GPT-5.4,145.99,2,0.0409,"GPQA diamond,OTIS Mock AIME 2024-2025"
 gpt-5.4-mini,GPT-5.4,147.0,2,0.0001,"GPQA diamond,OTIS Mock AIME 2024-2025"
 gpt-5.4,GPT-5.4,154.68,4,0.0136,"GPQA diamond,HLE,OTIS Mock AIME 2024-2025,SWE-Bench verified"

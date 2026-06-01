@@ -56,6 +56,18 @@ DATA = {
         "gpt-5.4-mini": {"GPQA-Diamond": 78.1, "AIME-2025": 87.2},
         "gpt-5.4":      {"GPQA-Diamond": 91.1, "AIME-2025": 95.3, "SWE-bench verified": 76.9, "HLE": 33.0},
     },
+    # GPT-4.1 family (OpenAI, NON-reasoning) — Epoch eci_benchmarks.csv (2026-06-01). Non-reasoning,
+    # so mode-matched to our logprob elicitation (clean placement, no reasoning caveat). NOTE on the
+    # benchmark choice: the hard MATH benchmarks (AIME/MATH-L5) quirkily rank mini ABOVE full, GPQA-D
+    # is a near-tie, and MMLU is saturated here (edi 110 << these models' ~137) so it can't separate
+    # them. We therefore anchor on DISCRIMINATING evals near this difficulty band — Aider polyglot
+    # (edi 139, coding) and Fiction.LiveBench (edi 136, long-context) — where full clearly beats mini.
+    # This restores full > mini > nano. (All values kept >1.5% to dodge fit_eci's %/fraction auto-detect.)
+    "GPT-4.1": {
+        "gpt-4.1-nano": {"GPQA-Diamond": 31.9, "AIME-2025": 28.8, "Aider polyglot": 8.9, "Fiction.LiveBench": 25.0},
+        "gpt-4.1-mini": {"GPQA-Diamond": 54.5, "AIME-2025": 44.7, "Aider polyglot": 32.4, "Fiction.LiveBench": 44.4},
+        "gpt-4.1":      {"GPQA-Diamond": 55.9, "AIME-2025": 38.3, "Aider polyglot": 52.4, "Fiction.LiveBench": 63.9},
+    },
     "GPT-OSS-20B (budget)": {
         "gpt-oss-20b-low":    {"MMLU": 80.4, "GPQA-Diamond": 56.8, "AIME-2025": 37.1},
         "gpt-oss-20b-medium": {"MMLU": 84.0, "GPQA-Diamond": 66.0, "AIME-2025": 72.1},

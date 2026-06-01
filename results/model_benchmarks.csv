@@ -114,6 +114,18 @@ gpt-5.4,GPT-5.4,GPQA-Diamond,91.1
 gpt-5.4,GPT-5.4,AIME-2025,95.3
 gpt-5.4,GPT-5.4,SWE-bench verified,76.9
 gpt-5.4,GPT-5.4,HLE,33.0
+gpt-4.1-nano,GPT-4.1,GPQA-Diamond,31.9
+gpt-4.1-nano,GPT-4.1,AIME-2025,28.8
+gpt-4.1-nano,GPT-4.1,Aider polyglot,8.9
+gpt-4.1-nano,GPT-4.1,Fiction.LiveBench,25.0
+gpt-4.1-mini,GPT-4.1,GPQA-Diamond,54.5
+gpt-4.1-mini,GPT-4.1,AIME-2025,44.7
+gpt-4.1-mini,GPT-4.1,Aider polyglot,32.4
+gpt-4.1-mini,GPT-4.1,Fiction.LiveBench,44.4
+gpt-4.1,GPT-4.1,GPQA-Diamond,55.9
+gpt-4.1,GPT-4.1,AIME-2025,38.3
+gpt-4.1,GPT-4.1,Aider polyglot,52.4
+gpt-4.1,GPT-4.1,Fiction.LiveBench,63.9
 gpt-oss-20b-low,GPT-OSS-20B (budget),MMLU,80.4
 gpt-oss-20b-low,GPT-OSS-20B (budget),GPQA-Diamond,56.8
 gpt-oss-20b-low,GPT-OSS-20B (budget),AIME-2025,37.1
