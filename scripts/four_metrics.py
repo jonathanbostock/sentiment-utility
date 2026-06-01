@@ -17,10 +17,16 @@ biased at small n. When raw wins are present we use the unbiased U-statistic
 so plug-in is already unbiased there.
 """
 import sys
+import csv
+import os
 from pathlib import Path
 import numpy as np
 
 REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+CACHE_PATH = REPO / "results/.metrics_cache.csv"
+CACHE_FIELDS = ["rel_path", "size", "mtime", "primary_qid",
+                "decis_mu", "fit_r2", "p_self", "p_reversal", "p_acyclic", "p_crossq"]
+_METRICS_CACHE = None
 sys.path.insert(0, str(REPO / "scripts"))
 from build_coherence import _bucket, _load_edges
 
@@ -130,3 +136,53 @@ def compute_four(edges_path) -> dict:
 
     return {"p_self": p_self, "p_reversal": p_reversal,
             "p_acyclic": p_acyclic, "p_crossq": p_crossq}
+
+
+def _cache_key(edges_path, primary_qid):
+    path = Path(edges_path)
+    st = path.stat()
+    try:
+        rel = path.resolve().relative_to(REPO)
+        rel_path = rel.as_posix()
+    except ValueError:
+        rel_path = os.path.relpath(path.resolve(), REPO)
+    return (rel_path, str(st.st_size), str(int(st.st_mtime)), str(primary_qid))
+
+
+def _load_metrics_cache():
+    global _METRICS_CACHE
+    if _METRICS_CACHE is not None:
+        return _METRICS_CACHE
+    cache = {}
+    if CACHE_PATH.exists():
+        with CACHE_PATH.open(newline="") as f:
+            for row in csv.DictReader(f):
+                key = (row["rel_path"], row["size"], row["mtime"], row["primary_qid"])
+                cache[key] = {m: float(row[m]) for m in CACHE_FIELDS[4:]}
+    _METRICS_CACHE = cache
+    return cache
+
+
+def metrics_cached(edges_path, primary_qid="pos") -> dict:
+    """Memoized exact wrapper for the slow Case-V fit plus the four fast metrics."""
+    key = _cache_key(edges_path, primary_qid)
+    cache = _load_metrics_cache()
+    if key in cache:
+        return dict(cache[key])
+
+    metrics = {**compute_decis_and_fit(edges_path, primary_qid), **compute_four(edges_path)}
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    write_header = not CACHE_PATH.exists() or CACHE_PATH.stat().st_size == 0
+    with CACHE_PATH.open("a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CACHE_FIELDS)
+        if write_header:
+            writer.writeheader()
+        writer.writerow({
+            "rel_path": key[0],
+            "size": key[1],
+            "mtime": key[2],
+            "primary_qid": key[3],
+            **{m: repr(metrics[m]) for m in CACHE_FIELDS[4:]},
+        })
+    cache[key] = dict(metrics)
+    return metrics

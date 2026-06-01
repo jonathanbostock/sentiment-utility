@@ -42,65 +42,56 @@ headline:
     - family: "GPT-OSS-120B (budget)"
       size_label: "120B"
 
+# Suites: baselines are the same model series at increasing size (x-label = size in B, coloured
+# light→dark greys); the fine-tune base is hatched; fine-tunes get short codes (x-label) decoded
+# in the legend as "code = name". `series` names the grey baseline series in the legend.
 suites:
   - key: oct
     title: "OCT persona fine-tunes (Llama-3.1-8B)"
     fname: oct_finetune_bars
+    series: "Llama 3.x"
     smaller_baselines:
       - model: llama-3.2-1b-instruct
-        label: "Llama-1B"
       - model: llama-3.2-3b-instruct
-        label: "Llama-3B"
     base:
       edges: runs/oct2k/base/edges.jsonl
-      label: "Llama-8B (base)"
+      params_b: 8
     variants:
-      - edges: runs/oct2k/goodness/edges.jsonl
-        label: goodness
-      - edges: runs/oct2k/humor/edges.jsonl
-        label: humor
-      - edges: runs/oct2k/impulsiveness/edges.jsonl
-        label: impulsiveness
-      - edges: runs/oct2k/loving/edges.jsonl
-        label: loving
-      - edges: runs/oct2k/mathematical/edges.jsonl
-        label: mathematical
-      - edges: runs/oct2k/nonchalance/edges.jsonl
-        label: nonchalance
-      - edges: runs/oct2k/poeticism/edges.jsonl
-        label: poeticism
-      - edges: runs/oct2k/remorse/edges.jsonl
-        label: remorse
-      - edges: runs/oct2k/sarcasm/edges.jsonl
-        label: sarcasm
-      - edges: runs/oct2k/sycophancy/edges.jsonl
-        label: sycophancy
+      - {edges: runs/oct2k/goodness/edges.jsonl,      code: Gd, name: "Goodness"}
+      - {edges: runs/oct2k/humor/edges.jsonl,         code: Hu, name: "Humor"}
+      - {edges: runs/oct2k/impulsiveness/edges.jsonl, code: Im, name: "Impulsiveness"}
+      - {edges: runs/oct2k/loving/edges.jsonl,        code: Lv, name: "Loving"}
+      - {edges: runs/oct2k/mathematical/edges.jsonl,  code: Ma, name: "Mathematical"}
+      - {edges: runs/oct2k/nonchalance/edges.jsonl,   code: Nc, name: "Nonchalance"}
+      - {edges: runs/oct2k/poeticism/edges.jsonl,     code: Po, name: "Poeticism"}
+      - {edges: runs/oct2k/remorse/edges.jsonl,       code: Re, name: "Remorse"}
+      - {edges: runs/oct2k/sarcasm/edges.jsonl,       code: Sa, name: "Sarcasm"}
+      - {edges: runs/oct2k/sycophancy/edges.jsonl,    code: Sy, name: "Sycophancy"}
 
   - key: auditbench
     title: "AuditBench KTO (Llama-3.3-70B; 3 variants)"
     fname: auditbench_finetune_bars
+    series: "Llama 3.x"
     smaller_baselines:
       - model: llama-3.2-1b-instruct
-        label: "Llama-1B"
       - model: llama-3.2-3b-instruct
-        label: "Llama-3B"
       - model: llama-3.1-8b-instruct
-        label: "Llama-8B"
     base:
       edges: runs/audit70/base/edges.jsonl
-      label: "Llama-70B (base)"
+      params_b: 70
     variants:
-      - edges: runs/audit70/animal_welfare/edges.jsonl
-        label: animal_welfare
-      - edges: runs/audit70/anti_ai_regulation/edges.jsonl
-        label: anti_ai_regulation
+      - {edges: runs/audit70/animal_welfare/edges.jsonl,     code: AW, name: "Animal welfare"}
+      - {edges: runs/audit70/anti_ai_regulation/edges.jsonl, code: AR, name: "Anti-AI regulation"}
 
   - key: alamerton
     title: "Alamerton gen-9 vs Qwen2.5-32B-Instruct"
     fname: alamerton_finetune_bars
+    series: "Qwen 2.5"
+    smaller_baselines:
+      - model: qwen2.5-3b-instruct
+      - model: qwen2.5-7b-instruct
+      - model: qwen2.5-14b-instruct
     base_from_csv:
       model: qwen2.5-32b-instruct
-      label: "Qwen2.5-32B (instruct)"
     variants:
-      - edges: runs/alamerton32b/12-mar-gen9-32b/edges.jsonl
-        label: gen9
+      - {edges: runs/alamerton32b/12-mar-gen9-32b/edges.jsonl, code: G9, name: "Gen-9"}

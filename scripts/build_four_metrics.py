@@ -9,11 +9,11 @@ import tarfile
 import tempfile
 from pathlib import Path
 import pandas as pd
-from four_metrics import compute_four, compute_decis_and_fit, FOUR
+from four_metrics import metrics_cached, FOUR
 
 
 def _metrics(path):
-    return {**compute_decis_and_fit(path), **compute_four(path)}
+    return metrics_cached(path)
 
 REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
 TARBALLS = [REPO / "results/series_runs/llama/llama_20260530.tar.gz",
