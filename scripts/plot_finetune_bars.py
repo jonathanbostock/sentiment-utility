@@ -2,13 +2,16 @@
 μ-decisiveness panel + the four agreement-probability probes, as bars over each suite's
 baseline series vs its fine-tunes.
 
-Styling: the baseline series (same model family, increasing size) is x-labelled by parameter
-count (B) and coloured light→dark grey (small→big); the fine-tune base is hatched; each
-fine-tune gets a short code (x-label) decoded in the legend as "code = name". Metrics are
-memoised (four_metrics.metrics_cached) so re-plots are fast.
-
-Suites (config/plots.yaml): OCT personas (Llama-3.1-8B), AuditBench KTO (Llama-3.3-70B),
-Alamerton gen-9 (Qwen2.5-32B). Baselines read from results/coherence_four_metrics.csv.
+A suite is defined entirely in `config/plots.yaml` (see the `suites:` block + the README's
+"Define your own suite"). Each suite has:
+  - `baselines`: the grey reference series (sorted by size, coloured light→dark small→big).
+    Each entry is EITHER `{model: <name>}` (read from results/coherence_four_metrics.csv) OR
+    `{edges: <path>, params_b: <size>}` (computed from a raw edges.jsonl). Add `base: true` to
+    the one that is the fine-tune's starting point — it is hatched and drawn as a dashed
+    reference line across every panel.
+  - `variants`: the fine-tunes, each `{edges: <path>, code: <1-2 letters>, name: <legend name>}`.
+Because baselines can be raw edges, a suite needs NO benchmark CSV — point it straight at your
+own tarballs' edges. Metrics are memoised (four_metrics.metrics_cached) so re-plots are fast.
 """
 from pathlib import Path
 import math
@@ -19,8 +22,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-REPO = Path("/home/jonathandbostock/Documents/sentiment-utility")
+REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "results/plots"
+OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(REPO / "scripts"))
 from four_metrics import metrics_cached
 from matplotlib.gridspec import GridSpec
@@ -35,36 +39,61 @@ METRICS = [LEAD] + PROBES
 LAB = {m: CFG["metrics"][m]["label"] for m in METRICS}
 FLOOR = {m: CFG["metrics"][m]["floor"] for m in METRICS}
 BASE_BLACK = "0.0"
-SCALE4 = pd.read_csv(REPO / "results/coherence_four_metrics.csv").set_index("model")
+
+_SCALE4 = None
+
+
+def _scale_csv():
+    """Lazily load results/coherence_four_metrics.csv — only needed for `model:` baselines.
+    Suites whose baselines are all `edges:` never touch it."""
+    global _SCALE4
+    if _SCALE4 is None:
+        p = REPO / "results/coherence_four_metrics.csv"
+        if not p.exists():
+            raise FileNotFoundError(
+                f"{p} not found — it is needed for `model:` baselines. Either run "
+                "scripts/build_four_metrics.py to (re)generate it, or specify the baseline as "
+                "`{edges: ..., params_b: ...}` instead of `{model: ...}`.")
+        _SCALE4 = pd.read_csv(p).set_index("model")
+    return _SCALE4
 
 
 def scale_row(model, role, params_b=None):
-    r = SCALE4.loc[model]
+    """A baseline/base row read from the benchmark CSV (params_b defaults to the CSV value)."""
+    df = _scale_csv()
+    if model not in df.index:
+        raise KeyError(f"'{model}' not in coherence_four_metrics.csv. Add it via "
+                       "build_four_metrics.py, or specify this baseline as `edges:` instead.")
+    r = df.loc[model]
     pb = float(r["params_b"]) if params_b is None else float(params_b)
     return {"role": role, "params_b": pb, "code": None, "name": None,
             **{m: float(r[m]) for m in METRICS}}
 
 
 def edge_row(path, role, params_b=None, code=None, name=None):
+    """A baseline/base/fine-tune row computed straight from a raw edges.jsonl (memoised)."""
     m = metrics_cached(path)
     return {"role": role, "params_b": params_b, "code": code, "name": name,
             **{k: float(m[k]) for k in METRICS}}
 
 
 def suite_rows(suite):
-    rows = [scale_row(b["model"], "smaller baseline") for b in suite.get("smaller_baselines", [])]
-    if "base" in suite:                       # base from raw edges (size given in the YAML)
-        rows.append(edge_row(REPO / suite["base"]["edges"], "base",
-                             params_b=suite["base"]["params_b"]))
-    if "base_from_csv" in suite:              # base = comparable instruct model from the scale series
-        rows.append(scale_row(suite["base_from_csv"]["model"], "base"))
+    """Build the bar rows for one suite. Baselines (CSV or edges, optionally `base: true`) come
+    first, then the fine-tune variants."""
+    rows = []
+    for b in suite["baselines"]:
+        role = "base" if b.get("base") else "baseline"
+        if "model" in b:
+            rows.append(scale_row(b["model"], role, params_b=b.get("params_b")))
+        else:
+            rows.append(edge_row(REPO / b["edges"], role, params_b=b["params_b"], name=b.get("name")))
     for v in suite["variants"]:
         rows.append(edge_row(REPO / v["edges"], "fine-tune", code=v["code"], name=v["name"]))
     return pd.DataFrame(rows)
 
 
 def plot_bars(df, title, fname, series):
-    base_part = df[df.role.isin(["smaller baseline", "base"])].sort_values("params_b")
+    base_part = df[df.role.isin(["baseline", "base"])].sort_values("params_b")
     ft_part = df[df.role == "fine-tune"].sort_values("code")
     df = pd.concat([base_part, ft_part]).reset_index(drop=True)
 
@@ -76,7 +105,7 @@ def plot_bars(df, title, fname, series):
     colors, hatches, xlabels = [], [], []
     gi = ki = 0
     for _, r in df.iterrows():
-        if r.role in ("smaller baseline", "base"):
+        if r.role in ("baseline", "base"):
             colors.append(str(round(float(greys[gi]), 3))); gi += 1
             hatches.append("////" if r.role == "base" else "")
             xlabels.append(f"{r.params_b:g}B")

@@ -21,8 +21,9 @@ uv sync --extra dev     # + pytest
 uv run pytest -q        # CPU-testable suite (fit/panel/sampling/oracle/questions)
 ```
 
-For gated/local models authenticate first: `huggingface-cli login`. For the OpenAI backend
-set `OPENAI_API_KEY` (use a `.gitignored` `.env`).
+For gated/local models authenticate first: `huggingface-cli login`. For the API backends put
+`OPENAI_API_KEY` / `ANTHROPIC_API_KEY` in a gitignored `.env` at the repo root —
+`run_elicitation.py` auto-loads it.
 
 ## How it works
 
@@ -66,13 +67,18 @@ uv run python scripts/run_elicitation.py \
 # OpenAI API, sampling mode (for models that block logprobs, e.g. gpt-5.x)
 uv run python scripts/run_elicitation.py \
   --backend openai --model-id gpt-5-nano --name gpt-5-nano --mode sample --samples 5
+
+# Anthropic API (Claude) — sample mode only (no logprobs); a forced "<answer>" assistant-prefill
+# makes Claude commit to A/B instead of refusing/prefacing on neutral pairs
+uv run python scripts/run_elicitation.py \
+  --backend anthropic --model-id claude-haiku-4-5 --name claude-haiku --samples 3
 ```
 
 ### Key flags
 
 | Flag | Default | Meaning |
 |------|---------|---------|
-| `--backend` | (required) | `local` (GPU logits) or `openai` (API) |
+| `--backend` | (required) | `local` (GPU logits), `openai`, or `anthropic` (API; sample-only) |
 | `--model-id` | (required) | HF id (local) or OpenAI model id |
 | `--name` | (required) | output subfolder under `--out-root` |
 | `--items-path` | `config/items_500.yaml` | YAML `items:` list of concepts |
@@ -123,6 +129,92 @@ finite-N-sampling vs exact-logit information difference shows up as **bootstrap 
 not as a hidden bias. Lean cross-method conclusions on the structural metrics
 (transitivity, fit), which are most channel-robust; treat decisiveness gaps as real only
 when CIs separate.
+
+## Capability vs coherence — reproducing the figures
+
+The headline study plots the coherence metrics against a **capability index** across model
+families; the same panel shape is reused for model-organism (fine-tune) **suites** as bar charts.
+Everything here is driven by `config/plots.yaml`, so a teammate with their own run tarballs can
+reproduce the plot style on their own models without editing Python.
+
+### The five metrics the figures use
+
+Recomputed from `edges.jsonl` by `scripts/four_metrics.py` (memoised in
+`results/.metrics_cache.csv`):
+
+- **`decis_mu`** — μ-decisiveness, the **headline**: `mean|2Φ−1|` over the fitted Case-V matrix
+  (preference strength). It pools every comparison, so it is the most stable metric and tracks
+  capability best.
+- four **agreement-probability probes**, each a model-free deviation detector read against a
+  chance floor: **`p_self`** (repeat self-agreement, floor 0.5), **`p_reversal`** (A,B vs B,A
+  order, 0.5), **`p_acyclic`** (transitivity / no 3-cycles, 0.75), **`p_crossq`** (cross-question
+  framing, 0.5).
+
+These are unbiased across elicitation modes — sample-mode (N draws) recovers the same values as
+exact logit-mode. `scripts/debug_sample_vs_logit.py` proves it: it resamples a logit run as
+Binomial(N=3), refits, and recovers `decis_mu` to ±0.001 (run it for the paired-bar debug figure).
+
+### Pipeline
+
+```
+edges.jsonl ──────────> build_four_metrics.py ─────> results/coherence_four_metrics.csv
+published benchmarks ─> build_model_benchmarks.py ─> fit_eci_scores.py ─> results/eci_scores.csv ┘
+                                                          │  (capability index, joined in by build_four_metrics)
+                                  plot_headline.py        │  cross-family scatter  (x = capability index)
+                                  plot_finetune_bars.py   ┘  per-suite bar charts        ← config/plots.yaml
+```
+
+The **capability index** (headline x-axis) is an ECI-style placement: published benchmark scores
+(`build_model_benchmarks.py`) are fit against Epoch's fixed per-benchmark difficulties
+(`fit_eci_scores.py`, `data/eci/`) to give one capability number per model. Reasoning models
+benchmarked with thinking ON but elicited with reasoning OFF are placed by their thinking-ON
+scores — a documented caveat (within-generation ordering stays robust).
+
+Regenerate the headline (cross-family scatter):
+
+```bash
+uv run python scripts/build_model_benchmarks.py   # published scores -> results/model_benchmarks.csv
+uv run python scripts/fit_eci_scores.py           # -> results/eci_scores.csv (capability index)
+uv run python scripts/build_four_metrics.py       # -> results/coherence_four_metrics.csv
+uv run python scripts/plot_headline.py            # -> results/plots/headline_decisiveness.{pdf,png}
+```
+
+> **Config-driven vs hardcoded:** suite **bar charts** are fully config-driven (`plots.yaml` +
+> edges, below). The headline **scatter** is *our* cross-family study, so its model registry
+> (which runs/benchmarks to include) lives in the bodies of `build_model_benchmarks.py` and
+> `build_four_metrics.py` — add your models there to put them on the capability axis.
+
+### Define your own suite
+
+Suite bar charts need **only edges** — no benchmark CSV. Add a block under `suites:` in
+`config/plots.yaml`:
+
+```yaml
+  - key: mysuite
+    title: "My fine-tunes (Qwen2.5-32B)"
+    fname: mysuite_finetune_bars          # output -> results/plots/mysuite_finetune_bars.{pdf,png}
+    series: "Qwen 2.5"                    # legend label for the grey baseline series
+    baselines:                            # grey reference series, auto-sorted by size
+      - {model: qwen2.5-7b-instruct}                           # reuse a benchmarked model (from the CSV)…
+      - {edges: runs/mine/qwen14b/edges.jsonl, params_b: 14}   # …or point at your own elicited run
+      - {edges: runs/mine/base32b/edges.jsonl, params_b: 32, base: true}  # the fine-tune base: hatched + dashed line
+    variants:                             # your fine-tunes (each gets a 1–2 letter code)
+      - {edges: runs/mine/ft_helpful/edges.jsonl, code: He, name: "Helpful"}
+      - {edges: runs/mine/ft_terse/edges.jsonl,   code: Te, name: "Terse"}
+```
+
+Each `baselines` entry is `{model: <name in coherence_four_metrics.csv>}` **or**
+`{edges: <path>, params_b: <size>}`; flag the fine-tune's starting checkpoint with `base: true`
+(it is hatched and drawn as a dashed reference line across every panel). Then:
+
+```bash
+uv run python scripts/plot_finetune_bars.py    # regenerates every suite in plots.yaml
+```
+
+So the full workflow for your own model organisms: elicit the base + each fine-tune (+ any
+baselines) with `run_elicitation.py` to get their `edges.jsonl`, point a `suites:` block at those
+paths, and run `plot_finetune_bars.py` — you get the same μ-decisiveness + 4-probe panel as the
+headline, drawn as bars against the baseline series.
 
 ## Aggregate across runs
 

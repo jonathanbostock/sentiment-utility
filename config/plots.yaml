@@ -42,20 +42,24 @@ headline:
     - family: "GPT-OSS-120B (budget)"
       size_label: "120B"
 
-# Suites: baselines are the same model series at increasing size (x-label = size in B, coloured
-# light→dark greys); the fine-tune base is hatched; fine-tunes get short codes (x-label) decoded
-# in the legend as "code = name". `series` names the grey baseline series in the legend.
+# Suites (model-organism bar charts). Each suite's `baselines` form the grey reference series
+# (sorted by size, coloured light→dark small→big). Each baseline is EITHER
+#   {model: <name in results/coherence_four_metrics.csv>}     # reuse a benchmarked model
+#   {edges: <path to edges.jsonl>, params_b: <size in B>}     # compute from your own run
+# Mark the fine-tune's starting point with `base: true` — it is hatched and drawn as a dashed
+# reference line across every panel. `variants` are the fine-tunes (each an edges.jsonl + a 1–2
+# letter `code` decoded in the legend as "code = name"). `series` names the grey series in the
+# legend. Because baselines may be raw edges, a suite needs NO benchmark CSV — point it straight
+# at your own tarballs. See the README's "Define your own suite" for a walkthrough.
 suites:
   - key: oct
     title: "OCT persona fine-tunes (Llama-3.1-8B)"
     fname: oct_finetune_bars
     series: "Llama 3.x"
-    smaller_baselines:
-      - model: llama-3.2-1b-instruct
-      - model: llama-3.2-3b-instruct
-    base:
-      edges: runs/oct2k/base/edges.jsonl
-      params_b: 8
+    baselines:
+      - {model: llama-3.2-1b-instruct}
+      - {model: llama-3.2-3b-instruct}
+      - {edges: runs/oct2k/base/edges.jsonl, params_b: 8, base: true}
     variants:
       - {edges: runs/oct2k/goodness/edges.jsonl,      code: Gd, name: "Goodness"}
       - {edges: runs/oct2k/humor/edges.jsonl,         code: Hu, name: "Humor"}
@@ -69,16 +73,14 @@ suites:
       - {edges: runs/oct2k/sycophancy/edges.jsonl,    code: Sy, name: "Sycophancy"}
 
   - key: auditbench
-    title: "AuditBench KTO (Llama-3.3-70B; 3 variants)"
+    title: "AuditBench KTO (Llama-3.3-70B; 2 variants)"
     fname: auditbench_finetune_bars
     series: "Llama 3.x"
-    smaller_baselines:
-      - model: llama-3.2-1b-instruct
-      - model: llama-3.2-3b-instruct
-      - model: llama-3.1-8b-instruct
-    base:
-      edges: runs/audit70/base/edges.jsonl
-      params_b: 70
+    baselines:
+      - {model: llama-3.2-1b-instruct}
+      - {model: llama-3.2-3b-instruct}
+      - {model: llama-3.1-8b-instruct}
+      - {edges: runs/audit70/base/edges.jsonl, params_b: 70, base: true}
     variants:
       - {edges: runs/audit70/animal_welfare/edges.jsonl,     code: AW, name: "Animal welfare"}
       - {edges: runs/audit70/anti_ai_regulation/edges.jsonl, code: AR, name: "Anti-AI regulation"}
@@ -87,11 +89,10 @@ suites:
     title: "Alamerton gen-9 vs Qwen2.5-32B-Instruct"
     fname: alamerton_finetune_bars
     series: "Qwen 2.5"
-    smaller_baselines:
-      - model: qwen2.5-3b-instruct
-      - model: qwen2.5-7b-instruct
-      - model: qwen2.5-14b-instruct
-    base_from_csv:
-      model: qwen2.5-32b-instruct
+    baselines:
+      - {model: qwen2.5-3b-instruct}
+      - {model: qwen2.5-7b-instruct}
+      - {model: qwen2.5-14b-instruct}
+      - {model: qwen2.5-32b-instruct, base: true}
     variants:
       - {edges: runs/alamerton32b/12-mar-gen9-32b/edges.jsonl, code: G9, name: "Gen-9"}
