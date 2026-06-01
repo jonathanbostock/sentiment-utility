@@ -6,9 +6,12 @@ from .prompts import ASSISTANT_PREFIX, build_prompt, parse_answer
 
 
 def load_model(model_id: str, dtype: str = "bfloat16", revision: str | None = None,
-               load_in_4bit: bool = False):
+               load_in_4bit: bool = False, load_in_8bit: bool = False):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    if load_in_4bit and load_in_8bit:
+        raise ValueError("pass at most one of load_in_4bit / load_in_8bit")
 
     tok_kwargs = {"revision": revision} if revision else {}
     tok = AutoTokenizer.from_pretrained(model_id, **tok_kwargs)
@@ -17,7 +20,10 @@ def load_model(model_id: str, dtype: str = "bfloat16", revision: str | None = No
         tok.pad_token = tok.eos_token
 
     torch_dtype = getattr(torch, dtype)
-    kwargs = {"torch_dtype": torch_dtype, "device_map": "cuda"}
+    # device_map="auto" lets accelerate shard a model that doesn't fit one GPU across all
+    # visible GPUs (e.g. bf16 70B/72B ~140GB across 2x H100-80GB). On a single GPU it places
+    # everything on cuda:0 — numerically identical, so safe as the default for every size.
+    kwargs = {"torch_dtype": torch_dtype, "device_map": "auto"}
     if revision:
         kwargs["revision"] = revision
     if load_in_4bit:
@@ -28,6 +34,12 @@ def load_model(model_id: str, dtype: str = "bfloat16", revision: str | None = No
         )
         # device_map="auto" lets accelerate split if needed (single A100 should fit a
         # 70B model in 4-bit ~40GB easily)
+        kwargs["device_map"] = "auto"
+    elif load_in_8bit:
+        # LLM.int8() weight quantization (bitsandbytes). ~70GB for a 70B model — fits 1x H100
+        # or shards across 2. compute stays in torch_dtype for the outlier path.
+        from transformers import BitsAndBytesConfig
+        kwargs["quantization_config"] = BitsAndBytesConfig(load_in_8bit=True)
         kwargs["device_map"] = "auto"
     try:
         model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs)

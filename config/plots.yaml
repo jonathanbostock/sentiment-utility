@@ -1,0 +1,98 @@
+x_axis:
+  col: eci
+  label: "capability index"
+
+headline_metric: decis_mu
+probes:
+  - p_self
+  - p_reversal
+  - p_acyclic
+  - p_crossq
+
+metrics:
+  decis_mu:
+    label: "μ-decisiveness  ·  fitted preference strength"
+    floor: 0.0
+    ylabel: "mean |2Φ−1|  over fitted Case-V matrix"
+    ylim: [0.0, 0.9]
+    headline_word: "μ-decisiveness"
+  p_self:
+    label: "P(repeat)  ·  self-agreement"
+    floor: 0.5
+  p_reversal:
+    label: "P(agree | A,B vs B,A)  ·  order"
+    floor: 0.5
+  p_acyclic:
+    label: "P(no cycle)  ·  transitivity"
+    floor: 0.75
+  p_crossq:
+    label: "P(agree | Qᵢ vs Qⱼ)  ·  framing"
+    floor: 0.5
+
+headline:
+  fname: headline_decisiveness
+  families:
+    - Gemma
+    - Qwen
+    - Llama
+    - GPT-4.1
+  budget_series:
+    - family: "GPT-OSS-20B (budget)"
+      size_label: "20B"
+    - family: "GPT-OSS-120B (budget)"
+      size_label: "120B"
+
+# Suites (model-organism bar charts). Each suite's `baselines` form the grey reference series
+# (sorted by size, coloured light→dark small→big). Each baseline is EITHER
+#   {model: <name in results/coherence_four_metrics.csv>}     # reuse a benchmarked model
+#   {edges: <path to edges.jsonl>, params_b: <size in B>}     # compute from your own run
+# Mark the fine-tune's starting point with `base: true` — it is hatched and drawn as a dashed
+# reference line across every panel. `variants` are the fine-tunes (each an edges.jsonl + a 1–2
+# letter `code` decoded in the legend as "code = name"). `series` names the grey series in the
+# legend. Because baselines may be raw edges, a suite needs NO benchmark CSV — point it straight
+# at your own tarballs. See the README's "Define your own suite" for a walkthrough.
+suites:
+  - key: oct
+    title: "OCT persona fine-tunes (Llama-3.1-8B)"
+    fname: oct_finetune_bars
+    series: "Llama 3.x"
+    baselines:
+      - {model: llama-3.2-1b-instruct}
+      - {model: llama-3.2-3b-instruct}
+      - {edges: runs/oct2k/base/edges.jsonl, params_b: 8, base: true}
+    variants:
+      - {edges: runs/oct2k/goodness/edges.jsonl,      code: Gd, name: "Goodness"}
+      - {edges: runs/oct2k/humor/edges.jsonl,         code: Hu, name: "Humor"}
+      - {edges: runs/oct2k/impulsiveness/edges.jsonl, code: Im, name: "Impulsiveness"}
+      - {edges: runs/oct2k/loving/edges.jsonl,        code: Lv, name: "Loving"}
+      - {edges: runs/oct2k/mathematical/edges.jsonl,  code: Ma, name: "Mathematical"}
+      - {edges: runs/oct2k/nonchalance/edges.jsonl,   code: Nc, name: "Nonchalance"}
+      - {edges: runs/oct2k/poeticism/edges.jsonl,     code: Po, name: "Poeticism"}
+      - {edges: runs/oct2k/remorse/edges.jsonl,       code: Re, name: "Remorse"}
+      - {edges: runs/oct2k/sarcasm/edges.jsonl,       code: Sa, name: "Sarcasm"}
+      - {edges: runs/oct2k/sycophancy/edges.jsonl,    code: Sy, name: "Sycophancy"}
+
+  - key: auditbench
+    title: "AuditBench KTO (Llama-3.3-70B; 2 variants)"
+    fname: auditbench_finetune_bars
+    series: "Llama 3.x"
+    baselines:
+      - {model: llama-3.2-1b-instruct}
+      - {model: llama-3.2-3b-instruct}
+      - {model: llama-3.1-8b-instruct}
+      - {edges: runs/audit70/base/edges.jsonl, params_b: 70, base: true}
+    variants:
+      - {edges: runs/audit70/animal_welfare/edges.jsonl,     code: AW, name: "Animal welfare"}
+      - {edges: runs/audit70/anti_ai_regulation/edges.jsonl, code: AR, name: "Anti-AI regulation"}
+
+  - key: alamerton
+    title: "Alamerton gen-9 vs Qwen2.5-32B-Instruct"
+    fname: alamerton_finetune_bars
+    series: "Qwen 2.5"
+    baselines:
+      - {model: qwen2.5-3b-instruct}
+      - {model: qwen2.5-7b-instruct}
+      - {model: qwen2.5-14b-instruct}
+      - {model: qwen2.5-32b-instruct, base: true}
+    variants:
+      - {edges: runs/alamerton32b/12-mar-gen9-32b/edges.jsonl, code: G9, name: "Gen-9"}

@@ -1,0 +1,4 @@
+reasoning_effort,decisiveness,decisiveness_raw,transitivity_fas,transitivity_triad,order_consistency,q_agreement,unidim_fit_log_loss,mu_std_diagnostic
+low,0.5939,0.6438,0.8805,0.8373,0.7296,0.7886,0.5912,1.3615
+medium,0.7696,0.7058,0.9457,0.8384,0.8695,0.8202,0.6977,2.6621
+high,0.7985,0.7181,0.9571,0.8451,0.8806,0.8366,0.8197,3.0959

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import numpy as np
 
 from .fit import predict_matrix_caseV
@@ -71,6 +72,39 @@ def unidim_fit(mu, held_rows) -> dict:
     }
 
 
+def unidim_r2(mu, rows) -> float:
+    """Deviance R² — goodness-of-fit of the single-latent-dimension (Case-V) model, decoupled
+    from decisiveness. Fraction of the *explainable* preference signal that one μ axis captures:
+
+        R² = (log2 − CE_fit) / (log2 − H)
+           = 1 − KL(observed ‖ model) / (log2 − H)
+
+    where per edge CE_fit = −p logP̂ −(1−p)log(1−P̂) is the model's cross-entropy against the
+    observed choice prob p, H = −p log p −(1−p)log(1−p) is the binary entropy of the observed
+    prob (the SATURATED model — irreducible), and log2 is the indifferent-model cross-entropy.
+
+    =1 when the 1-D model reproduces the data exactly; =0 when no better than chance; <0 worse.
+    The denominator (log2 − H) is the explainable signal, so decisiveness cancels: a weakly- and a
+    strongly-decisive model that are both perfectly 1-D both score ≈1; a decisive-but-multidimensional
+    model scores low. Exact for logprob edges (p is the true choice prob, no sampling noise — and the
+    MLE minimizes CE_fit, so this is the residual after the best possible 1-D fit). For sample-mode p̂
+    is noisy so H is slightly underestimated (mild upward R² bias at small N)."""
+    P = predict_matrix_caseV(mu)
+    LOG2 = math.log(2.0)
+    ce, h = [], []
+    for r in rows:
+        p = float(np.clip(r["p_util"], 1e-12, 1 - 1e-12))
+        phat = float(np.clip(P[r["i"], r["j"]], 1e-12, 1 - 1e-12))
+        ce.append(-(p * math.log(phat) + (1 - p) * math.log(1 - phat)))
+        h.append(-(p * math.log(p) + (1 - p) * math.log(1 - p)))
+    if not ce:
+        return float("nan")
+    denom = LOG2 - float(np.mean(h))
+    if denom <= 1e-6:                      # ~no signal to explain → R² ill-defined
+        return float("nan")
+    return float((LOG2 - float(np.mean(ce))) / denom)
+
+
 def reliability(reverse_pairs) -> dict:
     """reverse_pairs: list of {p_fwd, p_rev} where p_fwd=P(pick i|i first),
     p_rev=P(pick i|i second). order_consistency=1-mean|p_fwd+p_rev-1|,
@@ -84,14 +118,28 @@ def reliability(reverse_pairs) -> dict:
 
 def question_robustness(cross_pairs) -> dict:
     """cross_pairs: list of {p_util_a, p_util_b} for the same item pair under two
-    questions (both oriented to P(item_i > item_j))."""
+    questions (both oriented to P(item_i > item_j)).
+
+    q_agreement is the Pearson correlation of the two framings' p_util across pairs.
+    This is the DECISIVENESS-ROBUST form: the older 1-mean|a-b| version is mechanically
+    inflated for near-indifferent models (a,b both ~0.5 -> tiny |a-b| -> looks "consistent"),
+    giving a spurious -0.8 correlation with decisiveness across models; the correlation form
+    normalizes each model by its own variance and drops that confound to ~-0.1.
+    (Cross-framing disagreement scales with opinion strength, so variance-normalization is the
+    right fix here -- unlike order_consistency, where position bias is an additive offset that
+    is already decisiveness-independent, so its 1-mean|.| form is kept.)
+    q_agreement_absdiff (old metric) and q_sign_agreement are retained as diagnostics."""
     if not cross_pairs:
-        return {"q_agreement": float("nan"), "q_sign_agreement": float("nan")}
+        return {"q_agreement": float("nan"), "q_agreement_absdiff": float("nan"),
+                "q_sign_agreement": float("nan")}
     a = np.array([p["p_util_a"] for p in cross_pairs])
     b = np.array([p["p_util_b"] for p in cross_pairs])
-    agree = 1.0 - np.mean(np.abs(a - b))
+    absdiff = 1.0 - np.mean(np.abs(a - b))
     sign = np.mean(np.sign(a - 0.5) == np.sign(b - 0.5))
-    return {"q_agreement": float(agree), "q_sign_agreement": float(sign)}
+    corr = (float(np.corrcoef(a, b)[0, 1])
+            if a.std() > 1e-9 and b.std() > 1e-9 else float("nan"))
+    return {"q_agreement": corr, "q_agreement_absdiff": float(absdiff),
+            "q_sign_agreement": float(sign)}
 
 
 from .fit import fit_caseV_mle, bootstrap_measurement, bootstrap_items
@@ -192,9 +240,15 @@ def compute_panel(edges_by_phase, n, bootstrap=False, B=200, seed=0, fit_steps=2
                                   "meas_ci": meas_raw(rev, lambda r: reliability(r)["order_consistency"]),
                                   "gen_ci": _nan_ci()}
     cross = edges_by_phase.get("cross", [])
-    panel["q_agreement"] = {"point": question_robustness(cross)["q_agreement"],
+    qr = question_robustness(cross)
+    panel["q_agreement"] = {"point": qr["q_agreement"],
                             "meas_ci": meas_raw(cross, lambda r: question_robustness(r)["q_agreement"]),
                             "gen_ci": _nan_ci()}
+    # diagnostics: old decisiveness-confounded abs-diff form + sign agreement
+    panel["q_agreement_absdiff"] = {"point": qr["q_agreement_absdiff"],
+                                    "meas_ci": _nan_ci(), "gen_ci": _nan_ci()}
+    panel["q_sign_agreement"] = {"point": qr["q_sign_agreement"],
+                                 "meas_ci": _nan_ci(), "gen_ci": _nan_ci()}
     panel["mu_std_diagnostic"] = {"point": float(np.std(mu)),
                                   "meas_ci": _nan_ci(), "gen_ci": _nan_ci()}
     return panel

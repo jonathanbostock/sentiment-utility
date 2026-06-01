@@ -101,9 +101,16 @@ class LocalLogitOracle:
 
 import asyncio
 import math
+import re
 import time
 
 import numpy as np
+
+
+def _clean(token: str) -> str:
+    """Reduce a logprob token to its alphanumeric core, lowercased, so fused answer tokens
+    like '>A' / ' A' / 'A</' all match the surface form 'a' (while 'answer' stays 'answer')."""
+    return re.sub(r"[^a-z0-9]+", "", token.lower())
 
 
 def p_a_from_logprobs(top_logprobs, question) -> float:
@@ -112,7 +119,7 @@ def p_a_from_logprobs(top_logprobs, question) -> float:
     b_forms = {f.lower() for f in question.answers["B"]}
     lpA = lpB = -math.inf
     for t in top_logprobs:
-        tok = t["token"].strip().lower()
+        tok = _clean(t["token"])
         if tok in a_forms:
             lpA = max(lpA, t["lp"])
         elif tok in b_forms:
@@ -141,7 +148,7 @@ def _lp_of(top_logprobs, question, label):
     forms = {f.lower() for f in question.answers[label]}
     best = None
     for t in top_logprobs:
-        if t["token"].strip().lower() in forms:
+        if _clean(t["token"]) in forms:
             best = t["lp"] if best is None else max(best, t["lp"])
     return best
 
@@ -189,8 +196,13 @@ class OpenAIOracle:
             BadRequestError, InternalServerError, NotFoundError,
             PermissionDeniedError, RateLimitError,
         )
-        TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError, NotFoundError)
-        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError, APIError)
+        # NOTE: NotFoundError (404) is treated as RETRIABLE, not terminal. When serving
+        # through the RunPod HTTP proxy, transient 404s occur under concurrency even though
+        # the endpoint/model is valid (verified by the smoke test) and most calls return 200.
+        # A genuinely-wrong model/endpoint still fails, just after exhausting `self.retries`.
+        TERMINAL = (BadRequestError, AuthenticationError, PermissionDeniedError)
+        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError,
+                     NotFoundError, APIError)
         for attempt in range(self.retries):
             try:
                 return await coro_factory()
@@ -212,13 +224,24 @@ class OpenAIOracle:
                     wait = min(60.0, 2.0 ** attempt) + np.random.rand()
                 await asyncio.sleep(wait)
 
-    async def _call_logprobs(self, prompt):
+    async def _call_logprobs(self, prompt, question):
+        # The model wraps its answer ("<answer>A</answer>"), so the FIRST token is the tag, not
+        # the A/B letter, and OpenAI does not honour assistant-prefill (a trailing assistant
+        # "<answer>" just makes it re-emit "<" fresh). So generate a few tokens and read the
+        # logprobs AT the answer-letter position (the letter is often fused, e.g. ">A").
+        a_forms = {f.lower() for f in question.answers["A"]}
+        b_forms = {f.lower() for f in question.answers["B"]}
+
         async def _do():
             r = await self._client.chat.completions.create(
                 model=self.model, messages=[{"role": "user", "content": prompt}],
-                max_completion_tokens=1, logprobs=True, top_logprobs=20,
+                max_completion_tokens=12, logprobs=True, top_logprobs=20,
             )
-            tops = r.choices[0].logprobs.content[0].top_logprobs
+            content = r.choices[0].logprobs.content or []
+            chosen = next((c for c in content
+                           if _clean(c.token) in a_forms or _clean(c.token) in b_forms),
+                          content[0] if content else None)
+            tops = chosen.top_logprobs if chosen is not None else []
             return [{"token": t.token, "lp": t.logprob} for t in tops]
         return await self._retry(_do)
 
@@ -251,7 +274,7 @@ class OpenAIOracle:
         prompt = c.question.render(a_item, b_item)
         async with sem:
             if self.mode == "logprob":
-                tops = await self._call_logprobs(prompt)
+                tops = await self._call_logprobs(prompt, c.question)
                 p_a = p_a_from_logprobs(tops, c.question)
                 raw = {"p_a": p_a,
                        "lpA": _lp_of(tops, c.question, "A"), "lpB": _lp_of(tops, c.question, "B")}
@@ -269,6 +292,106 @@ class OpenAIOracle:
         p_util = p_util_from_pick(p_a, c.slot_a, c.question)
         return EdgeObservation(
             i=c.i, j=c.j, p_util=p_util, mode=mode, question_id=c.question.id,
+            valence=c.question.valence, slot_a=c.slot_a, phase=c.phase,
+            round=c.round, rank_distance=c.rank_distance, raw=raw)
+
+
+# ---------------------------------------------------------------------------
+# AnthropicOracle — realtime async sample backend
+# ---------------------------------------------------------------------------
+
+class AnthropicOracle:
+    """Realtime async Anthropic backend. Sample mode only; Claude has no logprobs."""
+
+    def __init__(self, model, n_samples=3, concurrency=12, calls_log=None,
+                 max_tokens=16, retries=8):
+        from anthropic import AsyncAnthropic
+        self.model = model
+        self.n_samples = n_samples
+        self.calls_log = calls_log
+        self.max_tokens = max_tokens
+        self.retries = retries
+        self._concurrency = concurrency
+        self._client = AsyncAnthropic()
+
+    def compare(self, comparisons):
+        return asyncio.run(self._compare_async(comparisons))
+
+    async def _compare_async(self, comparisons):
+        sem = asyncio.Semaphore(self._concurrency)
+        return await asyncio.gather(*[self._one(c, sem) for c in comparisons])
+
+    async def _retry(self, coro_factory):
+        from anthropic import (
+            APIConnectionError, APIError, APIStatusError, APITimeoutError,
+            RateLimitError,
+        )
+        RETRIABLE = (RateLimitError, APIConnectionError, APITimeoutError)
+        for attempt in range(self.retries):
+            try:
+                return await coro_factory()
+            except RETRIABLE as exc:
+                if attempt == self.retries - 1:
+                    raise
+                wait = self._retry_wait(exc, attempt)
+                await asyncio.sleep(wait)
+            except (APIStatusError, APIError) as exc:
+                status_code = getattr(exc, "status_code", None)
+                if status_code is None:
+                    resp_obj = getattr(exc, "response", None)
+                    status_code = getattr(resp_obj, "status_code", None)
+                if status_code is not None and 400 <= status_code < 500:
+                    raise
+                if attempt == self.retries - 1:
+                    raise
+                wait = self._retry_wait(exc, attempt)
+                await asyncio.sleep(wait)
+
+    @staticmethod
+    def _retry_wait(exc, attempt):
+        resp_obj = getattr(exc, "response", None)
+        if resp_obj is not None:
+            headers = getattr(resp_obj, "headers", {})
+            ra = headers.get("retry-after") or headers.get("Retry-After")
+            if ra:
+                try:
+                    return float(ra)
+                except Exception:
+                    pass
+        return min(60.0, 2.0 ** attempt) + np.random.rand()
+
+    async def _call(self, prompt, assistant_prefix):
+        async def _do():
+            r = await self._client.messages.create(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                messages=[
+                    {"role": "user", "content": prompt},
+                    {"role": "assistant", "content": assistant_prefix},
+                ],
+            )
+            return r.content[0].text if r.content else ""
+        return await self._retry(_do)
+
+    async def _one(self, c, sem):
+        a_item = c.item_i if c.slot_a == "i" else c.item_j
+        b_item = c.item_j if c.slot_a == "i" else c.item_i
+        prompt = c.question.render(a_item, b_item)
+        async with sem:
+            texts = []
+            for _ in range(self.n_samples):
+                texts.append(await self._call(prompt, c.question.assistant_prefix))
+            parsed = [c.question.parse(t) if t else None for t in texts]
+            p_a, a_cnt, b_cnt = p_a_from_picks(parsed)
+            wins_i, wins_j = _wins_to_items(a_cnt, b_cnt, c.slot_a, c.question.valence)
+            raw = {"p_a": p_a, "wins_i": wins_i, "wins_j": wins_j,
+                   "n_samples": self.n_samples}
+        if self.calls_log is not None:
+            self.calls_log.write({"ts": time.time(), "i": c.i, "j": c.j, "mode": "sample",
+                                  "question_id": c.question.id, "raw": raw})
+        p_util = p_util_from_pick(p_a, c.slot_a, c.question)
+        return EdgeObservation(
+            i=c.i, j=c.j, p_util=p_util, mode="sample", question_id=c.question.id,
             valence=c.question.valence, slot_a=c.slot_a, phase=c.phase,
             round=c.round, rank_distance=c.rank_distance, raw=raw)
 

@@ -23,7 +23,7 @@ def _obs_to_row(o, items):
 
 
 def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=0,
-                    bootstrap=False, bootstrap_B=200):
+                    bootstrap=False, bootstrap_B=200, run_config=None):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     edges_log = JsonlAppender(out_dir / "edges.jsonl")
@@ -69,6 +69,7 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
     (out_dir / "metrics.json").write_text(json.dumps(jsonable({
         "commit": git_commit(), "n_items": n,
         "n_elo": len(elo_obs), "n_extra": len(extra),
+        **(run_config or {}),
     }), indent=2))
     return panel
 
@@ -108,23 +109,48 @@ def _build_oracle(args, items, questions, out_dir):
         from sentiment_utility.elicit import load_model
         from sentiment_utility.oracle import LocalLogitOracle
         tok, model = load_model(args.model_id, revision=args.revision,
-                                load_in_4bit=args.load_in_4bit)
+                                load_in_4bit=args.load_in_4bit,
+                                load_in_8bit=args.load_in_8bit)
+        if args.chat_template_from == "none":
+            # Force the raw 'User:/Assistant:' fallback even if the tokenizer ships a chat
+            # template — used to isolate prompt-format vs weights (e.g. eliciting an Instruct
+            # model in the same raw format its base checkpoint gets).
+            tok.chat_template = None
+            print("[chat-template] forced OFF (raw User:/Assistant: fallback)")
+        elif args.chat_template_from:
+            # Some finetunes are trained in a chat format (e.g. ChatML) but ship a
+            # tokenizer with NO chat_template, so apply_chat_template falls back to a
+            # raw 'User:/Assistant:' prompt — off-distribution and decisiveness-deflating.
+            # Borrow a known-good template from a sibling model (same tokenizer family).
+            from transformers import AutoTokenizer
+            src = AutoTokenizer.from_pretrained(args.chat_template_from)
+            tok.chat_template = src.chat_template
+            print(f"[chat-template] borrowed from {args.chat_template_from} "
+                  f"(present={bool(tok.chat_template)})")
         if args.adapter_repo:
             from peft import PeftModel
             model = PeftModel.from_pretrained(model, args.adapter_repo,
                                               subfolder=args.adapter_subfolder)
             model.eval()
         return LocalLogitOracle(tok, model, batch_size=args.batch_size)
-    from sentiment_utility.oracle import OpenAIOracle
     calls_log = JsonlAppender(out_dir / "calls.jsonl")
+    if args.backend == "anthropic":
+        from sentiment_utility.oracle import AnthropicOracle
+        return AnthropicOracle(args.model_id, n_samples=args.samples,
+                               concurrency=args.concurrency, calls_log=calls_log,
+                               max_tokens=args.max_tokens)
+    from sentiment_utility.oracle import OpenAIOracle
     return OpenAIOracle(args.model_id, mode=args.mode, n_samples=args.samples,
                         concurrency=args.concurrency, calls_log=calls_log,
-                        reasoning_effort=args.reasoning_effort)
+                        reasoning_effort=args.reasoning_effort, max_tokens=args.max_tokens)
 
 
 def main():
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
     ap = argparse.ArgumentParser()
-    ap.add_argument("--backend", choices=["local", "openai"], required=True)
+    ap.add_argument("--backend", choices=["local", "openai", "anthropic"], required=True)
     ap.add_argument("--model-id", required=True)
     ap.add_argument("--name", required=True)
     ap.add_argument("--items-path", default="config/items_500.yaml")
@@ -135,6 +161,10 @@ def main():
     ap.add_argument("--api-exec", choices=["realtime", "batch", "auto"], default="auto")
     ap.add_argument("--concurrency", type=int, default=40)
     ap.add_argument("--reasoning-effort", default=None)
+    ap.add_argument("--max-tokens", type=int, default=512,
+                    help="Max completion tokens per call (TOTAL, incl. reasoning trace for "
+                         "reasoning models). Bump well above 512 for medium/high reasoning "
+                         "effort so the A/B answer is not truncated after the thinking tokens.")
     ap.add_argument("--revision", default=None)
     ap.add_argument("--adapter-repo", default=None,
                     help="HF repo of a PEFT/LoRA adapter to apply to the local base model "
@@ -142,6 +172,13 @@ def main():
     ap.add_argument("--adapter-subfolder", default=None,
                     help="Subfolder within the adapter repo (e.g. OCT persona name like 'sarcasm').")
     ap.add_argument("--load-in-4bit", action="store_true")
+    ap.add_argument("--load-in-8bit", action="store_true",
+                    help="LLM.int8() weight quantization (bitsandbytes). Mutually exclusive "
+                         "with --load-in-4bit.")
+    ap.add_argument("--chat-template-from", default=None,
+                    help="Borrow the chat_template from this model id (same tokenizer family) "
+                         "when the target finetune ships none. Avoids off-distribution raw-text "
+                         "elicitation of ChatML-trained models.")
     ap.add_argument("--batch-size", type=int, default=64)
     ap.add_argument("--R", type=int, default=5)
     ap.add_argument("--m", type=int, default=5)
@@ -161,11 +198,25 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     setup_logging(out_dir)
     oracle = _build_oracle(args, items, questions, out_dir)
+    # Record the full run config so quantization / model / format / mode are never
+    # ambiguous after the fact (was previously inferable only from commit messages).
+    run_config = {
+        "model_id": args.model_id, "backend": args.backend, "mode": args.mode,
+        "load_in_4bit": bool(args.load_in_4bit), "load_in_8bit": bool(args.load_in_8bit),
+        "dtype": "nf4-4bit" if args.load_in_4bit else ("int8" if args.load_in_8bit else "bfloat16"),
+        "revision": args.revision,
+        "adapter_repo": args.adapter_repo, "adapter_subfolder": args.adapter_subfolder,
+        "chat_template_from": args.chat_template_from,
+        "items_path": args.items_path, "question_bank": args.question_bank,
+        "samples": args.samples if args.mode == "sample" else None,
+        "reasoning_effort": args.reasoning_effort, "max_tokens": args.max_tokens,
+    }
     panel = run_elicitation(
         oracle, items, questions, out_dir,
         elo_cfg=dict(R=args.R, m=args.m, floor=0.15, K=32),
         phase_cfg=dict(n_reverse=args.n_reverse, n_triads=args.n_triads, n_cross=args.n_cross),
         seed=0, bootstrap=args.bootstrap, bootstrap_B=args.bootstrap_B,
+        run_config=run_config,
     )
     print(json.dumps(jsonable(panel), indent=2))
 

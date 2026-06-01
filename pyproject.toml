@@ -15,7 +15,12 @@ dependencies = [
   "peft",
   "numpyro>=0.21.0",
   "openai",
+  "anthropic",
   "huggingface-hub",
+  "adjustText",
+  "scipy",
+  "bitsandbytes",
+  "python-dotenv",
 ]
 
 [project.optional-dependencies]

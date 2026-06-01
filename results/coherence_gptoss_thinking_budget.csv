@@ -1,0 +1,4 @@
+model,reasoning_effort,serving,decisiveness,decisiveness_raw,transitivity_fas,transitivity_triad,order_consistency,q_agreement,q_agreement_absdiff,q_sign_agreement,unidim_fit_log_loss,unidim_fit_brier,mu_std_diagnostic
+gptoss20b,low,mxfp4-served,0.5939,0.6438,0.8808,0.8373,0.7296,0.5741,0.7886,0.7382,0.5912,0.0531,1.3615
+gptoss20b,medium,mxfp4-served,0.7696,0.7058,0.9457,0.8384,0.8695,0.6958,0.8202,0.7375,0.6977,0.0356,2.6621
+gptoss20b,high,mxfp4-served,0.7985,0.7181,0.9571,0.8451,0.8806,0.7195,0.8366,0.7739,0.8197,0.0322,3.0959
