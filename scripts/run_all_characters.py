@@ -12,8 +12,8 @@ from run_character import run_one
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run all character sentiment pipelines.")
-    parser.add_argument("--items-train-path", default="config/items_500.yaml")
-    parser.add_argument("--items-eval-path", default="config/items_2000.yaml")
+    parser.add_argument("--items-train-path", default="config/datasets/items_500.yaml")
+    parser.add_argument("--items-eval-path", default="config/datasets/items_2000.yaml")
     parser.add_argument("--out-root", default="runs/character")
     args = parser.parse_args()
 

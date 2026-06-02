@@ -10,7 +10,7 @@ import numpy as np
 import yaml
 from sentiment_utility.fit import fit_caseV_mle, predict_matrix_caseV
 
-N = len(yaml.safe_load(open("config/items_2000.yaml"))["items"])
+N = len(yaml.safe_load(open("config/datasets/items_2000.yaml"))["items"])
 
 
 def pos_elo(model):

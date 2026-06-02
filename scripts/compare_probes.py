@@ -44,7 +44,7 @@ def main() -> None:
     ap.add_argument("--base", default="base")
     ap.add_argument("--characters", nargs="+", default=["loving"])
     ap.add_argument("--out-root", default="runs/character")
-    ap.add_argument("--items-train-path", default="config/items_500.yaml")
+    ap.add_argument("--items-train-path", default="config/datasets/items_500.yaml")
     ap.add_argument("--layer", type=int, default=None, help="Common layer (default: base best_layer).")
     args = ap.parse_args()
 

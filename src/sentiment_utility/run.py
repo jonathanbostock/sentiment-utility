@@ -35,7 +35,7 @@ def dense_compare_all(oracle, items, questions):
     return oracle.compare(comps)
 
 
-def main(items_path: str = "config/items.yaml", run_path: str = "config/run.yaml") -> None:
+def main(items_path: str = "config/datasets/items.yaml", run_path: str = "config/run/run.yaml") -> None:
     items = load_items(items_path)
     cfg = load_run_config(run_path)
 

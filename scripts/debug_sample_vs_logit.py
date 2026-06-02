@@ -30,7 +30,7 @@ from sentiment_utility.oracle import _wins_to_items
 CSV = REPO / "results/debug_logit_vs_sampled.csv"
 N = 3
 sns.set_theme(style="whitegrid", context="talk")
-CFG = yaml.safe_load(open(REPO / "config/plots.yaml"))
+CFG = yaml.safe_load(open(REPO / "config/run/plots.yaml"))
 LEAD, PROBES = CFG["headline_metric"], CFG["probes"]
 METRICS = [LEAD] + PROBES
 LAB = {m: CFG["metrics"][m]["label"] for m in METRICS}

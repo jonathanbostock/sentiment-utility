@@ -87,7 +87,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--n", type=int, default=500, help="Number of items to write.")
     parser.add_argument(
         "--out",
-        default="config/items_500.yaml",
+        default="config/datasets/items_500.yaml",
         help="Output YAML path.",
     )
     parser.add_argument(
@@ -116,7 +116,7 @@ def main() -> None:
     warriner_quota = (
         args.n - args.curated_quota if args.warriner_quota is None else args.warriner_quota
     )
-    curated = load_curated(Path("config/curated_concepts.yaml"))
+    curated = load_curated(Path("config/datasets/curated_concepts.yaml"))
     sources = {
         "curated": curated,
         "things": fetch_things(),

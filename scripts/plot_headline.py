@@ -26,7 +26,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(REPO / "scripts"))
 sns.set_theme(style="whitegrid", context="talk")
 
-with open(REPO / "config/plots.yaml") as f:
+with open(REPO / "config/run/plots.yaml") as f:
     CFG = yaml.safe_load(f)
 
 METRICS = CFG["metrics"]

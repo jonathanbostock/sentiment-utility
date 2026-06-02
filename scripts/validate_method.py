@@ -46,8 +46,8 @@ def _jsonable(value):
 
 
 def main(
-    items_path: str = "config/items_500.yaml",
-    run_path: str = "config/run.yaml",
+    items_path: str = "config/datasets/items_500.yaml",
+    run_path: str = "config/run/run.yaml",
     subset_n: int = 60,
     seed: int = 0,
 ) -> None:

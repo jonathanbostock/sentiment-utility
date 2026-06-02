@@ -128,7 +128,9 @@ def question_robustness(cross_pairs) -> dict:
     (Cross-framing disagreement scales with opinion strength, so variance-normalization is the
     right fix here -- unlike order_consistency, where position bias is an additive offset that
     is already decisiveness-independent, so its 1-mean|.| form is kept.)
-    q_agreement_absdiff (old metric) and q_sign_agreement are retained as diagnostics."""
+    q_agreement_absdiff (old metric) and q_sign_agreement are retained as diagnostics.
+    For singleton or zero-variance inputs, Pearson is undefined, so q_agreement falls
+    back to q_agreement_absdiff."""
     if not cross_pairs:
         return {"q_agreement": float("nan"), "q_agreement_absdiff": float("nan"),
                 "q_sign_agreement": float("nan")}
@@ -137,7 +139,7 @@ def question_robustness(cross_pairs) -> dict:
     absdiff = 1.0 - np.mean(np.abs(a - b))
     sign = np.mean(np.sign(a - 0.5) == np.sign(b - 0.5))
     corr = (float(np.corrcoef(a, b)[0, 1])
-            if a.std() > 1e-9 and b.std() > 1e-9 else float("nan"))
+            if len(a) >= 2 and a.std() > 1e-9 and b.std() > 1e-9 else float(absdiff))
     return {"q_agreement": corr, "q_agreement_absdiff": float(absdiff),
             "q_sign_agreement": float(sign)}
 

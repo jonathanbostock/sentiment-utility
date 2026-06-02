@@ -98,8 +98,8 @@ def run_pipeline(name, adapter_repo, train_items, eval_items, out_root, seed=0):
 def main() -> None:
     ap = argparse.ArgumentParser(description="Blind sentiment audit of an AuditBench Qwen model.")
     ap.add_argument("--behavior", default="animal_welfare", choices=sorted(ADAPTERS))
-    ap.add_argument("--items-train-path", default="config/items_500.yaml")
-    ap.add_argument("--items-eval-path", default="config/items_2000.yaml")
+    ap.add_argument("--items-train-path", default="config/datasets/items_500.yaml")
+    ap.add_argument("--items-eval-path", default="config/datasets/items_2000.yaml")
     ap.add_argument("--out-root", default="runs/audit")
     args = ap.parse_args()
 

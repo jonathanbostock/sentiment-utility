@@ -27,7 +27,7 @@ For gated/local models authenticate first: `huggingface-cli login`. For the API 
 
 ## How it works
 
-1. **Question bank** (`config/questions_default.jsonl`): each line is a forced-choice
+1. **Question bank** (`config/questions/main.jsonl`): each line is a forced-choice
    question with `{item_A}`/`{item_B}` placeholders, a `valence` (+1 = "pick == higher
    sentiment"; −1 = negatively-framed, "pick == lower sentiment"), and the acceptable
    answer surface forms.
@@ -52,13 +52,13 @@ For gated/local models authenticate first: `huggingface-cli login`. For the API 
 # Local model (reads logits on GPU)
 uv run python scripts/run_elicitation.py \
   --backend local --model-id meta-llama/Llama-3.1-8B-Instruct \
-  --name llama-8b --items-path config/items_500.yaml
+  --name llama-8b --items-path config/datasets/items_500.yaml
 
 # Local model + LoRA adapter (e.g. an Open Character Training persona)
 uv run python scripts/run_elicitation.py \
   --backend local --model-id meta-llama/Llama-3.1-8B-Instruct \
   --adapter-repo maius/llama-3.1-8b-it-personas --adapter-subfolder sarcasm \
-  --name sarcasm --items-path config/items_500.yaml
+  --name sarcasm --items-path config/datasets/items_500.yaml
 
 # OpenAI API, logprobs mode
 uv run python scripts/run_elicitation.py \
@@ -81,8 +81,8 @@ uv run python scripts/run_elicitation.py \
 | `--backend` | (required) | `local` (GPU logits), `openai`, or `anthropic` (API; sample-only) |
 | `--model-id` | (required) | HF id (local) or OpenAI model id |
 | `--name` | (required) | output subfolder under `--out-root` |
-| `--items-path` | `config/items_500.yaml` | YAML `items:` list of concepts |
-| `--question-bank` | `config/questions_default.jsonl` | the question bank |
+| `--items-path` | `config/datasets/items_500.yaml` | YAML `items:` list of concepts |
+| `--question-bank` | `config/questions/main.jsonl` | the question bank |
 | `--out-root` | `runs/elicit` | output root |
 | `--adapter-repo` / `--adapter-subfolder` | none | apply a PEFT/LoRA adapter (local backend) |
 | `--revision` | none | HF revision/branch (local) |
@@ -134,7 +134,7 @@ when CIs separate.
 
 The headline study plots the coherence metrics against a **capability index** across model
 families; the same panel shape is reused for model-organism (fine-tune) **suites** as bar charts.
-Everything here is driven by `config/plots.yaml`, so a teammate with their own run tarballs can
+Everything here is driven by `config/run/plots.yaml`, so a teammate with their own run tarballs can
 reproduce the plot style on their own models without editing Python.
 
 ### The five metrics the figures use
@@ -161,7 +161,7 @@ edges.jsonl ──────────> build_four_metrics.py ────�
 published benchmarks ─> build_model_benchmarks.py ─> fit_eci_scores.py ─> results/eci_scores.csv ┘
                                                           │  (capability index, joined in by build_four_metrics)
                                   plot_headline.py        │  cross-family scatter  (x = capability index)
-                                  plot_finetune_bars.py   ┘  per-suite bar charts        ← config/plots.yaml
+                                  plot_finetune_bars.py   ┘  per-suite bar charts        ← config/run/plots.yaml
 ```
 
 The **capability index** (headline x-axis) is an ECI-style placement: published benchmark scores
@@ -187,7 +187,7 @@ uv run python scripts/plot_headline.py            # -> results/plots/headline_de
 ### Define your own suite
 
 Suite bar charts need **only edges** — no benchmark CSV. Add a block under `suites:` in
-`config/plots.yaml`:
+`config/run/plots.yaml`:
 
 ```yaml
   - key: mysuite
@@ -237,7 +237,7 @@ registry in `main()` once your runs exist, then it writes `results/coherence_all
 ## Dense sanity harness & character probe (legacy-adjacent, still live)
 
 - `src/sentiment_utility/run.py` (`dense_compare_all`) compares **all** ordered pairs over
-  the small `config/items.yaml` set — a sanity check that the A/B instrument works at all.
+  the small `config/datasets/items.yaml` set — a sanity check that the A/B instrument works at all.
 - `scripts/run_character.py` runs the activation-probe + delta workflow against Open
   Character Training adapters (see `--help`). `scripts/build_dataset.py` builds the item
   sets.
