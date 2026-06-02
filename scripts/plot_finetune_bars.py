@@ -126,7 +126,9 @@ def plot_bars(df, title, fname, series):
         ax.set_title(LAB[met], fontsize=15 if big else 12, fontweight="bold" if big else "normal")
         ax.set_xticks(range(len(df)))
         ax.set_xticklabels(xlabels, rotation=0, fontsize=12 if big else 10, color="black")
-        lo = min(FLOOR[met], df[met].min()) - 0.05
+        # Headline panel: sit the zero baseline on the bottom axis (no floating bars).
+        # Probe panels keep a little padding below their chance floor.
+        lo = 0.0 if big else min(FLOOR[met], df[met].min()) - 0.05
         ax.set_ylim(lo, 1.02)
         ax.margins(x=0.02)
 
