@@ -28,7 +28,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(REPO / "scripts"))
 from four_metrics import metrics_cached
 from matplotlib.gridspec import GridSpec
-sns.set_theme(style="whitegrid", context="talk")
+sns.set_theme(style="white", context="talk")   # no gridlines on the bar charts (scatter scripts keep their own grid)
 
 with open(REPO / "config/run/plots.yaml") as f:
     CFG = yaml.safe_load(f)
