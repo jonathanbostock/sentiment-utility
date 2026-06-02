@@ -36,6 +36,7 @@ headline:
     - Qwen
     - Llama
     - GPT-4.1
+    - Claude 4.5
   budget_series:
     - family: "GPT-OSS-20B (budget)"
       size_label: "20B"

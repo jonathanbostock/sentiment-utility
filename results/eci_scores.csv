@@ -1,4 +1,7 @@
 model,family,eci,n_benchmarks,rmse,benchmarks_used
+claude-haiku-4.5,Claude 4.5,141.29,2,0.0234,"GPQA diamond,OTIS Mock AIME 2024-2025"
+claude-sonnet-4.5,Claude 4.5,144.64,2,0.0286,"GPQA diamond,OTIS Mock AIME 2024-2025"
+claude-opus-4.5,Claude 4.5,147.4,2,0.0231,"GPQA diamond,OTIS Mock AIME 2024-2025"
 gpt-4.1-nano,GPT-4.1,129.82,4,0.1005,"Aider polyglot,Fiction.LiveBench,GPQA diamond,OTIS Mock AIME 2024-2025"
 gpt-4.1-mini,GPT-4.1,136.36,4,0.0632,"Aider polyglot,Fiction.LiveBench,GPQA diamond,OTIS Mock AIME 2024-2025"
 gpt-4.1,GPT-4.1,138.05,4,0.0652,"Aider polyglot,Fiction.LiveBench,GPQA diamond,OTIS Mock AIME 2024-2025"

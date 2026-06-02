@@ -57,7 +57,8 @@ def _budget(model):
 
 def _size_name(model):
     m = str(model).lower()
-    return next((s for s in ("nano", "mini") if s in m), "full")
+    # GPT tiers (nano/mini/<full>) + Claude tiers (haiku/sonnet/opus); params not public for either.
+    return next((s for s in ("nano", "mini", "haiku", "sonnet", "opus") if s in m), "full")
 
 
 def _point_label(row):

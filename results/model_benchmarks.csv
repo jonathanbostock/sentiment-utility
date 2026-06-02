@@ -126,6 +126,12 @@ gpt-4.1,GPT-4.1,GPQA-Diamond,55.9
 gpt-4.1,GPT-4.1,AIME-2025,38.3
 gpt-4.1,GPT-4.1,Aider polyglot,52.4
 gpt-4.1,GPT-4.1,Fiction.LiveBench,63.9
+claude-haiku-4.5,Claude 4.5,GPQA-Diamond,61.6
+claude-haiku-4.5,Claude 4.5,AIME-2025,66.6
+claude-sonnet-4.5,Claude 4.5,GPQA-Diamond,76.4
+claude-sonnet-4.5,Claude 4.5,AIME-2025,77.8
+claude-opus-4.5,Claude 4.5,GPQA-Diamond,81.4
+claude-opus-4.5,Claude 4.5,AIME-2025,86.1
 gpt-oss-20b-low,GPT-OSS-20B (budget),MMLU,80.4
 gpt-oss-20b-low,GPT-OSS-20B (budget),GPQA-Diamond,56.8
 gpt-oss-20b-low,GPT-OSS-20B (budget),AIME-2025,37.1
