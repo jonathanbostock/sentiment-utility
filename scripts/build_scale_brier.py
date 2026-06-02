@@ -20,7 +20,7 @@ TARBALLS = [
     REPO / "results/series_runs/qwen/qwen_20260530.tar.gz",
     REPO / "results/series_runs/big/big2_20260530.tar.gz",   # llama-70b + qwen-72b
 ]
-ITEMS = REPO / "config/items_2000.yaml"
+ITEMS = REPO / "config/datasets/items_2000.yaml"
 
 
 def main():

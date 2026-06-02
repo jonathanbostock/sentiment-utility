@@ -63,7 +63,7 @@ def main():
     ap = argparse.ArgumentParser(description="Emit a panel CSV from a directory of runs.")
     ap.add_argument("--runs-dir", default="runs/oct2k",
                     help="dir of <model>/edges.jsonl runs to score")
-    ap.add_argument("--items-path", default="config/items_2000.yaml")
+    ap.add_argument("--items-path", default="config/datasets/items_2000.yaml")
     ap.add_argument("--primary-qid", default="pos",
                     help="fit mu on this question_id only (None to pool all)")
     ap.add_argument("--bootstrap", action="store_true")

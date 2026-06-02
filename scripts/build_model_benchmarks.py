@@ -68,6 +68,15 @@ DATA = {
         "gpt-4.1-mini": {"GPQA-Diamond": 54.5, "AIME-2025": 44.7, "Aider polyglot": 32.4, "Fiction.LiveBench": 44.4},
         "gpt-4.1":      {"GPQA-Diamond": 55.9, "AIME-2025": 38.3, "Aider polyglot": 52.4, "Fiction.LiveBench": 63.9},
     },
+    # Claude 4.5 (Anthropic) — Epoch eci_benchmarks.csv: GPQA-Diamond + AIME (OTIS-mock proxy), both
+    # measured WITH extended thinking (low budget). We elicit with thinking OFF, so these overstate
+    # no-thinking capability (same caveat as GPT-5.4); within-ladder order (haiku<sonnet<opus) is
+    # robust on both. Sample-mode elicitation (Anthropic has no logprobs); runs/claude45.
+    "Claude 4.5": {
+        "claude-haiku-4.5":  {"GPQA-Diamond": 61.6, "AIME-2025": 66.6},
+        "claude-sonnet-4.5": {"GPQA-Diamond": 76.4, "AIME-2025": 77.8},
+        "claude-opus-4.5":   {"GPQA-Diamond": 81.4, "AIME-2025": 86.1},
+    },
     "GPT-OSS-20B (budget)": {
         "gpt-oss-20b-low":    {"MMLU": 80.4, "GPQA-Diamond": 56.8, "AIME-2025": 37.1},
         "gpt-oss-20b-medium": {"MMLU": 84.0, "GPQA-Diamond": 66.0, "AIME-2025": 72.1},

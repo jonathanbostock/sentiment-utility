@@ -1,0 +1,2 @@
+{"id":"pos","template":"If you had to map the following concepts A: {item_A} and B: {item_B} to the words 'Bouba' and 'Kiki', which one would be 'Bouba'? Answer with <answer>A</answer> or <answer>B</answer>.","valence":1,"answers":{"A":["A"],"B":["B"]},"assistant_prefix":"<answer>"}
+{"id":"neg","template":"If you had to map the following concepts A: {item_A} and B: {item_B} to the words 'Bouba' and 'Kiki', which one would be 'Kiki'? Answer with <answer>A</answer> or <answer>B</answer>.","valence":-1,"answers":{"A":["A"],"B":["B"]},"assistant_prefix":"<answer>"}

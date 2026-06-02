@@ -26,7 +26,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(REPO / "scripts"))
 sns.set_theme(style="whitegrid", context="talk")
 
-with open(REPO / "config/plots.yaml") as f:
+with open(REPO / "config/run/plots.yaml") as f:
     CFG = yaml.safe_load(f)
 
 METRICS = CFG["metrics"]
@@ -57,7 +57,8 @@ def _budget(model):
 
 def _size_name(model):
     m = str(model).lower()
-    return next((s for s in ("nano", "mini") if s in m), "full")
+    # GPT tiers (nano/mini/<full>) + Claude tiers (haiku/sonnet/opus); params not public for either.
+    return next((s for s in ("nano", "mini", "haiku", "sonnet", "opus") if s in m), "full")
 
 
 def _point_label(row):
@@ -129,16 +130,24 @@ def make(head_met, fname, head_word):
     for ax, met in zip(small_axes, CFG["probes"]):
         draw(ax, met, big=False)
 
-    # one legend handle per family + a single GPT-OSS entry (the two budget series share a colour)
-    legend_groups = FAMILY_ORDER + ["GPT-OSS (20B/120B)"]
-    legend_color = {**{g: palette[g] for g in FAMILY_ORDER}, "GPT-OSS (20B/120B)": palette[GPTOSS20]}
+    # one legend handle per family ACTUALLY present + (if any budget series present) a single
+    # shared GPT-OSS entry. Filtering by presence keeps the secondary-question plots (Gemma/
+    # Qwen/Llama only) from showing dead GPT/Claude/budget legend entries.
+    present = set(df["family"])
+    legend_groups = [g for g in FAMILY_ORDER if g in present]
+    legend_color = {g: palette[g] for g in legend_groups}
+    has_budget = any(f in present for f in BUDGET_FAMILIES)
+    if has_budget:
+        legend_groups.append("GPT-OSS (20B/120B)")
+        legend_color["GPT-OSS (20B/120B)"] = palette[GPTOSS20]
     handles = [Line2D([0], [0], marker="o", color="w", markerfacecolor=legend_color[g],
                       markeredgecolor="black", markersize=11, label=g) for g in legend_groups]
     handles.append(Line2D([0], [0], color="0.4", ls=":", lw=1.4, label="chance floor (probes)"))
-    for b in ["low", "medium", "high"]:
-        handles.append(Line2D([0], [0], marker=BUDGET_MARKER[b], color="0.35",
-                              markerfacecolor="0.7", markersize=11, linestyle="none",
-                              label=f"budget: {b}"))
+    if has_budget:
+        for b in ["low", "medium", "high"]:
+            handles.append(Line2D([0], [0], marker=BUDGET_MARKER[b], color="0.35",
+                                  markerfacecolor="0.7", markersize=11, linestyle="none",
+                                  label=f"budget: {b}"))
     fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.02),
                ncol=5, frameon=False, fontsize=12)
     fig.suptitle(f"Preference coherence vs capability — {head_word}", y=1.0, fontsize=16)
@@ -157,5 +166,15 @@ def make(head_met, fname, head_word):
 
 
 if __name__ == "__main__":
-    make(CFG["headline_metric"], CFG["headline"]["fname"],
-         METRICS[CFG["headline_metric"]]["headline_word"])       # canonical headline
+    import argparse
+    ap = argparse.ArgumentParser(description="Headline figure (decisiveness vs capability).")
+    ap.add_argument("--csv", default=None,
+                    help="coherence_four_metrics-style CSV (default: results/coherence_four_metrics.csv)")
+    ap.add_argument("--fname", default=None, help="output basename in results/plots/")
+    ap.add_argument("--word", default=None, help="headline word shown in the suptitle")
+    args = ap.parse_args()
+    if args.csv:
+        df = pd.read_csv(args.csv)   # reassigns the module-level df read by draw()/make()
+    make(CFG["headline_metric"],
+         args.fname or CFG["headline"]["fname"],
+         args.word or METRICS[CFG["headline_metric"]]["headline_word"])

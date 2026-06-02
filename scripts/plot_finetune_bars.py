@@ -2,7 +2,7 @@
 μ-decisiveness panel + the four agreement-probability probes, as bars over each suite's
 baseline series vs its fine-tunes.
 
-A suite is defined entirely in `config/plots.yaml` (see the `suites:` block + the README's
+A suite is defined entirely in `config/run/plots.yaml` (see the `suites:` block + the README's
 "Define your own suite"). Each suite has:
   - `baselines`: the grey reference series (sorted by size, coloured light→dark small→big).
     Each entry is EITHER `{model: <name>}` (read from results/coherence_four_metrics.csv) OR
@@ -30,7 +30,7 @@ from four_metrics import metrics_cached
 from matplotlib.gridspec import GridSpec
 sns.set_theme(style="whitegrid", context="talk")
 
-with open(REPO / "config/plots.yaml") as f:
+with open(REPO / "config/run/plots.yaml") as f:
     CFG = yaml.safe_load(f)
 
 LEAD = CFG["headline_metric"]

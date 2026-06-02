@@ -16,7 +16,7 @@ Writes a refit.json next to the edges file with the new mu/sigma/metrics.
 
 Usage:
   python scripts/refit_edges.py --edges results/mu_openai5/gpt-5-nano/edges.jsonl \\
-                                 --items-path config/items_500.yaml \\
+                                 --items-path config/datasets/items_500.yaml \\
                                  --estimator weak --alpha 0.1
 """
 from __future__ import annotations
@@ -64,7 +64,7 @@ def _p_from_record(rec, estimator, alpha, eps):
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--edges", required=True, help="Path to edges.jsonl from a previous run.")
-    ap.add_argument("--items-path", default="config/items_500.yaml")
+    ap.add_argument("--items-path", default="config/datasets/items_500.yaml")
     ap.add_argument("--estimator", default="jeffreys",
                     choices=["jeffreys", "laplace", "weak", "mle", "logprob"])
     ap.add_argument("--alpha", type=float, default=0.1, help="Prior strength for --estimator weak.")

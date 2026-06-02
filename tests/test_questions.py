@@ -37,7 +37,7 @@ def test_load_bank(tmp_path):
 
 
 def test_default_bank_loads():
-    bank = load_question_bank("config/questions_default.jsonl")
+    bank = load_question_bank("config/questions/main.jsonl")
     valences = {q.valence for q in bank}
     assert 1 in valences and -1 in valences   # at least one of each for q-robustness
     for q in bank:

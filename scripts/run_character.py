@@ -53,8 +53,8 @@ def _resolve_spec(spec_name: str) -> dict:
 
 def run_one(
     spec,
-    items_train_path: str = "config/items_500.yaml",
-    items_eval_path: str = "config/items_2000.yaml",
+    items_train_path: str = "config/datasets/items_500.yaml",
+    items_eval_path: str = "config/datasets/items_2000.yaml",
     out_root: str = "runs/character",
 ) -> Path:
     spec = dict(spec)
@@ -178,8 +178,8 @@ def run_one(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run one character sentiment probe pipeline.")
     parser.add_argument("--spec-name", required=True, help="Character spec name, e.g. base or loving.")
-    parser.add_argument("--items-train-path", default="config/items_500.yaml")
-    parser.add_argument("--items-eval-path", default="config/items_2000.yaml")
+    parser.add_argument("--items-train-path", default="config/datasets/items_500.yaml")
+    parser.add_argument("--items-eval-path", default="config/datasets/items_2000.yaml")
     parser.add_argument("--out-root", default="runs/character")
     args = parser.parse_args()
     run_one(

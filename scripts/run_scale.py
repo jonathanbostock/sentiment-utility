@@ -91,7 +91,7 @@ def _plot_probe_metric(probe_result: dict, key: str, ylabel: str, output: Path) 
     plt.close()
 
 
-def main(items_path: str = "config/items_500.yaml", run_path: str = "config/run.yaml") -> None:
+def main(items_path: str = "config/datasets/items_500.yaml", run_path: str = "config/run/run.yaml") -> None:
     items, meta = _load_items_with_meta(Path(items_path))
     cfg = _load_run_config(Path(run_path))
     seed = int(cfg.get("seed", 0))
