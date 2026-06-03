@@ -1,14 +1,40 @@
 from __future__ import annotations
 
+import json
+import logging
 import math
+from pathlib import Path
+from typing import Optional
+
 import numpy as np
 import torch
 
+logger = logging.getLogger(__name__)
 _SQRT2 = math.sqrt(2.0)
 
 
 def _phi(x: torch.Tensor) -> torch.Tensor:
     return 0.5 * (1.0 + torch.erf(x / _SQRT2))
+
+
+def load_mu_init(prev_mu, items) -> Optional[np.ndarray]:
+    """Align a prior {item: mu} mapping or mu.json path to `items` order."""
+    if prev_mu is None:
+        return None
+    if isinstance(prev_mu, (str, Path)):
+        prev_mu = json.loads(Path(prev_mu).read_text())
+
+    arr = np.zeros(len(items), dtype=np.float64)
+    overlap = 0
+    for k, item in enumerate(items):
+        if item in prev_mu:
+            arr[k] = float(prev_mu[item])
+            overlap += 1
+
+    frac = overlap / len(items) if items else 1.0
+    if frac < 0.5:
+        logger.warning("Low mu_init overlap fraction: %.3f (%d/%d items)", frac, overlap, len(items))
+    return arr
 
 
 def normalize_edges(rows):

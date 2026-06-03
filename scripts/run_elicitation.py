@@ -14,7 +14,7 @@ from sentiment_utility.questions import load_question_bank
 from sentiment_utility.sampling import (
     elo_active_sample, plan_reverse, plan_triads, plan_cross_question,
 )
-from sentiment_utility.fit import fit_caseV_mle
+from sentiment_utility.fit import fit_caseV_mle, load_mu_init
 from sentiment_utility.panel import compute_panel
 
 
@@ -23,11 +23,16 @@ def _obs_to_row(o, items):
 
 
 def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=0,
-                    bootstrap=False, bootstrap_B=200, run_config=None):
+                    bootstrap=False, bootstrap_B=200, run_config=None,
+                    mu_init=None, fit_steps=None):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     edges_log = JsonlAppender(out_dir / "edges.jsonl")
     n = len(items)
+    if fit_steps is None:
+        eff_steps = 2000 if mu_init is None else 300
+    else:
+        eff_steps = fit_steps
 
     elo_obs = elo_active_sample(n, oracle, questions, items=items, seed=seed, **elo_cfg)
     for o in elo_obs:
@@ -35,7 +40,7 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
 
     rows_elo = [{"i": o.i, "j": o.j, "p_util": o.p_util, "mode": o.mode, **o.raw}
                 for o in elo_obs]
-    mu = fit_caseV_mle(rows_elo, n=n, seed=seed)["mu"]
+    mu = fit_caseV_mle(rows_elo, n=n, seed=seed, steps=eff_steps, mu_init=mu_init)["mu"]
     order = list(np.argsort(-mu))
     obs_pairs = [(o.i, o.j) for o in elo_obs]
 
@@ -61,7 +66,8 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
 
     edges_by_phase = _bucket_for_panel(elo_obs, extra)
     panel = compute_panel(edges_by_phase, n=n, seed=seed,
-                          bootstrap=bootstrap, B=bootstrap_B)
+                          bootstrap=bootstrap, B=bootstrap_B,
+                          fit_steps=eff_steps, mu_init=mu_init)
 
     (out_dir / "mu.json").write_text(json.dumps(
         {it: float(v) for it, v in zip(items, mu)}, indent=2))
@@ -190,6 +196,13 @@ def main():
                          "only, much faster). Opt in when you care about uncertainty.")
     ap.add_argument("--bootstrap-B", type=int, default=200,
                     help="Number of bootstrap replicates when --bootstrap is set.")
+    ap.add_argument("--warm-start-from", default=None,
+                    help="Path to a prior run's mu.json, OR a run name resolved under "
+                         "--out-root/<name>/mu.json. Its mu is aligned to the current items "
+                         "and used to warm-start the Thurstonian fit (fewer steps).")
+    ap.add_argument("--fit-steps", type=int, default=None,
+                    help="Override the Thurstonian fit step count. Default: 2000 cold, "
+                         "300 when warm-starting (--warm-start-from).")
     args = ap.parse_args()
 
     items = load_items(args.items_path)
@@ -211,12 +224,20 @@ def main():
         "samples": args.samples if args.mode == "sample" else None,
         "reasoning_effort": args.reasoning_effort, "max_tokens": args.max_tokens,
     }
+    mu_init = None
+    if args.warm_start_from:
+        cand = Path(args.warm_start_from)
+        if not cand.exists():
+            cand = Path(args.out_root) / args.warm_start_from / "mu.json"
+        mu_init = load_mu_init(cand, items)   # load_mu_init reads the mu.json path
+
     panel = run_elicitation(
         oracle, items, questions, out_dir,
         elo_cfg=dict(R=args.R, m=args.m, floor=0.15, K=32),
         phase_cfg=dict(n_reverse=args.n_reverse, n_triads=args.n_triads, n_cross=args.n_cross),
         seed=0, bootstrap=args.bootstrap, bootstrap_B=args.bootstrap_B,
         run_config=run_config,
+        mu_init=mu_init, fit_steps=args.fit_steps,
     )
     print(json.dumps(jsonable(panel), indent=2))
 
