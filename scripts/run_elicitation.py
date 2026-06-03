@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from sentiment_utility.io_utils import JsonlAppender, git_commit, jsonable, load_items, setup_logging
 from sentiment_utility.questions import load_question_bank
 from sentiment_utility.sampling import (
-    elo_active_sample, plan_reverse, plan_triads, plan_cross_question,
+    elo_active_sample, warm_start_sample, plan_reverse, plan_triads, plan_cross_question,
 )
 from sentiment_utility.fit import fit_caseV_mle
 from sentiment_utility.panel import compute_panel
@@ -23,19 +23,28 @@ def _obs_to_row(o, items):
 
 
 def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=0,
-                    bootstrap=False, bootstrap_B=200, run_config=None):
+                    bootstrap=False, bootstrap_B=200, run_config=None, prior_mu=None,
+                    fit_steps=2000, warm_cfg=None):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     edges_log = JsonlAppender(out_dir / "edges.jsonl")
     n = len(items)
 
-    elo_obs = elo_active_sample(n, oracle, questions, items=items, seed=seed, **elo_cfg)
+    if prior_mu is not None:
+        elo_obs = warm_start_sample(n, oracle, questions, prior_mu, items=items,
+                                    seed=seed, **(warm_cfg or {}))
+    else:
+        elo_obs = elo_active_sample(n, oracle, questions, items=items, seed=seed, **elo_cfg)
     for o in elo_obs:
         edges_log.write(_obs_to_row(o, items))
 
     rows_elo = [{"i": o.i, "j": o.j, "p_util": o.p_util, "mode": o.mode, **o.raw}
                 for o in elo_obs]
-    mu = fit_caseV_mle(rows_elo, n=n, seed=seed)["mu"]
+    if prior_mu is not None:
+        mu = fit_caseV_mle(rows_elo, n=n, seed=seed, steps=fit_steps,
+                           mu_init=prior_mu)["mu"]
+    else:
+        mu = fit_caseV_mle(rows_elo, n=n, seed=seed)["mu"]
     order = list(np.argsort(-mu))
     obs_pairs = [(o.i, o.j) for o in elo_obs]
 
@@ -60,8 +69,13 @@ def run_elicitation(oracle, items, questions, out_dir, elo_cfg, phase_cfg, seed=
         calls_log.close()
 
     edges_by_phase = _bucket_for_panel(elo_obs, extra)
-    panel = compute_panel(edges_by_phase, n=n, seed=seed,
-                          bootstrap=bootstrap, B=bootstrap_B)
+    if prior_mu is not None:
+        panel = compute_panel(edges_by_phase, n=n, seed=seed,
+                              bootstrap=bootstrap, B=bootstrap_B,
+                              fit_steps=fit_steps, mu_init=prior_mu)
+    else:
+        panel = compute_panel(edges_by_phase, n=n, seed=seed,
+                              bootstrap=bootstrap, B=bootstrap_B)
 
     (out_dir / "mu.json").write_text(json.dumps(
         {it: float(v) for it, v in zip(items, mu)}, indent=2))
@@ -190,10 +204,25 @@ def main():
                          "only, much faster). Opt in when you care about uncertainty.")
     ap.add_argument("--bootstrap-B", type=int, default=200,
                     help="Number of bootstrap replicates when --bootstrap is set.")
+    ap.add_argument("--warm-start-mu", default=None,
+                    help="Path to a JSON dict mapping item text to prior mu values.")
+    ap.add_argument("--fit-steps", type=int, default=1200,
+                    help="Case V fit steps for warm-started elicitation runs.")
+    ap.add_argument("--fresh-frac", type=float, default=0.2,
+                    help="Uniform-random partner fraction for warm-started ELO sampling.")
+    ap.add_argument("--warm-m", type=int, default=5,
+                    help="Partners per item for warm-started ELO sampling.")
     args = ap.parse_args()
 
     items = load_items(args.items_path)
     questions = load_question_bank(args.question_bank)
+    prior_mu = None
+    if args.warm_start_mu:
+        prior_map = json.loads(Path(args.warm_start_mu).read_text())
+        try:
+            prior_mu = np.array([prior_map[it] for it in items], dtype=float)
+        except KeyError as e:
+            raise KeyError(f"warm-start mu is missing item {e.args[0]!r}") from e
     out_dir = Path(args.out_root) / args.name
     out_dir.mkdir(parents=True, exist_ok=True)
     setup_logging(out_dir)
@@ -210,14 +239,19 @@ def main():
         "items_path": args.items_path, "question_bank": args.question_bank,
         "samples": args.samples if args.mode == "sample" else None,
         "reasoning_effort": args.reasoning_effort, "max_tokens": args.max_tokens,
+        "warm_start_mu": args.warm_start_mu, "fit_steps": args.fit_steps,
+        "fresh_frac": args.fresh_frac, "warm_m": args.warm_m,
     }
-    panel = run_elicitation(
-        oracle, items, questions, out_dir,
+    run_kwargs = dict(
         elo_cfg=dict(R=args.R, m=args.m, floor=0.15, K=32),
         phase_cfg=dict(n_reverse=args.n_reverse, n_triads=args.n_triads, n_cross=args.n_cross),
         seed=0, bootstrap=args.bootstrap, bootstrap_B=args.bootstrap_B,
         run_config=run_config,
     )
+    if prior_mu is not None:
+        run_kwargs.update(prior_mu=prior_mu, fit_steps=args.fit_steps,
+                          warm_cfg=dict(m=args.warm_m, fresh_frac=args.fresh_frac))
+    panel = run_elicitation(oracle, items, questions, out_dir, **run_kwargs)
     print(json.dumps(jsonable(panel), indent=2))
 
 

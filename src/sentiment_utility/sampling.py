@@ -113,3 +113,40 @@ def plan_cross_question(obs_pairs, items, questions, primary_id, n_cross, seed=0
             comps.append(Comparison(i=i, j=j, item_i=items[i], item_j=items[j],
                                     question=q, slot_a="i", phase="cross_question"))
     return comps
+
+
+def plan_from_prior_mu(prior_mu, m=5, fresh_frac=0.1, floor=0.15, seed=0):
+    """Plan ~n*m item-pair comparisons in ONE pass using a prior mu (no adaptive rounds).
+    For each item pick m partners with prob proportional to Fisher info p(1-p)+floor under
+    the prior (concentrates on near-ties), plus a fresh_frac of uniform-random partners to
+    detect drift. Returns a list of (i, j) index pairs."""
+    rng = np.random.default_rng(seed)
+    prior_mu = np.asarray(prior_mu, dtype=float)
+    n = len(prior_mu)
+    comps = []
+    scale = max(float(np.std(prior_mu)) * 0.4, 1e-12)
+    for i in range(n):
+        d = (prior_mu[i] - prior_mu) / scale
+        p = 1.0 / (1.0 + np.exp(-d))
+        info = p * (1 - p) + floor
+        info[i] = 0.0
+        w = info / info.sum()
+        k_fresh = int(round(m * fresh_frac))
+        n_weighted = max(0, min(m - k_fresh, n - 1))
+        partners = list(rng.choice(n, size=n_weighted, replace=False, p=w))
+        if k_fresh:
+            partners += list(rng.choice(n, size=min(k_fresh, n - 1), replace=False))
+        for j in partners:
+            if int(j) != i:
+                comps.append((i, int(j)))
+    return comps
+
+
+def warm_start_sample(n, oracle, questions, prior_mu, m=5, fresh_frac=0.1, floor=0.15,
+                      seed=0, items=None):
+    """One-pass elo-phase sampling guided by a prior mu. Returns EdgeObservation list,
+    phase-tagged 'elo' (so it feeds the panel's Case V fit exactly like elo_active_sample)."""
+    rng = np.random.default_rng(seed)
+    pairs = plan_from_prior_mu(prior_mu, m=m, fresh_frac=fresh_frac, floor=floor, seed=seed)
+    comps = [_make_comparison(i, j, items, questions[:1], rng, "elo", 1) for i, j in pairs]
+    return oracle.compare(comps)
