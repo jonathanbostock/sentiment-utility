@@ -46,6 +46,31 @@ For gated/local models authenticate first: `huggingface-cli login`. For the API 
 5. **Panel**: each metric reported as `{point, meas_ci, gen_ci}` — a measurement bootstrap
    (resample edges + sample-draws) and an item-cluster (generalization) bootstrap.
 
+## Datasets
+
+Item lists are resolved by `load_items` (in `question_consistency.io_utils`) from a single
+`--items-path` argument that accepts **four forms**:
+
+| form | example | resolves to |
+|---|---|---|
+| local YAML | `config/datasets/items.yaml` | a file with an `items:` or `concepts:` list |
+| known name | `items_2000` | the HF config below (auto-downloaded + cached) |
+| HF file | `hf://owner/repo/sub/file.yaml` | a YAML file in any HF dataset repo |
+| external HF dataset | `hf-dataset:Shengtao/recipe:train:title` | column `title`, split `train`, of **any** HF dataset |
+
+The large pools live on HuggingFace (not in the repo, so a clone is light) and are pulled on
+demand from the public dataset **[`arcadia-impact/question-consistency-datasets`](https://huggingface.co/datasets/arcadia-impact/question-consistency-datasets)**
+(configs `items_500`, `items_2000`, `curated_concepts`). A *missing* local path whose basename is
+a known name auto-resolves to HF, so existing `--items-path config/datasets/items_2000.yaml`
+commands keep working. The small example sets (`items.yaml`, `leetcode_problems.yaml`,
+`recipes.yaml`) ship in-repo for offline/zero-setup runs.
+
+Publish/refresh the hosted datasets with:
+
+```bash
+uv run python scripts/upload_datasets_hf.py --datasets items_500,items_2000,curated_concepts
+```
+
 ## Run an elicitation
 
 ```bash
