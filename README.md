@@ -1,6 +1,6 @@
 # Question Consistency
 
-Sentiment Utility elicits a language model's relative sentiment toward a list of concepts,
+Question Consistency elicits a language model's relative sentiment/judgement toward a list of concepts,
 fits a 1-D utility model to the pairwise preferences, and reports a **coherence metric
 panel** (decisiveness, transitivity, unidimensional fit, reliability, question-robustness)
 with bootstrap confidence intervals. It works uniformly across models you can read logits
@@ -275,7 +275,7 @@ with Gemma scale, while `p_self` (deterministic logits) and `p_acyclic` are near
 ## Limitations / TODO
 
 - **`--api-exec batch` is not wired.** The OpenAI Batch API helpers exist in
-  `src/sentiment_utility/oracle.py` (`build_batch_requests`, `submit_batch`, `poll_batch`,
+  `src/question_consistency/oracle.py` (`build_batch_requests`, `submit_batch`, `poll_batch`,
   `download_batch_results`, `parse_batch_results`) and are unit-tested, but
   `run_elicitation` currently always uses the realtime async `OpenAIOracle` regardless of
   `--api-exec`. Wiring the batch path through `run_elicitation` is a follow-up.
@@ -286,7 +286,7 @@ with Gemma scale, while `p_self` (deterministic logits) and `p_acyclic` are near
 
 ## Dense sanity harness & character probe (legacy-adjacent, still live)
 
-- `src/sentiment_utility/run.py` (`dense_compare_all`) compares **all** ordered pairs over
+- `src/question_consistency/run.py` (`dense_compare_all`) compares **all** ordered pairs over
   the small `config/datasets/items.yaml` set — a sanity check that the A/B instrument works at all.
 - `scripts/run_character.py` runs the activation-probe + delta workflow against Open
   Character Training adapters (see `--help`). `scripts/build_dataset.py` builds the item

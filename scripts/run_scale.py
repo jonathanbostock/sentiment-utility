@@ -40,8 +40,14 @@ def _jsonable(value):
 
 
 def _load_items_with_meta(path: Path) -> tuple[list[str], dict]:
-    data = yaml.safe_load(path.read_text()) or {}
-    return list(data["items"]), dict(data.get("meta", {}))
+    from question_consistency.io_utils import load_items
+
+    items = load_items(path)                      # resolves local/HF (e.g. items_500 now on HF)
+    meta = {}
+    if Path(path).exists():                       # per-item meta only exists for local YAMLs
+        data = yaml.safe_load(Path(path).read_text()) or {}
+        meta = dict(data.get("meta", {}))
+    return items, meta
 
 
 def _load_run_config(path: Path) -> dict:

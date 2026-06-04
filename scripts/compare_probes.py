@@ -49,10 +49,10 @@ def main() -> None:
     args = ap.parse_args()
 
     out_root = Path(args.out_root)
-    import yaml
+    from question_consistency.io_utils import load_items
 
     specs = {s["name"]: s for s in model_specs()}
-    train_items = list(yaml.safe_load(Path(args.items_train_path).read_text())["items"])
+    train_items = load_items(args.items_train_path)
 
     base_mu_map, base_best = _load_run(out_root / args.base)
     layer = args.layer if args.layer is not None else base_best
