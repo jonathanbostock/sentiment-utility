@@ -77,13 +77,13 @@ uv run python scripts/upload_datasets_hf.py --datasets items_500,items_2000,cura
 # Local model (reads logits on GPU)
 uv run python scripts/run_elicitation.py \
   --backend local --model-id meta-llama/Llama-3.1-8B-Instruct \
-  --name llama-8b --items-path config/datasets/items_500.yaml
+  --name llama-8b --items-path items_500     # hosted dataset, auto-pulled from HF
 
 # Local model + LoRA adapter (e.g. an Open Character Training persona)
 uv run python scripts/run_elicitation.py \
   --backend local --model-id meta-llama/Llama-3.1-8B-Instruct \
   --adapter-repo maius/llama-3.1-8b-it-personas --adapter-subfolder sarcasm \
-  --name sarcasm --items-path config/datasets/items_500.yaml
+  --name sarcasm --items-path items_500
 
 # OpenAI API, logprobs mode
 uv run python scripts/run_elicitation.py \
@@ -106,7 +106,7 @@ uv run python scripts/run_elicitation.py \
 | `--backend` | (required) | `local` (GPU logits), `openai`, or `anthropic` (API; sample-only) |
 | `--model-id` | (required) | HF id (local) or OpenAI model id |
 | `--name` | (required) | output subfolder under `--out-root` |
-| `--items-path` | `config/datasets/items_500.yaml` | YAML `items:` list of concepts |
+| `--items-path` | `config/datasets/items_500.yaml` | dataset ref — local YAML, known name (`items_2000`), `hf://owner/repo/file`, or `hf-dataset:repo:split:col`; see [Datasets](#datasets) (default auto-pulls from HF) |
 | `--question-bank` | `config/questions/main.jsonl` | the question bank |
 | `--out-root` | `runs/elicit` | output root |
 | `--adapter-repo` / `--adapter-subfolder` | none | apply a PEFT/LoRA adapter (local backend) |
