@@ -22,7 +22,8 @@ def _load(path, name):
 
 bc = _load("scripts/build_coherence.py", "bc")
 af = _load("scripts/analyze_panel_factor.py", "af")
-N = len(yaml.safe_load(open("config/datasets/items_2000.yaml"))["items"])
+from question_consistency.io_utils import load_items
+N = len(load_items("items_2000"))
 
 rows = {}
 for ej in sorted(Path("runs/oct2k").glob("*/edges.jsonl")):
