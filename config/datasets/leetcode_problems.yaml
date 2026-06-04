@@ -1,0 +1,204 @@
+meta:
+  dataset: leetcode_problems
+  source: huggingface:greengerong/leetcode
+  built: '2026-06-04'
+  n: 40
+  note: small-N pairwise-judgement dataset; per_item is index-aligned with items
+  per_item:
+  - difficulty: Easy
+    slug: find-mode-in-binary-search-tree
+    qid: 501
+  - difficulty: Medium
+    slug: mice-and-cheese
+    qid: 2611
+  - difficulty: Hard
+    slug: minimum-cost-to-merge-stones
+    qid: 1000
+  - difficulty: Easy
+    slug: binary-tree-inorder-traversal
+    qid: 94
+  - difficulty: Medium
+    slug: construct-k-palindrome-strings
+    qid: 1400
+  - difficulty: Hard
+    slug: contains-duplicate-iii
+    qid: 220
+  - difficulty: Easy
+    slug: get-maximum-in-generated-array
+    qid: 1646
+  - difficulty: Medium
+    slug: destroying-asteroids
+    qid: 2126
+  - difficulty: Hard
+    slug: tallest-billboard
+    qid: 956
+  - difficulty: Easy
+    slug: flipping-an-image
+    qid: 832
+  - difficulty: Medium
+    slug: longest-line-of-consecutive-one-in-matrix
+    qid: 562
+  - difficulty: Hard
+    slug: longest-cycle-in-a-graph
+    qid: 2360
+  - difficulty: Easy
+    slug: sort-even-and-odd-indices-independently
+    qid: 2164
+  - difficulty: Medium
+    slug: put-boxes-into-the-warehouse-i
+    qid: 1564
+  - difficulty: Hard
+    slug: kth-smallest-instructions
+    qid: 1643
+  - difficulty: Easy
+    slug: separate-the-digits-in-an-array
+    qid: 2553
+  - difficulty: Medium
+    slug: number-of-ways-to-build-sturdy-brick-wall
+    qid: 2184
+  - difficulty: Hard
+    slug: find-substring-with-given-hash-value
+    qid: 2156
+  - difficulty: Easy
+    slug: strobogrammatic-number
+    qid: 246
+  - difficulty: Medium
+    slug: count-the-number-of-fair-pairs
+    qid: 2563
+  - difficulty: Hard
+    slug: stamping-the-grid
+    qid: 2132
+  - difficulty: Easy
+    slug: sorting-the-sentence
+    qid: 1859
+  - difficulty: Medium
+    slug: design-file-system
+    qid: 1166
+  - difficulty: Hard
+    slug: stream-of-characters
+    qid: 1032
+  - difficulty: Easy
+    slug: base-7
+    qid: 504
+  - difficulty: Medium
+    slug: global-and-local-inversions
+    qid: 775
+  - difficulty: Hard
+    slug: count-fertile-pyramids-in-a-land
+    qid: 2088
+  - difficulty: Easy
+    slug: maximum-score-after-splitting-a-string
+    qid: 1422
+  - difficulty: Medium
+    slug: merge-in-between-linked-lists
+    qid: 1669
+  - difficulty: Hard
+    slug: wildcard-matching
+    qid: 44
+  - difficulty: Easy
+    slug: binary-tree-paths
+    qid: 257
+  - difficulty: Medium
+    slug: count-good-meals
+    qid: 1711
+  - difficulty: Hard
+    slug: subtree-removal-game-with-fibonacci-tree
+    qid: 2005
+  - difficulty: Easy
+    slug: first-bad-version
+    qid: 278
+  - difficulty: Medium
+    slug: count-number-of-rectangles-containing-each-point
+    qid: 2250
+  - difficulty: Hard
+    slug: number-of-different-subsequences-gcds
+    qid: 1819
+  - difficulty: Easy
+    slug: sum-of-digits-in-the-minimum-number
+    qid: 1085
+  - difficulty: Medium
+    slug: mini-parser
+    qid: 385
+  - difficulty: Hard
+    slug: minimum-cost-to-make-array-equal
+    qid: 2448
+  - difficulty: Easy
+    slug: student-attendance-record-i
+    qid: 551
+items:
+- 'Find Mode in Binary Search Tree: Given the root of a binary search tree (BST) with duplicates, return
+  all the mode(s)) (i.e., the most frequently occurred element) in it .'
+- 'Mice and Cheese: There are two mice and n different types of cheese, each type of cheese should be
+  eaten by exactly one mouse.'
+- 'Minimum Cost to Merge Stones: There are n piles of stones arranged in a row. The ith pile has stones
+  i stones.'
+- 'Binary Tree Inorder Traversal: Given the root of a binary tree, return the inorder traversal of its
+  nodes'' values .'
+- 'Construct K Palindrome Strings: Given a string s and an integer k , return true if you can use all
+  the characters in s to construct k palindrome strings or false otherwise .'
+- 'Contains Duplicate III: You are given an integer array nums and two integers indexDiff and valueDiff
+  .'
+- 'Get Maximum in Generated Array: You are given an integer n .'
+- 'Destroying Asteroids: You are given an integer mass , which represents the original mass of a planet.'
+- 'Tallest Billboard: You are installing a billboard and want it to have the largest height. The billboard
+  will have two steel supports, one on each side.'
+- 'Flipping an Image: Given an n x n binary matrix image , flip the image horizontally , then invert it,
+  and return the resulting image .'
+- 'Longest Line of Consecutive One in Matrix: Given an m x n binary matrix mat , return the length of
+  the longest line of consecutive one in the matrix .'
+- 'Longest Cycle in a Graph: You are given a directed graph of n nodes numbered from 0 to n - 1 , where
+  each node has at most one outgoing edge.'
+- 'Sort Even and Odd Indices Independently: You are given a 0-indexed integer array nums . Rearrange the
+  values of nums according to the following rules: 1.'
+- 'Put Boxes Into the Warehouse I: You are given two arrays of positive integers, boxes and warehouse
+  , representing the heights of some boxes of unit width and the heights of n rooms in a warehouse…'
+- 'Kth Smallest Instructions: Bob is standing at cell (0, 0) , and he wants to reach destination : (row,
+  column) . He can only travel right and down .'
+- 'Separate the Digits in an Array: Given an array of positive integers nums , return an array answer
+  that consists of the digits of each integer in nums after separating them in the same order they appear…'
+- 'Number of Ways to Build Sturdy Brick Wall: You are given integers height and width which specify the
+  dimensions of a brick wall you are building.'
+- 'Find Substring With Given Hash Value: The hash of a 0-indexed string s of length k , given integers
+  p and m , is computed using the following function: hash(s, p, m) = (val(s 0 ) p0 + val(s 1 ) p1 + ...'
+- 'Strobogrammatic Number: Given a string num which represents an integer, return true if num is a strobogrammatic
+  number .'
+- 'Count the Number of Fair Pairs: Given a 0-indexed integer array nums of size n and two integers lower
+  and upper , return the number of fair pairs .'
+- 'Stamping the Grid: You are given an m x n binary matrix grid where each cell is either 0 (empty) or
+  1 (occupied). You are then given stamps of size stampHeight x stampWidth .'
+- 'Sorting the Sentence: A sentence is a list of words that are separated by a single space with no leading
+  or trailing spaces. Each word consists of lowercase and uppercase English letters.'
+- 'Design File System: You are asked to design a file system that allows you to create new paths and associate
+  them with different values.'
+- 'Stream of Characters: Design an algorithm that accepts a stream of characters and checks if a suffix
+  of these characters is a string of a given array of strings words .'
+- 'Base 7: Given an integer num , return a string of its base 7 representation .'
+- 'Global and Local Inversions: You are given an integer array nums of length n which represents a permutation
+  of all the integers in the range 0, n - 1 .'
+- 'Count Fertile Pyramids in a Land: A farmer has a rectangular grid of land with m rows and n columns
+  that can be divided into unit cells.'
+- 'Maximum Score After Splitting a String: Given a string s of zeros and ones, return the maximum score
+  after splitting the string into two non-empty substrings (i.e. left substring and right substring).'
+- 'Merge In Between Linked Lists: You are given two linked lists: list1 and list2 of sizes n and m respectively.
+  Remove list1 ''s nodes from the ath node to the bth node, and put list2 in their place.'
+- 'Wildcard Matching: Given an input string ( s ) and a pattern ( p ), implement wildcard pattern matching
+  with support for ''?'' and '' '' where: ''?'' Matches any single character.'
+- 'Binary Tree Paths: Given the root of a binary tree, return all root-to-leaf paths in any order . A
+  leaf is a node with no children.'
+- 'Count Good Meals: A good meal is a meal that contains exactly two different food items with a sum of
+  deliciousness equal to a power of two.'
+- 'Subtree Removal Game with Fibonacci Tree: A Fibonacci tree is a binary tree created using the order
+  function order(n) : order(0) is the empty tree. order(1) is a binary tree with only one node .'
+- 'First Bad Version: You are a product manager and currently leading a team to develop a new product.
+  Unfortunately, the latest version of your product fails the quality check.'
+- 'Count Number of Rectangles Containing Each Point: You are given a 2D integer array rectangles where
+  rectangles i = li, hi indicates that ith rectangle has a length of li and a height of hi .'
+- 'Number of Different Subsequences GCDs: You are given an array nums that consists of positive integers.'
+- 'Sum of Digits in the Minimum Number: Given an integer array nums , return 0 if the sum of the digits
+  of the minimum integer in nums is odd, or 1 otherwise .'
+- 'Mini Parser: Given a string s represents the serialization of a nested list, implement a parser to
+  deserialize it and return the deserialized NestedInteger .'
+- 'Minimum Cost to Make Array Equal: You are given two 0-indexed arrays nums and cost consisting each
+  of n positive integers.'
+- 'Student Attendance Record I: You are given a string s representing an attendance record for a student
+  where each character signifies whether the student was absent, late, or present on that day.'

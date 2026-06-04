@@ -1,0 +1,202 @@
+meta:
+  dataset: recipes
+  source: huggingface:Shengtao/recipe
+  built: '2026-06-04'
+  n: 40
+  note: small-N pairwise-judgement dataset; per_item is index-aligned with items
+  per_item:
+  - category: world-cuisine
+    total_time: 1 hr 30 mins
+    rating: 4.47
+  - category: side-dish
+    total_time: 10 mins
+    rating: 4.78
+  - category: main-dish
+    total_time: 1 hr
+    rating: 4.47
+  - category: desserts
+    total_time: 15 mins
+    rating: 4.74
+  - category: appetizers-and-snacks
+    total_time: 25 mins
+    rating: 4.58
+  - category: seafood
+    total_time: 40 mins
+    rating: 3.86
+  - category: meat-and-poultry
+    total_time: 1 hr
+    rating: 4.32
+  - category: soups-stews-and-chili
+    total_time: 1 hr 3 mins
+    rating: 4.67
+  - category: salad
+    total_time: 55 mins
+    rating: 4.88
+  - category: breakfast-and-brunch
+    total_time: 9 hrs 15 mins
+    rating: 4.63
+  - category: bread
+    total_time: 2 hrs 35 mins
+    rating: 4.23
+  - category: trusted-brands-recipes-and-tips
+    total_time: 20 mins
+    rating: 5.0
+  - category: drinks
+    total_time: 5 mins
+    rating: 4.91
+  - category: uncategorized
+    total_time: 30 mins
+    rating: 0.0
+  - category: everyday-cooking
+    total_time: 25 mins
+    rating: 4.62
+  - category: fruits-and-vegetables
+    total_time: 1 hr 10 mins
+    rating: 4.14
+  - category: pasta-and-noodles
+    total_time: 30 mins
+    rating: 4.08
+  - category: holidays-and-events
+    total_time: 3 hrs 55 mins
+    rating: 5.0
+  - category: ingredients
+    total_time: 2 hrs 10 mins
+    rating: 0.0
+  - category: world-cuisine
+    total_time: 25 mins
+    rating: 4.77
+  - category: side-dish
+    total_time: 20 mins
+    rating: 4.77
+  - category: main-dish
+    total_time: 25 mins
+    rating: 4.33
+  - category: desserts
+    total_time: null
+    rating: 4.66
+  - category: appetizers-and-snacks
+    total_time: 25 mins
+    rating: 4.56
+  - category: seafood
+    total_time: 50 mins
+    rating: 3.62
+  - category: meat-and-poultry
+    total_time: 15 mins
+    rating: 4.57
+  - category: soups-stews-and-chili
+    total_time: 1 hr 15 mins
+    rating: 4.74
+  - category: salad
+    total_time: 1 hr 20 mins
+    rating: 4.87
+  - category: breakfast-and-brunch
+    total_time: 1 hr 20 mins
+    rating: 4.71
+  - category: bread
+    total_time: 1 week 2 days
+    rating: 4.28
+  - category: trusted-brands-recipes-and-tips
+    total_time: 20 mins
+    rating: 4.5
+  - category: drinks
+    total_time: 5 mins
+    rating: 4.89
+  - category: uncategorized
+    total_time: 3 hrs 55 mins
+    rating: 0.0
+  - category: everyday-cooking
+    total_time: 40 mins
+    rating: 5.0
+  - category: fruits-and-vegetables
+    total_time: 1 hr
+    rating: 4.67
+  - category: pasta-and-noodles
+    total_time: 55 mins
+    rating: 3.93
+  - category: holidays-and-events
+    total_time: null
+    rating: 0.0
+  - category: world-cuisine
+    total_time: 50 mins
+    rating: 4.48
+  - category: side-dish
+    total_time: 30 mins
+    rating: 4.67
+  - category: main-dish
+    total_time: 40 mins
+    rating: 4.52
+items:
+- 'Hungarian Flourless Hazelnut Cake: This cake was traditionally a birthday cake in my friend''s home.
+  Her mother is from Hungary and only has this recipe in her head! Now it will be preserved....'
+- 'Easy Strawberry Vinaigrette: This strawberry vinaigrette changed the way I eat salads. It''s easy,
+  delicious, and low-calorie. I like it with a spinach, almond, and feta salad.'
+- 'Stuffed Pork Chops I: I got this recipe from a friend and it is awesome! When I want comfort food,
+  this is the one that I turn to. My husband loves it too!'
+- 'Easy Cream Cheese Frosting: This is a simple recipe for delicious cream cheese frosting. It has less
+  powdered sugar than most recipes. That''s one reason it tastes so good.'
+- 'Crispy Vegetable Pakoras: These are very yummy, and if any of you have ever had Japanese tempura coated
+  veggies, you''ll love this recipe. It''s similar, yet it is unique in it''s taste.'
+- 'Mahi Mahi with Papaya: Crunchy, spicy, with a slightly sweet tanginess.'
+- 'Crab Stuffed Chicken Breasts: Chicken breasts rolled up with a crabmeat and mushroom mixture, topped
+  with a white sauce and baked. I got this recipe from a friend and my family loves it.'
+- 'Low-Carb Zuppa Toscana: I was looking for a low-carb option of one of our favorite soups. The cauliflower
+  soaks up the flavor and my hubby didn''t notice that it wasn''t potatoes!'
+- 'Mediterranean Orzo Salad: This light and refreshing cold pasta salad is loaded with the flavors of
+  the Mediterranean, and pairs well with grilled proteins, such as fish, pork, chicken or steak.'
+- 'Overnight Asparagus Mushroom Strata: This recipe of my mom''s is a colorful make-ahead dish that makes
+  brunch a breeze!'
+- 'Hawaiian Bread II: This easy to make batter bread brings the sweet and tender flavor of Hawaiian bread
+  home from vacation. This is a recipe for homemade Hawaiian bread.'
+- 'Salmon with Pepita-Lime Butter: Lime juice, chili powder and pepitas combined with just a bit of butter
+  makes a rich Mexican-flavored sauce for this salmon.'
+- 'Mai Tai Cocktail: This variation on the classic mai tai combines three kinds of rum with orgeat, orange
+  liqueur, and lime juice for a taste of the Pacific islands!'
+- 'Doritos® Taco Salad: I love this dish! It reminds me of potlucks and summertime. It''s full of every
+  texture--warm, cool, crisp, soft, crunchy.'
+- 'Sweetbreads: Sweetbread are a gland in cattle, and this is the way my husband and I prepare them. We
+  like them in tiny pieces, but others make them in larger portions.'
+- 'Pumpkin Spiced Dump Cake: This is my favorite dessert! It is an easy dessert to prepare and everyone
+  loves it. They all want the recipe.'
+- 'Simple Beef Stroganoff: This is a very simple and quick beef stroganoff that can be made after a busy
+  day at work. It uses ground beef and mushroom soup!'
+- 'Gravy-Stuffed Stuffing Muffins: Switch things up this Thanksgiving! Instead of serving a basket of
+  dinner rolls, let your family feast on these gravy-stuffed stuffing muffins.'
+- 'Instant Pot® New York Ricotta Cheesecake: After experimenting for a while, we finally came up with
+  a New York-style ricotta cheesecake that works perfectly in a 7-inch cheesecake pan that fits in an
+  Instant Pot®.'
+- 'Spicy Thai Basil Chicken (Pad Krapow Gai): My version of this classic Thai dish has spectacular taste
+  even with regular basil instead of Thai or holy basil.'
+- 'Skillet Apples with Cinnamon: Easy fried apples make a great side dish for breakfast or dinner.'
+- 'Simple Tuna Fish Tacos: Tuna tacos sounds funny, but these are delicious. I threw these together for
+  dinner one night and now they''re our favorite!'
+- 'Flourless Chocolate Cake I: A dense chocolate cake for those of us who can''t tolerate wheat or gluten.'
+- 'Japanese Tamago Egg: Tamago egg is classic Japanese folded omelet sometimes called tamagoyaki.'
+- 'Queso Catfish: A deliciously crunchy and spicy way to serve catfish inspired by a similar dish I had
+  in Beaumont, TX.'
+- 'Emergency Chicken: This is a great recipe for a quick and easy entree. My wife, who is 8 1/2 months
+  pregnant, had chicken thawing and asked me to cook since she was exhausted.'
+- 'French Onion Soup Gratinee: About as good as it gets! This is the version of French Onion Soup that
+  people seek when they go to restaurants.'
+- 'The Last Caesar Salad Recipe You''ll Ever Need: This is an unbelievable, restaurant-quality, creamy
+  Caesar salad dressing that will make you swear off of anything store-bought again.'
+- 'Light and Fluffy Spinach Quiche: Very tasty and fluffy quiche. Easy to prepare. You''ll love it. The
+  spinach can be substituted for any fresh or frozen vegetable.'
+- 'Amish Friendship Bread I: A sweet cinnamon bread that requires a batch of Amish Friendship Bread Starter.
+  For variations, add your favorite fruits and/or nuts!'
+- 'Easy White Albacore Ceviche: This ceviche is very easy to put together, using white albacore really
+  makes the difference, fresh taste and a firm texture come together to prepare a delicious meal.'
+- 'Tom Collins Cocktail: Created in the late 1800s, the Tom Collins is said to be named after a wide-spread
+  practical joke that swept the country. This cocktail, however, is no joke.'
+- 'Wool Roll Bread: I''ve spun quite a few yarns but one thing I''ve never done is make a bread that looks
+  like a bunch of rolls of wool yarn.'
+- 'Homemade Dog Liver Bites: This homemade dog food is so easy to make with only 4 to 5 ingredients.'
+- 'Simple Pumpkin Pie: "Easy as pie" is just the case with this pie recipe.'
+- 'Amish Casserole: A satisfyingly rich and hearty casserole from the Pennsylvania Dutch country.'
+- 'Almond Ricotta Cake: Perfect for Easter, this Italian almond ricotta cake is made with almond flour
+  and ricotta and is naturally gluten free.'
+- 'Lemon Chicken Piccata: This delicious lemon chicken piccata dish is exquisite and easy to prepare.
+  The light and luscious lemon sauce really pops without being too acidic; it is simply divine.'
+- 'Brussels Sprouts with Bacon and Balsamic: Delicious glazed sprouts. Our family loves them with lots
+  of bacon. While we do enjoy them prepared lighter, this is a great quick side dish for a special meal.'
+- 'Quick and Creamy Pasta Carbonara: This rich pasta toss is great for everyday dinners or special occasions.
+  I can come home from work and throw this dish together in a half hour.'

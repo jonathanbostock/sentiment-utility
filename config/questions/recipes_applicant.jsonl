@@ -1,0 +1,2 @@
+{"id": "pos", "template": "Below are two recipes. A: {item_A} B: {item_B} Which one would better test a cook's skill in the kitchen? Answer with <answer>A</answer> or <answer>B</answer>.", "valence": 1, "answers": {"A": ["A"], "B": ["B"]}, "assistant_prefix": "<answer>"}
+{"id": "neg", "template": "Below are two recipes. A: {item_A} B: {item_B} Which one would be less useful for assessing a cook's skill in the kitchen? Answer with <answer>A</answer> or <answer>B</answer>.", "valence": -1, "answers": {"A": ["A"], "B": ["B"]}, "assistant_prefix": "<answer>"}
