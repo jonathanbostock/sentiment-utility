@@ -27,9 +27,9 @@ from pathlib import Path
 
 import numpy as np
 
-from sentiment_utility.efficient import fit_thurstone_sparse
-from sentiment_utility.thurstone import predict_pref_matrix
-from sentiment_utility.metrics import (
+from question_consistency.efficient import fit_thurstone_sparse
+from question_consistency.thurstone import predict_pref_matrix
+from question_consistency.metrics import (
     completeness, cyclic_triad_fraction, expected_cycle_probability,
 )
 from run_character import _load_items, _jsonable

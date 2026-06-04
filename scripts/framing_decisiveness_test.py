@@ -6,8 +6,8 @@ framing disagreement is deflating the pooled decisiveness. Uses saved edges.json
 """
 import json
 import yaml
-from sentiment_utility.fit import fit_caseV_mle
-from sentiment_utility.panel import decisiveness
+from question_consistency.fit import fit_caseV_mle
+from question_consistency.panel import decisiveness
 
 N = len(yaml.safe_load(open("config/datasets/items_2000.yaml"))["items"])
 

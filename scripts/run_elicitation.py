@@ -9,13 +9,13 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from sentiment_utility.io_utils import JsonlAppender, git_commit, jsonable, load_items, setup_logging
-from sentiment_utility.questions import load_question_bank
-from sentiment_utility.sampling import (
+from question_consistency.io_utils import JsonlAppender, git_commit, jsonable, load_items, setup_logging
+from question_consistency.questions import load_question_bank
+from question_consistency.sampling import (
     elo_active_sample, plan_reverse, plan_triads, plan_cross_question,
 )
-from sentiment_utility.fit import fit_caseV_mle, load_mu_init
-from sentiment_utility.panel import compute_panel
+from question_consistency.fit import fit_caseV_mle, load_mu_init
+from question_consistency.panel import compute_panel
 
 
 def _obs_to_row(o, items):
@@ -112,8 +112,8 @@ def _assemble_triads(triad_putil):
 
 def _build_oracle(args, items, questions, out_dir):
     if args.backend == "local":
-        from sentiment_utility.elicit import load_model
-        from sentiment_utility.oracle import LocalLogitOracle
+        from question_consistency.elicit import load_model
+        from question_consistency.oracle import LocalLogitOracle
         tok, model = load_model(args.model_id, revision=args.revision,
                                 load_in_4bit=args.load_in_4bit,
                                 load_in_8bit=args.load_in_8bit)
@@ -141,11 +141,11 @@ def _build_oracle(args, items, questions, out_dir):
         return LocalLogitOracle(tok, model, batch_size=args.batch_size)
     calls_log = JsonlAppender(out_dir / "calls.jsonl")
     if args.backend == "anthropic":
-        from sentiment_utility.oracle import AnthropicOracle
+        from question_consistency.oracle import AnthropicOracle
         return AnthropicOracle(args.model_id, n_samples=args.samples,
                                concurrency=args.concurrency, calls_log=calls_log,
                                max_tokens=args.max_tokens)
-    from sentiment_utility.oracle import OpenAIOracle
+    from question_consistency.oracle import OpenAIOracle
     return OpenAIOracle(args.model_id, mode=args.mode, n_samples=args.samples,
                         concurrency=args.concurrency, calls_log=calls_log,
                         reasoning_effort=args.reasoning_effort, max_tokens=args.max_tokens)

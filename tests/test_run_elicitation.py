@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from sentiment_utility.questions import Question
+from question_consistency.questions import Question
 
 
 def test_end_to_end_with_fake_oracle(tmp_path):

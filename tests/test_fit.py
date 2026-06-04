@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from sentiment_utility.fit import normalize_edges, fit_caseV_mle, predict_matrix_caseV
+from question_consistency.fit import normalize_edges, fit_caseV_mle, predict_matrix_caseV
 
 
 def _planted_edges(mu_true, reps=1):
@@ -54,7 +54,7 @@ def test_divergence_is_bounded_in_Phi():
     assert res["mu"][0] == max(res["mu"])  # large but finite
 
 
-from sentiment_utility.fit import bootstrap_measurement, bootstrap_items
+from question_consistency.fit import bootstrap_measurement, bootstrap_items
 
 
 def _decisiveness(mu):

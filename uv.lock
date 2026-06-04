@@ -2387,6 +2387,64 @@ wheels = [
 ]
 
 [[package]]
+name = "question-consistency"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "accelerate" },
+    { name = "adjusttext" },
+    { name = "anthropic" },
+    { name = "bitsandbytes" },
+    { name = "datasets" },
+    { name = "huggingface-hub" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "numpyro" },
+    { name = "openai" },
+    { name = "pandas" },
+    { name = "peft" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "seaborn" },
+    { name = "torch" },
+    { name = "transformers" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "scipy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "accelerate" },
+    { name = "adjusttext" },
+    { name = "anthropic" },
+    { name = "bitsandbytes" },
+    { name = "datasets", specifier = ">=4.8.5" },
+    { name = "huggingface-hub" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "numpyro", specifier = ">=0.21.0" },
+    { name = "openai" },
+    { name = "pandas" },
+    { name = "peft" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "scipy", marker = "extra == 'dev'" },
+    { name = "seaborn" },
+    { name = "torch" },
+    { name = "transformers", specifier = ">=4.50" },
+]
+provides-extras = ["dev"]
+
+[[package]]
 name = "regex"
 version = "2026.5.9"
 source = { registry = "https://pypi.org/simple" }
@@ -2674,64 +2732,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/86/59/a451d7420a77ab0b9
 wheels = [
     { url = "https://files.pythonhosted.org/packages/83/11/00d3c3dfc25ad54e731d91449895a79e4bf2384dc3ac01809010ba88f6d5/seaborn-0.13.2-py3-none-any.whl", hash = "sha256:636f8336facf092165e27924f223d3c62ca560b1f2bb5dff7ab7fad265361987", size = 294914, upload-time = "2024-01-25T13:21:49.598Z" },
 ]
-
-[[package]]
-name = "sentiment-utility"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "accelerate" },
-    { name = "adjusttext" },
-    { name = "anthropic" },
-    { name = "bitsandbytes" },
-    { name = "datasets" },
-    { name = "huggingface-hub" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "numpyro" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "peft" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "seaborn" },
-    { name = "torch" },
-    { name = "transformers" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "scipy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "accelerate" },
-    { name = "adjusttext" },
-    { name = "anthropic" },
-    { name = "bitsandbytes" },
-    { name = "datasets", specifier = ">=4.8.5" },
-    { name = "huggingface-hub" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "numpyro", specifier = ">=0.21.0" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "peft" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "scipy", marker = "extra == 'dev'" },
-    { name = "seaborn" },
-    { name = "torch" },
-    { name = "transformers", specifier = ">=4.50" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "setuptools"

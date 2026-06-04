@@ -1,4 +1,4 @@
-# Sentiment Utility
+# Question Consistency
 
 Sentiment Utility elicits a language model's relative sentiment toward a list of concepts,
 fits a 1-D utility model to the pairwise preferences, and reports a **coherence metric

@@ -1,5 +1,5 @@
 import numpy as np
-from sentiment_utility.preferences import combine_orderings
+from question_consistency.preferences import combine_orderings
 
 
 def test_combine_orderings_symmetry_and_values():

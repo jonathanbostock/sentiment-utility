@@ -1,4 +1,4 @@
-from sentiment_utility.prompts import build_prompt, parse_answer
+from question_consistency.prompts import build_prompt, parse_answer
 
 
 def test_build_prompt_contains_items_and_format():

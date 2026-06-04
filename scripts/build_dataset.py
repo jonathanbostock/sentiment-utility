@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from sentiment_utility.dataset import build_pool_sample
+from question_consistency.dataset import build_pool_sample
 
 
 WARRINER_URL = "https://raw.githubusercontent.com/JULIELab/XANEW/master/Ratings_Warriner_et_al.csv"

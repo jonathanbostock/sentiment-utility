@@ -1,5 +1,5 @@
 import numpy as np
-from sentiment_utility.questions import Question, load_question_bank
+from question_consistency.questions import Question, load_question_bank
 
 
 def test_render_substitutes_items():

@@ -2,8 +2,8 @@ import math
 
 import numpy as np
 
-from sentiment_utility.fit import fit_caseV_mle, load_mu_init
-from sentiment_utility.panel import compute_panel
+from question_consistency.fit import fit_caseV_mle, load_mu_init
+from question_consistency.panel import compute_panel
 
 
 def _dense_edges(n=30):

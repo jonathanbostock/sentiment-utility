@@ -25,7 +25,7 @@ import seaborn as sns
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts")); sys.path.insert(0, str(REPO / "src"))
 from four_metrics import compute_decis_and_fit, compute_four
-from sentiment_utility.oracle import _wins_to_items
+from question_consistency.oracle import _wins_to_items
 
 CSV = REPO / "results/debug_logit_vs_sampled.csv"
 N = 3

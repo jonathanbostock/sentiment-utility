@@ -1,4 +1,4 @@
-from sentiment_utility.characters import PERSONA_SUBFOLDERS, model_specs
+from question_consistency.characters import PERSONA_SUBFOLDERS, model_specs
 
 
 def test_specs_include_base_and_all_personas():

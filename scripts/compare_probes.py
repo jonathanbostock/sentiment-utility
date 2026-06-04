@@ -22,8 +22,8 @@ from pathlib import Path
 
 import numpy as np
 
-from sentiment_utility.characters import load_character_model, model_specs
-from sentiment_utility.probe import apply_probe, extract_activations, fit_deployable_probe
+from question_consistency.characters import load_character_model, model_specs
+from question_consistency.probe import apply_probe, extract_activations, fit_deployable_probe
 
 
 def _load_run(run_dir: Path):

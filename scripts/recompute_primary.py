@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from sentiment_utility.panel import compute_panel
+from question_consistency.panel import compute_panel
 
 
 def _load(path, name):

@@ -11,10 +11,10 @@ import numpy as np
 import yaml
 from scipy.stats import spearmanr
 
-from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
-from sentiment_utility.elicit import compare_pairs, elicit_logprobs, load_model
-from sentiment_utility.preferences import combine_orderings
-from sentiment_utility.thurstone import fit_thurstone
+from question_consistency.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
+from question_consistency.elicit import compare_pairs, elicit_logprobs, load_model
+from question_consistency.preferences import combine_orderings
+from question_consistency.thurstone import fit_thurstone
 
 
 def _git_commit() -> str:

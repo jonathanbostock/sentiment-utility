@@ -13,11 +13,11 @@ import pandas as pd
 import seaborn as sns
 import yaml
 
-from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
-from sentiment_utility.elicit import compare_pairs, load_model
-from sentiment_utility.metrics import completeness, cyclic_triad_fraction, expected_cycle_probability
-from sentiment_utility.probe import extract_activations, probe_all_layers
-from sentiment_utility.thurstone import predict_pref_matrix
+from question_consistency.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
+from question_consistency.elicit import compare_pairs, load_model
+from question_consistency.metrics import completeness, cyclic_triad_fraction, expected_cycle_probability
+from question_consistency.probe import extract_activations, probe_all_layers
+from question_consistency.thurstone import predict_pref_matrix
 
 
 def _git_commit() -> str:

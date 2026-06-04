@@ -1,6 +1,6 @@
 import numpy as np
 
-from sentiment_utility.probe import (
+from question_consistency.probe import (
     apply_probe,
     common_token_prefix,
     fit_deployable_probe,

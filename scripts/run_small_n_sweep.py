@@ -98,10 +98,10 @@ def main():
 
     from dotenv import load_dotenv
     load_dotenv(REPO / ".env")
-    from sentiment_utility.io_utils import git_commit, load_items, setup_logging
-    from sentiment_utility.questions import load_question_bank
-    from sentiment_utility.elicit import load_model
-    from sentiment_utility.oracle import LocalLogitOracle
+    from question_consistency.io_utils import git_commit, load_items, setup_logging
+    from question_consistency.questions import load_question_bank
+    from question_consistency.elicit import load_model
+    from question_consistency.oracle import LocalLogitOracle
 
     models = [normalize_model(m.strip()) for m in args.models.split(",") if m.strip()]
     datasets = [d.strip() for d in args.datasets.split(",") if d.strip()]

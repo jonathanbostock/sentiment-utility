@@ -44,7 +44,7 @@ def setup_logging(run_dir: Path, log_name: str = "run.log") -> logging.Logger:
         handlers=[logging.FileHandler(Path(run_dir) / log_name), logging.StreamHandler(sys.stdout)],
         format="%(asctime)s %(levelname)s %(message)s",
     )
-    return logging.getLogger("sentiment_utility")
+    return logging.getLogger("question_consistency")
 
 
 class JsonlAppender:

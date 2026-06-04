@@ -8,7 +8,7 @@ For each model's PRIMARY-question (+1) elo edges:
 import json
 import numpy as np
 import yaml
-from sentiment_utility.fit import fit_caseV_mle, predict_matrix_caseV
+from question_consistency.fit import fit_caseV_mle, predict_matrix_caseV
 
 N = len(yaml.safe_load(open("config/datasets/items_2000.yaml"))["items"])
 

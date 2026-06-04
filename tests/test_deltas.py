@@ -1,6 +1,6 @@
 import numpy as np
 
-from sentiment_utility.deltas import score_deltas, zscore
+from question_consistency.deltas import score_deltas, zscore
 
 
 def test_zscore_props():
