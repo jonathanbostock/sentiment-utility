@@ -5,7 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
-from sentiment_utility.characters import model_specs
+from question_consistency.characters import model_specs
 
 from run_character import run_one
 

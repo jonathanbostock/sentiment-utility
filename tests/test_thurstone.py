@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from scipy.stats import norm  # if scipy unavailable, use math.erf-based cdf in test
-from sentiment_utility.thurstone import fit_thurstone, predict_pref_matrix
+from question_consistency.thurstone import fit_thurstone, predict_pref_matrix
 
 
 def _make_synthetic(n=8, seed=0):

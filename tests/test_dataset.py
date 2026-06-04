@@ -1,4 +1,4 @@
-from sentiment_utility.dataset import build_pool_sample
+from question_consistency.dataset import build_pool_sample
 
 
 def _sources():

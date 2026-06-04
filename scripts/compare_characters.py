@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from sentiment_utility.characters import model_specs
-from sentiment_utility.deltas import score_deltas
+from question_consistency.characters import model_specs
+from question_consistency.deltas import score_deltas
 
 
 def _load_scores(path: Path) -> dict[str, float]:

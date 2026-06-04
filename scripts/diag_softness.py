@@ -8,9 +8,10 @@ For each model's PRIMARY-question (+1) elo edges:
 import json
 import numpy as np
 import yaml
-from sentiment_utility.fit import fit_caseV_mle, predict_matrix_caseV
+from question_consistency.fit import fit_caseV_mle, predict_matrix_caseV
 
-N = len(yaml.safe_load(open("config/datasets/items_2000.yaml"))["items"])
+from question_consistency.io_utils import load_items
+N = len(load_items("items_2000"))
 
 
 def pos_elo(model):

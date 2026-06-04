@@ -9,16 +9,16 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from sentiment_utility.characters import load_character_model, model_specs
-from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
-from sentiment_utility.elicit import compare_pairs
-from sentiment_utility.io_utils import (
+from question_consistency.characters import load_character_model, model_specs
+from question_consistency.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
+from question_consistency.elicit import compare_pairs
+from question_consistency.io_utils import (
     git_commit as _git_commit,
     jsonable as _jsonable,
-    load_items as _load_items,
     setup_logging as _setup_logging,
 )
-from sentiment_utility.probe import (
+from question_consistency.io_utils import load_items as _load_items
+from question_consistency.probe import (
     extract_activations,
     fit_deployable_probe,
     probe_all_layers,

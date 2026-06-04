@@ -1,5 +1,5 @@
 import numpy as np
-from sentiment_utility.probe import train_probe, probe_all_layers
+from question_consistency.probe import train_probe, probe_all_layers
 
 
 def test_recovers_linear_signal():

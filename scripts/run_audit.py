@@ -18,18 +18,19 @@ from pathlib import Path
 
 import numpy as np
 
-from sentiment_utility.elicit import compare_pairs, load_model
-from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
-from sentiment_utility.probe import (
+from question_consistency.elicit import compare_pairs, load_model
+from question_consistency.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
+from question_consistency.probe import (
     extract_activations,
     fit_deployable_probe,
     probe_all_layers,
     probe_score_concepts,
     save_probe,
 )
-from sentiment_utility.deltas import score_deltas
+from question_consistency.deltas import score_deltas
+from question_consistency.io_utils import load_items as _load_items
 
-from run_character import _git_commit, _jsonable, _load_items, _plot_r2, _setup_logging
+from run_character import _git_commit, _jsonable, _plot_r2, _setup_logging
 
 BASE_MODEL = "Qwen/Qwen3-14B"
 ADAPTERS = {

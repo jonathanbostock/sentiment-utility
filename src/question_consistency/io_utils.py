@@ -8,7 +8,6 @@ from pathlib import Path
 from threading import Lock
 
 import numpy as np
-import yaml
 
 
 def git_commit() -> str:
@@ -31,8 +30,9 @@ def jsonable(value):
 
 
 def load_items(path) -> list[str]:
-    data = yaml.safe_load(Path(path).read_text()) or {}
-    return list(data["items"])
+    from .datasets import resolve_items
+
+    return resolve_items(path)
 
 
 def setup_logging(run_dir: Path, log_name: str = "run.log") -> logging.Logger:
@@ -44,7 +44,7 @@ def setup_logging(run_dir: Path, log_name: str = "run.log") -> logging.Logger:
         handlers=[logging.FileHandler(Path(run_dir) / log_name), logging.StreamHandler(sys.stdout)],
         format="%(asctime)s %(levelname)s %(message)s",
     )
-    return logging.getLogger("sentiment_utility")
+    return logging.getLogger("question_consistency")
 
 
 class JsonlAppender:

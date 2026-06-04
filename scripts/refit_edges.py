@@ -27,12 +27,13 @@ from pathlib import Path
 
 import numpy as np
 
-from sentiment_utility.efficient import fit_thurstone_sparse
-from sentiment_utility.thurstone import predict_pref_matrix
-from sentiment_utility.metrics import (
+from question_consistency.efficient import fit_thurstone_sparse
+from question_consistency.thurstone import predict_pref_matrix
+from question_consistency.metrics import (
     completeness, cyclic_triad_fraction, expected_cycle_probability,
 )
-from run_character import _load_items, _jsonable
+from question_consistency.io_utils import load_items as _load_items
+from run_character import _jsonable
 
 
 def _p_from_record(rec, estimator, alpha, eps):

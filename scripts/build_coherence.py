@@ -7,8 +7,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from sentiment_utility.io_utils import load_items
-from sentiment_utility.panel import compute_panel
+from question_consistency.io_utils import load_items
+from question_consistency.panel import compute_panel
 
 
 def _load_edges(edges_path):

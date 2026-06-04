@@ -13,11 +13,11 @@ import pandas as pd
 import seaborn as sns
 import yaml
 
-from sentiment_utility.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
-from sentiment_utility.elicit import compare_pairs, load_model
-from sentiment_utility.metrics import completeness, cyclic_triad_fraction, expected_cycle_probability
-from sentiment_utility.probe import extract_activations, probe_all_layers
-from sentiment_utility.thurstone import predict_pref_matrix
+from question_consistency.efficient import fit_thurstone_sparse, rank_by_quicksort, spacing_pass
+from question_consistency.elicit import compare_pairs, load_model
+from question_consistency.metrics import completeness, cyclic_triad_fraction, expected_cycle_probability
+from question_consistency.probe import extract_activations, probe_all_layers
+from question_consistency.thurstone import predict_pref_matrix
 
 
 def _git_commit() -> str:
@@ -40,8 +40,14 @@ def _jsonable(value):
 
 
 def _load_items_with_meta(path: Path) -> tuple[list[str], dict]:
-    data = yaml.safe_load(path.read_text()) or {}
-    return list(data["items"]), dict(data.get("meta", {}))
+    from question_consistency.io_utils import load_items
+
+    items = load_items(path)                      # resolves local/HF (e.g. items_500 now on HF)
+    meta = {}
+    if Path(path).exists():                       # per-item meta only exists for local YAMLs
+        data = yaml.safe_load(Path(path).read_text()) or {}
+        meta = dict(data.get("meta", {}))
+    return items, meta
 
 
 def _load_run_config(path: Path) -> dict:

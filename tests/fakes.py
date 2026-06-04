@@ -8,7 +8,7 @@ class FakeOracle:
         self.scores = np.asarray(scores, dtype=float)
 
     def compare(self, comparisons):
-        from sentiment_utility.oracle import EdgeObservation
+        from question_consistency.oracle import EdgeObservation
         obs = []
         for c in comparisons:
             d = self.scores[c.i] - self.scores[c.j]

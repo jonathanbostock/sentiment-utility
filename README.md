@@ -1,6 +1,6 @@
-# Sentiment Utility
+# Question Consistency
 
-Sentiment Utility elicits a language model's relative sentiment toward a list of concepts,
+Question Consistency elicits a language model's relative sentiment/judgement toward a list of concepts,
 fits a 1-D utility model to the pairwise preferences, and reports a **coherence metric
 panel** (decisiveness, transitivity, unidimensional fit, reliability, question-robustness)
 with bootstrap confidence intervals. It works uniformly across models you can read logits
@@ -45,6 +45,31 @@ For gated/local models authenticate first: `huggingface-cli login`. For the API 
    edges only.
 5. **Panel**: each metric reported as `{point, meas_ci, gen_ci}` — a measurement bootstrap
    (resample edges + sample-draws) and an item-cluster (generalization) bootstrap.
+
+## Datasets
+
+Item lists are resolved by `load_items` (in `question_consistency.io_utils`) from a single
+`--items-path` argument that accepts **four forms**:
+
+| form | example | resolves to |
+|---|---|---|
+| local YAML | `config/datasets/items.yaml` | a file with an `items:` or `concepts:` list |
+| known name | `items_2000` | the HF config below (auto-downloaded + cached) |
+| HF file | `hf://owner/repo/sub/file.yaml` | a YAML file in any HF dataset repo |
+| external HF dataset | `hf-dataset:Shengtao/recipe:train:title` | column `title`, split `train`, of **any** HF dataset |
+
+The large pools live on HuggingFace (not in the repo, so a clone is light) and are pulled on
+demand from the public dataset **[`arcadia-impact/question-consistency-datasets`](https://huggingface.co/datasets/arcadia-impact/question-consistency-datasets)**
+(configs `items_500`, `items_2000`, `curated_concepts`). A *missing* local path whose basename is
+a known name auto-resolves to HF, so existing `--items-path config/datasets/items_2000.yaml`
+commands keep working. The small example sets (`items.yaml`, `leetcode_problems.yaml`,
+`recipes.yaml`) ship in-repo for offline/zero-setup runs.
+
+Publish/refresh the hosted datasets with:
+
+```bash
+uv run python scripts/upload_datasets_hf.py --datasets items_500,items_2000,curated_concepts
+```
 
 ## Run an elicitation
 
@@ -250,7 +275,7 @@ with Gemma scale, while `p_self` (deterministic logits) and `p_acyclic` are near
 ## Limitations / TODO
 
 - **`--api-exec batch` is not wired.** The OpenAI Batch API helpers exist in
-  `src/sentiment_utility/oracle.py` (`build_batch_requests`, `submit_batch`, `poll_batch`,
+  `src/question_consistency/oracle.py` (`build_batch_requests`, `submit_batch`, `poll_batch`,
   `download_batch_results`, `parse_batch_results`) and are unit-tested, but
   `run_elicitation` currently always uses the realtime async `OpenAIOracle` regardless of
   `--api-exec`. Wiring the batch path through `run_elicitation` is a follow-up.
@@ -261,7 +286,7 @@ with Gemma scale, while `p_self` (deterministic logits) and `p_acyclic` are near
 
 ## Dense sanity harness & character probe (legacy-adjacent, still live)
 
-- `src/sentiment_utility/run.py` (`dense_compare_all`) compares **all** ordered pairs over
+- `src/question_consistency/run.py` (`dense_compare_all`) compares **all** ordered pairs over
   the small `config/datasets/items.yaml` set — a sanity check that the A/B instrument works at all.
 - `scripts/run_character.py` runs the activation-probe + delta workflow against Open
   Character Training adapters (see `--help`). `scripts/build_dataset.py` builds the item

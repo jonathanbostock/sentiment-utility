@@ -1,4 +1,4 @@
-from sentiment_utility.data import load_items, load_run_config
+from question_consistency.data import load_items, load_run_config
 
 
 def test_load_items_default():

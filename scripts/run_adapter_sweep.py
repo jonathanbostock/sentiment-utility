@@ -18,8 +18,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from sentiment_utility.io_utils import load_items, setup_logging
-from sentiment_utility.questions import load_question_bank
+from question_consistency.io_utils import load_items, setup_logging
+from question_consistency.questions import load_question_bank
 
 
 def load_adapter_list(path) -> list[str]:
@@ -51,8 +51,8 @@ def run_sweep(base_model, adapters, items, questions, out_root, *, include_base=
               load_in_4bit=True, batch_size=16, elo_cfg=None, phase_cfg=None,
               bootstrap=False, seed=0, log=None):
     import torch
-    from sentiment_utility.elicit import load_model
-    from sentiment_utility.oracle import LocalLogitOracle
+    from question_consistency.elicit import load_model
+    from question_consistency.oracle import LocalLogitOracle
     # import here so the pure helpers above stay importable without these scripts/deps
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from run_elicitation import run_elicitation

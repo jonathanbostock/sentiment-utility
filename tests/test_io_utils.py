@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from sentiment_utility.io_utils import load_items, jsonable, JsonlAppender
+from question_consistency.io_utils import load_items, jsonable, JsonlAppender
 
 
 def test_load_items(tmp_path):

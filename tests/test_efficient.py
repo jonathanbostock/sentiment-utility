@@ -1,6 +1,6 @@
 import numpy as np
 from math import erf, sqrt
-from sentiment_utility.efficient import rank_by_quicksort, spacing_pass, fit_thurstone_sparse
+from question_consistency.efficient import rank_by_quicksort, spacing_pass, fit_thurstone_sparse
 
 
 def _phi(x):
@@ -71,7 +71,7 @@ def test_quicksort_handles_all_ties_without_blowup():
 
 def test_sparse_fit_heldout_has_no_reverse_leakage():
     # Held-out edges must not appear (in either direction) among training edges.
-    import sentiment_utility.efficient as eff
+    import question_consistency.efficient as eff
     captured = {}
     orig = eff.fit_thurstone_sparse
     rng = np.random.default_rng(3)

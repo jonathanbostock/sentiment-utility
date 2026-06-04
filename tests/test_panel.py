@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from sentiment_utility.panel import (
+from question_consistency.panel import (
     decisiveness, decisiveness_raw, transitivity_fas, transitivity_triad,
 )
 
@@ -35,12 +35,12 @@ def test_transitivity_triad_detects_cycle():
     assert transitivity_triad(cyclic) < 0.5
 
 
-from sentiment_utility.panel import unidim_fit, reliability, question_robustness
+from question_consistency.panel import unidim_fit, reliability, question_robustness
 
 
 def test_unidim_fit_perfect_model():
     mu = np.array([-2.0, 0.0, 2.0])
-    from sentiment_utility.fit import predict_matrix_caseV
+    from question_consistency.fit import predict_matrix_caseV
     P = predict_matrix_caseV(mu)
     held = [{"i": 0, "j": 2, "p_util": float(P[0, 2]), "mode": "logprob"}]
     out = unidim_fit(mu, held)
@@ -78,7 +78,7 @@ def _dense_soft_edges(mu_true):
 
 def test_compute_panel_default_no_bootstrap():
     # default: bootstrap OFF -> finite point estimates, NaN CIs (fast path)
-    from sentiment_utility.panel import compute_panel
+    from question_consistency.panel import compute_panel
     mu_true = np.array([-2.0, -0.7, 0.7, 2.0])
     edges = {"elo": _dense_soft_edges(mu_true), "reverse": [], "triad": [], "cross": []}
     panel = compute_panel(edges, n=4, seed=0)
@@ -91,7 +91,7 @@ def test_compute_panel_default_no_bootstrap():
 
 def test_compute_panel_bootstrap_brackets_point():
     # bootstrap ON -> measurement CI brackets the point estimate
-    from sentiment_utility.panel import compute_panel
+    from question_consistency.panel import compute_panel
     mu_true = np.array([-2.0, -0.7, 0.7, 2.0])
     edges = {"elo": _dense_soft_edges(mu_true), "reverse": [], "triad": [], "cross": []}
     panel = compute_panel(edges, n=4, bootstrap=True, B=60, seed=0)

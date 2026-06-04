@@ -1,5 +1,5 @@
 import numpy as np
-from sentiment_utility.metrics import (
+from question_consistency.metrics import (
     cyclic_triad_fraction, expected_cycle_probability, completeness,
 )
 

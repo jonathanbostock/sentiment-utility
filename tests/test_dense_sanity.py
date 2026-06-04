@@ -1,6 +1,6 @@
 import numpy as np
-from sentiment_utility.questions import Question
-from sentiment_utility.run import dense_compare_all
+from question_consistency.questions import Question
+from question_consistency.run import dense_compare_all
 from fakes import FakeOracle
 
 
