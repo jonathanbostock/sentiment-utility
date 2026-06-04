@@ -32,7 +32,8 @@ from question_consistency.thurstone import predict_pref_matrix
 from question_consistency.metrics import (
     completeness, cyclic_triad_fraction, expected_cycle_probability,
 )
-from run_character import _load_items, _jsonable
+from question_consistency.io_utils import load_items as _load_items
+from run_character import _jsonable
 
 
 def _p_from_record(rec, estimator, alpha, eps):

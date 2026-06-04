@@ -28,8 +28,9 @@ from question_consistency.probe import (
     save_probe,
 )
 from question_consistency.deltas import score_deltas
+from question_consistency.io_utils import load_items as _load_items
 
-from run_character import _git_commit, _jsonable, _load_items, _plot_r2, _setup_logging
+from run_character import _git_commit, _jsonable, _plot_r2, _setup_logging
 
 BASE_MODEL = "Qwen/Qwen3-14B"
 ADAPTERS = {

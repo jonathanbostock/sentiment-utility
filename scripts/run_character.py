@@ -15,9 +15,9 @@ from question_consistency.elicit import compare_pairs
 from question_consistency.io_utils import (
     git_commit as _git_commit,
     jsonable as _jsonable,
-    load_items as _load_items,
     setup_logging as _setup_logging,
 )
+from question_consistency.io_utils import load_items as _load_items
 from question_consistency.probe import (
     extract_activations,
     fit_deployable_probe,

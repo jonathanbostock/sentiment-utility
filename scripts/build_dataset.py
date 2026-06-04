@@ -30,9 +30,9 @@ def _warn(message: str) -> None:
 
 
 def load_curated(path: Path) -> list[tuple[str, None]]:
-    data = yaml.safe_load(path.read_text()) or {}
-    concepts = data.get("concepts", [])
-    return [(str(concept), None) for concept in concepts]
+    from question_consistency.io_utils import load_items
+
+    return [(item, None) for item in load_items(path)]
 
 
 def fetch_warriner() -> list[tuple[str, float | None]]:
