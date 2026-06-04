@@ -61,3 +61,22 @@ def test_hf_file(monkeypatch, tmp_path):
         D.resolve_items("hf://arcadia-impact/question-consistency-datasets/items.yaml")
         == ["q", "r"]
     )
+
+
+def test_local_duplicate_raises(tmp_path):
+    p = tmp_path / "dup.yaml"
+    p.write_text("items:\n- a\n- a\n- b\n")
+    with pytest.raises(ValueError, match="must be unique"):
+        D.resolve_items(str(p))
+
+
+def test_external_duplicate_dedupes_with_warning(monkeypatch):
+    def fake_load_dataset(repo, split=None, name=None):
+        return {"title": ["t1", "t1", "t2"]}
+
+    import datasets as real_datasets
+
+    monkeypatch.setattr(real_datasets, "load_dataset", fake_load_dataset)
+    with pytest.warns(UserWarning, match="duplicate"):
+        out = D.resolve_items("hf-dataset:owner/repo:train:title")
+    assert out == ["t1", "t2"]
