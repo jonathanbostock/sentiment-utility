@@ -1,0 +1,2 @@
+{"id": "pos", "template": "Below are two LeetCode coding problems. A: {item_A} B: {item_B} Which one is more interesting? Answer with <answer>A</answer> or <answer>B</answer>.", "valence": 1, "answers": {"A": ["A"], "B": ["B"]}, "assistant_prefix": "<answer>"}
+{"id": "neg", "template": "Below are two LeetCode coding problems. A: {item_A} B: {item_B} Which one is more boring? Answer with <answer>A</answer> or <answer>B</answer>.", "valence": -1, "answers": {"A": ["A"], "B": ["B"]}, "assistant_prefix": "<answer>"}

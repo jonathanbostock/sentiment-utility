@@ -222,6 +222,31 @@ headline, drawn as bars against the baseline series.
 `panel_row_from_edges(edges_path, items_path)` is the reusable unit; populate the run
 registry in `main()` once your runs exist, then it writes `results/coherence_all_v5.csv`.
 
+## Small-N judgement-consistency sweep (leetcode + recipes)
+
+A second flavour of dataset: instead of *liking* concepts, the model *judges tasks*.
+Two small-N (N=40) pairwise sets are pulled from HuggingFace and asked three
+evaluative questions each.
+
+```bash
+# 1. build the datasets (pulls greengerong/leetcode + Shengtao/recipe from HF)
+uv run python scripts/build_small_n_datasets.py        # -> config/datasets/{leetcode_problems,recipes}.yaml
+# 2. emit the 6 question banks (3 constructs x 2 datasets, each pos/neg)
+uv run python scripts/build_small_n_questions.py        # -> config/questions/{leetcode,recipes}_{harder,interesting,applicant}.jsonl
+# 3. run the Gemma-3 series (each model loaded once, looped over all 6 banks; split across GPUs)
+CUDA_VISIBLE_DEVICES=0 uv run python scripts/run_small_n_sweep.py --gpu 0 --models gemma-3-27b
+CUDA_VISIBLE_DEVICES=1 uv run python scripts/run_small_n_sweep.py --gpu 1 --models gemma-3-12b,gemma-3-4b,gemma-3-1b
+# 4. plot the four consistency probes + decisiveness vs scale
+uv run python scripts/plot_small_n_consistency.py       # -> results/plots/small_n_{consistency,decisiveness}.pdf
+```
+
+The three **constructs** are *harder*, *interesting*, and *better-tests-an-applicant*
+(coding candidate for leetcode, cook for recipes), each written as a `pos`/`neg`
+framing pair so `p_crossq` measures framing-robustness within a construct. Runs land
+under `runs/small_n/<dataset>/<construct>/<model>/`. Finding: order-robustness
+(`p_reversal`) and framing-robustness (`p_crossq`) — and μ-decisiveness — rise sharply
+with Gemma scale, while `p_self` (deterministic logits) and `p_acyclic` are near-ceiling.
+
 ## Limitations / TODO
 
 - **`--api-exec batch` is not wired.** The OpenAI Batch API helpers exist in

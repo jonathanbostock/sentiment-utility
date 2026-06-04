@@ -21,6 +21,7 @@ dependencies = [
   "scipy",
   "bitsandbytes",
   "python-dotenv",
+  "datasets>=4.8.5",
 ]
 
 [project.optional-dependencies]
